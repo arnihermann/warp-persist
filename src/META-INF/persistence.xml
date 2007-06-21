@@ -8,7 +8,7 @@
     <persistence-unit name="testUnit" transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
         
-        <class>com.wideplay.warp.jpa.JpaTestEntity</class>
+        <class>com.wideplay.codemonkey.model.SourceArtifact</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
         <properties>
