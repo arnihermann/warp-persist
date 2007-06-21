@@ -4,6 +4,7 @@ import com.google.inject.Binder;
 import com.google.inject.Singleton;
 import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.PersistenceService;
+import com.wideplay.warp.persist.UnitOfWork;
 import org.hibernate.SessionFactory;
 import org.hibernate.Session;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -33,11 +34,15 @@ public class HibernateBindingSupport {
             case JTA:
                 return new HibernateJtaTxnInterceptor();
         }
-        
-        return null;
+
+        throw new IllegalArgumentException("No such transaction strategy known: " + transactionStrategy);
     }
 
     public static MethodInterceptor getFinderInterceptor() {
         return new HibernateFinderInterceptor();
+    }
+
+    public static void setUnitOfWork(UnitOfWork unitOfWork) {
+        SessionPerRequestFilter.setUnitOfWork(unitOfWork);
     }
 }

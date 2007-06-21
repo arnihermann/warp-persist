@@ -45,12 +45,14 @@ class PersistenceModule extends AbstractModule {
             case HIBERNATE:
                 HibernateBindingSupport.addBindings(binder());
                 txnInterceptor = HibernateBindingSupport.getInterceptor(transactionStrategy);
+                HibernateBindingSupport.setUnitOfWork(unitOfWork);
                 finderInterceptor = HibernateBindingSupport.getFinderInterceptor();
                 break;
             case JPA:
                 JpaBindingSupport.addBindings(binder());
                 txnInterceptor = JpaBindingSupport.getInterceptor(transactionStrategy);
                 JpaBindingSupport.setUnitOfWork(unitOfWork);
+                finderInterceptor = JpaBindingSupport.getFinderInterceptor();
                 break;
         }
 

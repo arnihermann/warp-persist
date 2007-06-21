@@ -6,12 +6,12 @@
 
     <context-param>
         <param-name>warp.module</param-name>
-        <param-value>com.wideplay.codemonkey.web.CodeMonkeyModule</param-value>
+        <param-value>com.wideplay.codemonkey.web.JpaCodeMonkeyModule</param-value>
     </context-param>
 
     <filter>
         <filter-name>osivFilter</filter-name>
-        <filter-class>com.wideplay.warp.hibernate.SessionPerRequestFilter</filter-class>
+        <filter-class>com.wideplay.warp.jpa.SessionPerRequestFilter</filter-class>
     </filter>
 
     <filter-mapping>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module relativePaths="true" type="J2EE_WEB_MODULE" version="4">
+<module version="4" relativePaths="true" type="J2EE_WEB_MODULE">
   <component name="AppServerSpecificValidatorsManager" />
   <component name="ModuleRootManager" />
   <component name="NewModuleRootManager" inherit-compiler-output="true">
@@ -242,6 +242,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="Groovy from GroovyJ 0.1.8 (Demetra)" level="application" />
     <orderEntryProperties />
   </component>
   <component name="WebModuleBuildComponent">
@@ -249,6 +250,7 @@
     <setting name="EXPLODED_ENABLED" value="true" />
     <setting name="JAR_URL" value="file://" />
     <setting name="JAR_ENABLED" value="false" />
+    <setting name="SYNC_EXPLODED_DIR" value="false" />
     <setting name="BUILD_MODULE_ON_FRAME_DEACTIVATION" value="false" />
     <setting name="BUILD_EXTERNAL_DEPENDENCIES" value="false" />
     <setting name="RUN_JASPER_VALIDATION" value="true" />
@@ -379,7 +381,7 @@
       <attribute name="URI" value="/WEB-INF/lib/warp-core.jar" />
       <url>jar://$MODULE_DIR$/lib/warp-core.jar!/</url>
     </containerElement>
-    <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/WEB-INF/web.xml" optional="false" version="2.4" />
+    <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/WEB-INF/hibernate-web.xml" optional="false" version="2.4" />
     <webroots>
       <root url="file://$MODULE_DIR$/resources" relative="/" />
       <root url="file://$MODULE_DIR$/WEB-INF" relative="/WEB-INF" />

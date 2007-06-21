@@ -32,10 +32,11 @@ public class JpaBindingSupport {
         binder.bind(PersistenceService.class).to(JpaPersistenceService.class).in(Singleton.class);
     }
 
-    //how ugly this static setup stuff is, ick. Please give us managed interceptors already guice!!!
+    //how ugly this static setup stuff is, ick. Please give us managed interceptors already guice!!! And use Warp people!
     public static void setUnitOfWork(UnitOfWork unitOfWork) {
         //set the default unit-of-work strategy
         JpaLocalTxnInterceptor.setUnitOfWork(unitOfWork);
+        SessionPerRequestFilter.setUnitOfWork(unitOfWork);
     }
 
     public static MethodInterceptor getInterceptor(TransactionStrategy transactionStrategy) {
@@ -44,9 +45,13 @@ public class JpaBindingSupport {
             case LOCAL:
                 return new JpaLocalTxnInterceptor();
             case JTA:
-//                return new HibernateJtaTxnInterceptor();
+                return new JpaJtaTxnInterceptor();
         }
 
-        return null;
+        throw new IllegalArgumentException("No such transaction strategy known: " + transactionStrategy);
+    }
+
+    public static MethodInterceptor getFinderInterceptor() {
+        return new JpaFinderInterceptor();
     }
 }
