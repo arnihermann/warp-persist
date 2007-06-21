@@ -1,0 +1,35 @@
+<project name="warp-persist" default="assemble.jar">
+    <description>Persistence support for Warp, or any guice-based project using hibernate or JPA</description>
+
+    <property file="build.properties"/>
+
+    <path id="persist.classpath">
+        <fileset dir="lib">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="clean" description="cleans up build residues">
+        <!--<delete dir="${dist}"/>-->
+        <delete dir="${build}"/>
+    </target>
+
+    <target name="init" description="sets up build dirs">
+        <mkdir dir="${build}"/>
+        <mkdir dir="${dist}"/>
+    </target>
+
+    <target name="build" depends="init" description="compiles sources">
+        <javac srcdir="src" destdir="${build}">
+            <classpath refid="persist.classpath"/>
+            <exclude name="com/wideplay/codemonkey/**"/>
+        </javac>
+    </target>
+
+    <target name="assemble.jar" depends="build"
+            description="builds and assembles a library jar for drop in persistence support in guice injectors">
+        <jar basedir="${build}" destfile="${dist}/warp-persist.jar"
+             description="Persistence support for Warp, or any guice-based project using hibernate or JPA (www.wideplay.com)">
+        </jar>
+    </target>
+</project>
