@@ -9,7 +9,7 @@ import java.lang.annotation.RetentionPolicy;
  * Created with IntelliJ IDEA.
  * On: 3/06/2007
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
 @BindingAnnotation

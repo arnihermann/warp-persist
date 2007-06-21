@@ -1,15 +1,15 @@
 package com.wideplay.warp.hibernate;
 
+import com.wideplay.warp.persist.Transactional;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.hibernate.Transaction;
-import com.wideplay.warp.persist.Transactional;
 
 /**
  * Created with IntelliJ IDEA.
  * On: May 26, 2007 3:07:46 PM
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  */
 class HibernateLocalTxnInterceptor implements MethodInterceptor {
 

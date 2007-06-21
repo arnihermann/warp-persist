@@ -1,19 +1,18 @@
 package com.wideplay.warp.jpa;
 
+import com.wideplay.warp.persist.Transactional;
+import com.wideplay.warp.persist.UnitOfWork;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
-import javax.transaction.UserTransaction;
 import javax.naming.InitialContext;
-
-import com.wideplay.warp.persist.Transactional;
-import com.wideplay.warp.persist.UnitOfWork;
+import javax.transaction.UserTransaction;
 
 /**
  * Created with IntelliJ IDEA.
  * On: May 26, 2007 3:07:46 PM
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  */
 class JpaJtaTxnInterceptor implements MethodInterceptor {
     private static UnitOfWork unitOfWork;

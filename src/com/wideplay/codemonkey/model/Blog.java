@@ -6,7 +6,7 @@ import java.util.Date;
  * Created with IntelliJ IDEA.
  * On: May 10, 2007 7:53:55 PM
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  */
 public class Blog {
     private String text;

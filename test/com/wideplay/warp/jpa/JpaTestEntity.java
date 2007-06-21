@@ -3,16 +3,16 @@ package com.wideplay.warp.jpa;
 import com.wideplay.warp.persist.dao.Finder;
 
 import javax.persistence.Entity;
-import javax.persistence.NamedQuery;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
 import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
  * On: 2/06/2007
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
 @Entity

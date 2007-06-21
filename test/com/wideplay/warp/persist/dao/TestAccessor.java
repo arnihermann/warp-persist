@@ -3,15 +3,15 @@ package com.wideplay.warp.persist.dao;
 import com.google.inject.name.Named;
 import com.wideplay.warp.hibernate.HibernateTestEntity;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.HashSet;
 
 /**
  * Created with IntelliJ IDEA.
  * On: 3/06/2007
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
 public interface TestAccessor {

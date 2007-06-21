@@ -1,17 +1,17 @@
 package com.wideplay.warp.persist.dao;
 
-import com.wideplay.warp.jpa.JpaTestEntity;
 import com.google.inject.name.Named;
+import com.wideplay.warp.jpa.JpaTestEntity;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.LinkedHashSet;
 
 /**
  * Created with IntelliJ IDEA.
  * On: 3/06/2007
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
 public interface JpaTestAccessor {

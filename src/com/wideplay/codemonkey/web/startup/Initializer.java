@@ -3,15 +3,15 @@ package com.wideplay.codemonkey.web.startup;
 import com.google.inject.Inject;
 import com.wideplay.warp.persist.PersistenceService;
 
-import java.util.Properties;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * Created with IntelliJ IDEA.
  * On: May 26, 2007 2:33:20 PM
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  */
 public class Initializer {
     private final PersistenceService service;

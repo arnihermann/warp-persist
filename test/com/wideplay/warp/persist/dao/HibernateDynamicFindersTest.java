@@ -1,17 +1,17 @@
 package com.wideplay.warp.persist.dao;
 
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeTest;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.AnnotationConfiguration;
-import org.hibernate.Session;
-import com.google.inject.Injector;
-import com.google.inject.Guice;
 import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.wideplay.codemonkey.web.startup.Initializer;
+import com.wideplay.warp.hibernate.HibernateTestEntity;
 import com.wideplay.warp.persist.PersistenceService;
 import com.wideplay.warp.persist.UnitOfWork;
-import com.wideplay.warp.hibernate.HibernateTestEntity;
-import com.wideplay.codemonkey.web.startup.Initializer;
+import org.hibernate.Session;
+import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.cfg.Configuration;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
 
 import java.util.Date;
 import java.util.List;

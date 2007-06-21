@@ -1,19 +1,18 @@
 package com.wideplay.warp.hibernate;
 
-import com.google.inject.Injector;
-import com.google.inject.Guice;
 import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.google.inject.matcher.Matchers;
 import com.wideplay.codemonkey.web.startup.Initializer;
-import com.wideplay.warp.hibernate.HibernatePersistenceService;
-import com.wideplay.warp.persist.UnitOfWork;
-import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.PersistenceService;
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeClass;
+import com.wideplay.warp.persist.TransactionStrategy;
+import com.wideplay.warp.persist.UnitOfWork;
+import org.hibernate.Session;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.Session;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Created by IntelliJ IDEA.

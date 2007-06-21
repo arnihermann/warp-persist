@@ -2,7 +2,6 @@ package com.wideplay.warp.hibernate;
 
 import com.google.inject.BindingAnnotation;
 import com.google.inject.Inject;
-import com.wideplay.warp.hibernate.SessionFactoryHolder;
 import com.wideplay.warp.persist.PersistenceService;
 import org.hibernate.cfg.Configuration;
 
@@ -13,7 +12,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * Created with IntelliJ IDEA.
  * On: 30/04/2007
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
 class HibernatePersistenceService extends PersistenceService {

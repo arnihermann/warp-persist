@@ -1,8 +1,7 @@
 package com.wideplay.warp.jpa;
 
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceException;
+import javax.persistence.EntityManagerFactory;
 
 /**
  * Created by IntelliJ IDEA.

@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  * Created with IntelliJ IDEA.
  * On: May 10, 2007 8:08:38 PM
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

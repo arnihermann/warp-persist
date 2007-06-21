@@ -1,9 +1,9 @@
 package com.wideplay.warp.jpa;
 
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
 import com.wideplay.warp.persist.Transactional;
 import com.wideplay.warp.persist.UnitOfWork;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -12,7 +12,7 @@ import javax.persistence.EntityTransaction;
  * Created with IntelliJ IDEA.
  * On: May 26, 2007 3:07:46 PM
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  */
 class JpaLocalTxnInterceptor implements MethodInterceptor {
     private static UnitOfWork unitOfWork;

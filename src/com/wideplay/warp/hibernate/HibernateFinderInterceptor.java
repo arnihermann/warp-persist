@@ -1,19 +1,22 @@
 package com.wideplay.warp.hibernate;
 
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
-import org.hibernate.Session;
-import org.hibernate.Query;
+import com.google.inject.name.Named;
 import com.wideplay.warp.persist.dao.Finder;
 import com.wideplay.warp.persist.dao.FirstResult;
 import com.wideplay.warp.persist.dao.MaxResults;
-import com.google.inject.name.Named;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
+import org.hibernate.Query;
+import org.hibernate.Session;
 
-import java.util.*;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * Created by IntelliJ IDEA.

@@ -7,14 +7,14 @@ import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.UnitOfWork;
 import org.aopalliance.intercept.MethodInterceptor;
 
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 /**
  * Created with IntelliJ IDEA.
  * On: 2/06/2007
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
 public class JpaBindingSupport {

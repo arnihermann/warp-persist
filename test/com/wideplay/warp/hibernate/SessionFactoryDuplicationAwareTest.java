@@ -1,23 +1,23 @@
 package com.wideplay.warp.hibernate;
 
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeTest;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.AnnotationConfiguration;
-import com.wideplay.warp.persist.PersistenceService;
-import com.wideplay.warp.persist.UnitOfWork;
-import com.wideplay.warp.persist.TransactionStrategy;
-import com.wideplay.codemonkey.web.startup.Initializer;
-import com.google.inject.Injector;
-import com.google.inject.Guice;
 import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.google.inject.matcher.Matchers;
+import com.wideplay.codemonkey.web.startup.Initializer;
+import com.wideplay.warp.persist.PersistenceService;
+import com.wideplay.warp.persist.TransactionStrategy;
+import com.wideplay.warp.persist.UnitOfWork;
+import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.cfg.Configuration;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
 
 /**
  * Created with IntelliJ IDEA.
  * On: 2/06/2007
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
 public class SessionFactoryDuplicationAwareTest {

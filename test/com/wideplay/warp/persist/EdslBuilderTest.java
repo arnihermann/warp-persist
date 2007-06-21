@@ -1,21 +1,21 @@
 package com.wideplay.warp.persist;
 
-import org.testng.annotations.Test;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.AnnotationConfiguration;
-import com.google.inject.matcher.Matchers;
-import com.google.inject.Injector;
-import com.google.inject.Guice;
 import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.matcher.Matchers;
+import com.wideplay.codemonkey.web.startup.Initializer;
 import com.wideplay.warp.hibernate.HibernateTestEntity;
 import com.wideplay.warp.persist.dao.TestAccessor;
-import com.wideplay.codemonkey.web.startup.Initializer;
+import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.cfg.Configuration;
+import org.testng.annotations.Test;
 
 /**
  * Created with IntelliJ IDEA.
  * On: 2/06/2007
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
 public class EdslBuilderTest {

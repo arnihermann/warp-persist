@@ -1,24 +1,22 @@
 package com.wideplay.warp.jpa;
 
+import com.google.inject.name.Named;
+import com.wideplay.warp.persist.dao.Finder;
+import com.wideplay.warp.persist.dao.FirstResult;
+import com.wideplay.warp.persist.dao.MaxResults;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Constructor;
-import java.lang.annotation.Annotation;
-import java.util.Map;
-import java.util.WeakHashMap;
-import java.util.List;
-import java.util.Collection;
-
-import com.wideplay.warp.persist.dao.FirstResult;
-import com.wideplay.warp.persist.dao.MaxResults;
-import com.wideplay.warp.persist.dao.Finder;
-import com.google.inject.name.Named;
-
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * Created by IntelliJ IDEA.

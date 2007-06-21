@@ -1,7 +1,7 @@
 package com.wideplay.warp.jpa;
 
-import com.wideplay.warp.persist.PersistenceService;
 import com.google.inject.Inject;
+import com.wideplay.warp.persist.PersistenceService;
 
 import javax.persistence.Persistence;
 
@@ -9,7 +9,7 @@ import javax.persistence.Persistence;
  * Created with IntelliJ IDEA.
  * On: 30/04/2007
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
 class JpaPersistenceService extends PersistenceService {

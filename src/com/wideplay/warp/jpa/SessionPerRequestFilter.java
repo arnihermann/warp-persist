@@ -1,17 +1,15 @@
 package com.wideplay.warp.jpa;
 
-import org.hibernate.context.ManagedSessionContext;
+import com.wideplay.warp.persist.UnitOfWork;
 
 import javax.servlet.*;
 import java.io.IOException;
-
-import com.wideplay.warp.persist.UnitOfWork;
 
 /**
  * Created with IntelliJ IDEA.
  * On: 2/06/2007
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
 public class SessionPerRequestFilter implements Filter {

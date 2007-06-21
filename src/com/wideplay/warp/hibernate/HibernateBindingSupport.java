@@ -2,18 +2,18 @@ package com.wideplay.warp.hibernate;
 
 import com.google.inject.Binder;
 import com.google.inject.Singleton;
-import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.PersistenceService;
+import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.UnitOfWork;
-import org.hibernate.SessionFactory;
-import org.hibernate.Session;
 import org.aopalliance.intercept.MethodInterceptor;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 
 /**
  * Created with IntelliJ IDEA.
  * On: 2/06/2007
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
 public class HibernateBindingSupport {

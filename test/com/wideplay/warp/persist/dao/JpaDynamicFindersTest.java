@@ -1,29 +1,21 @@
 package com.wideplay.warp.persist.dao;
 
-import com.google.inject.Injector;
-import com.google.inject.Guice;
 import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
 import com.google.inject.Inject;
-import com.wideplay.warp.persist.PersistenceService;
-import com.wideplay.warp.persist.UnitOfWork;
-import com.wideplay.warp.persist.Transactional;
-import com.wideplay.warp.hibernate.HibernateTestEntity;
-import com.wideplay.warp.jpa.JpaUnit;
+import com.google.inject.Injector;
 import com.wideplay.warp.jpa.JpaTestEntity;
-import com.wideplay.codemonkey.web.startup.Initializer;
+import com.wideplay.warp.jpa.JpaUnit;
+import com.wideplay.warp.persist.PersistenceService;
+import com.wideplay.warp.persist.Transactional;
+import com.wideplay.warp.persist.UnitOfWork;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
+import javax.persistence.EntityManager;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeClass;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.AnnotationConfiguration;
-import org.hibernate.Session;
-
-import javax.persistence.EntityManager;
 
 /**
  * Created by IntelliJ IDEA.

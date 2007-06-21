@@ -8,7 +8,7 @@ import javax.persistence.Id;
  * Created with IntelliJ IDEA.
  * On: 30/04/2007
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
 @Entity

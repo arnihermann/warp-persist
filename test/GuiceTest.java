@@ -1,6 +1,6 @@
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
-import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import org.testng.annotations.Test;
 
@@ -8,7 +8,7 @@ import org.testng.annotations.Test;
  * Created with IntelliJ IDEA.
  * On: May 14, 2007 9:40:09 AM
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  */
 public class GuiceTest {
     @Inject private GuiceTest test;

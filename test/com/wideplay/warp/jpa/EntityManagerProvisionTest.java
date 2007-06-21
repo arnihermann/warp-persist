@@ -1,16 +1,16 @@
 package com.wideplay.warp.jpa;
 
-import com.google.inject.Injector;
-import com.google.inject.Guice;
 import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.matcher.Matchers;
-import com.wideplay.warp.persist.UnitOfWork;
-import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.PersistenceService;
+import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.Transactional;
-import org.testng.annotations.Test;
+import com.wideplay.warp.persist.UnitOfWork;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import javax.persistence.EntityManager;
 

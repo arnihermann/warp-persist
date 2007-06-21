@@ -1,22 +1,19 @@
 package com.wideplay.warp.jpa;
 
-import com.google.inject.Injector;
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
-import com.google.inject.AbstractModule;
+import com.google.inject.Injector;
 import com.google.inject.matcher.Matchers;
-import com.wideplay.warp.persist.*;
-import com.wideplay.warp.hibernate.HibernateTestEntity;
-
-import java.util.Date;
-
+import com.wideplay.warp.persist.PersistenceService;
+import com.wideplay.warp.persist.TransactionStrategy;
+import com.wideplay.warp.persist.Transactional;
+import com.wideplay.warp.persist.UnitOfWork;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Expression;
 
 import javax.persistence.EntityManager;
+import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,7 +22,7 @@ import javax.persistence.EntityManager;
  * For instance, a session-per-request strategy will control the opening and closing of the EM
  * at its own (manual) discretion. As opposed to a transactional unit of work.
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
 public class ManualLocalTransactionsTest {

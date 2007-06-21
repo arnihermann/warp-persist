@@ -1,15 +1,15 @@
 package com.wideplay.warp.hibernate;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import com.google.inject.Provider;
-import com.google.inject.Inject;
 
 /**
  * Created with IntelliJ IDEA.
  * On: May 26, 2007 2:26:28 PM
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  */
 class SessionProvider implements Provider<Session> {
     private final SessionFactory factory;

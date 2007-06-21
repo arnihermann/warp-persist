@@ -1,29 +1,28 @@
 package com.wideplay.warp.jpa;
 
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.AfterClass;
-import org.hibernate.Session;
-import org.hibernate.criterion.Expression;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Inject;
 import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.matcher.Matchers;
-import com.wideplay.warp.persist.*;
-import com.wideplay.warp.hibernate.HibernateTestEntity;
+import com.wideplay.warp.persist.PersistenceService;
+import com.wideplay.warp.persist.TransactionStrategy;
+import com.wideplay.warp.persist.Transactional;
+import com.wideplay.warp.persist.UnitOfWork;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import java.util.Date;
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
  * On: 2/06/2007
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
 @Test(suiteName = "jpa")

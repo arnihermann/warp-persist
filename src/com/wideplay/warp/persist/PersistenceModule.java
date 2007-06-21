@@ -5,8 +5,8 @@ import com.google.inject.cglib.proxy.Proxy;
 import com.google.inject.matcher.Matcher;
 import com.google.inject.matcher.Matchers;
 import com.wideplay.warp.hibernate.HibernateBindingSupport;
-import com.wideplay.warp.persist.dao.Finder;
 import com.wideplay.warp.jpa.JpaBindingSupport;
+import com.wideplay.warp.persist.dao.Finder;
 import org.aopalliance.intercept.MethodInterceptor;
 
 import java.util.LinkedHashSet;
@@ -16,7 +16,7 @@ import java.util.Set;
  * Created with IntelliJ IDEA.
  * On: 30/04/2007
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
 class PersistenceModule extends AbstractModule {

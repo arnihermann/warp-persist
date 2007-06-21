@@ -1,29 +1,31 @@
 package com.wideplay.warp.hibernate;
 
-import com.google.inject.Injector;
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
-import com.google.inject.AbstractModule;
+import com.google.inject.Injector;
 import com.google.inject.matcher.Matchers;
 import com.wideplay.codemonkey.web.startup.Initializer;
-import com.wideplay.warp.persist.*;
-
-import java.util.Date;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-import org.hibernate.cfg.AnnotationConfiguration;
-import org.hibernate.cfg.Configuration;
+import com.wideplay.warp.persist.PersistenceService;
+import com.wideplay.warp.persist.TransactionStrategy;
+import com.wideplay.warp.persist.Transactional;
+import com.wideplay.warp.persist.UnitOfWork;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.context.ManagedSessionContext;
 import org.hibernate.criterion.Expression;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
  * On: 2/06/2007
  *
- * @author Dhanji R. Prasanna
+ * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
 public class ManualLocalTransactionsTest {
