@@ -1,0 +1,159 @@
+<html>
+<head>
+<title>TestNG:  code-monkey</title>
+<link href="../testng.css" rel="stylesheet" type="text/css" />
+<link href="../my-testng.css" rel="stylesheet" type="text/css" />
+
+<style type="text/css">
+.log { display: none;} 
+.stack-trace { display: none;} 
+</style>
+<script type="text/javascript">
+<!--
+function flip(e) {
+  current = e.style.display;
+  if (current == 'block') {
+    e.style.display = 'none';
+  }
+  else {
+    e.style.display = 'block';
+  }
+}
+
+function toggleBox(szDivId)
+{
+  if (document.getElementById) {
+    flip(document.getElementById(szDivId));
+  }
+  else if (document.all) {
+    // this is the way old msie versions work
+    var style2 = document.all[szDivId].style;
+    style2.display = style2.display? "":"block";
+  }
+
+}
+
+function toggleAllBoxes() {
+  if (document.getElementsByTagName) {
+    d = document.getElementsByTagName('div');
+    for (i = 0; i < d.length; i++) {
+      if (d[i].className == 'log') {
+        flip(d[i]);
+      }
+    }
+  }
+}
+
+// -->
+</script>
+
+</head>
+<body>
+<h2 align='center'>code-monkey</h2><table border='1' align="center">
+<tr>
+<td>Tests passed/Failed/Skipped:</td><td>0/1/0</td>
+</tr><tr>
+<td>Started on:</td><td>Mon Jun 18 23:37:52 EST 2007</td>
+</tr>
+<tr><td>Total time:</td><td>0 seconds (344 ms)</td>
+</tr><tr>
+<td>Included groups:</td><td></td>
+</tr><tr>
+<td>Excluded groups:</td><td></td>
+</tr>
+</table><p/>
+<small><i>(Hover the method name to see the test class name)</i></small><p/>
+<table width='100%' border='1' class='invocation-failed'>
+<tr><td colspan='3' align='center'><b>FAILED CONFIGURATIONS</b></td></tr>
+<tr><td><b>Test method</b></td>
+<td width="10%"><b>Time (seconds)</b></td>
+<td width="30%"><b>Exception</b></td>
+</tr>
+<tr>
+<td title='com.wideplay.warp.jpa.EntityManagerFactoryProvisionTest.post()'>@AfterTest post</td>
+<td>0</td>
+<td><div><pre>java.lang.NullPointerException
+	at com.wideplay.warp.jpa.EntityManagerFactoryProvisionTest.post(EntityManagerFactoryProvisionTest.java:48)
+	at com.intellij.rt.execution.application.AppMain.main(AppMain.java:90)
+... Removed 23 stack frames</pre></div><a href='#' onClick='toggleBox("stack-trace26335425")'>Click to show all stack frames</a>
+<div class='stack-trace' id='stack-trace26335425'><pre>java.lang.NullPointerException
+	at com.wideplay.warp.jpa.EntityManagerFactoryProvisionTest.post(EntityManagerFactoryProvisionTest.java:48)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.testng.internal.MethodHelper.invokeMethod(MethodHelper.java:645)
+	at org.testng.internal.Invoker.invokeConfigurationMethod(Invoker.java:385)
+	at org.testng.internal.Invoker.invokeConfigurations(Invoker.java:141)
+	at org.testng.internal.Invoker.invokeConfigurations(Invoker.java:79)
+	at org.testng.TestRunner.afterRun(TestRunner.java:682)
+	at org.testng.TestRunner.run(TestRunner.java:484)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:278)
+	at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:273)
+	at org.testng.SuiteRunner.privateRun(SuiteRunner.java:253)
+	at org.testng.SuiteRunner.run(SuiteRunner.java:168)
+	at org.testng.TestNG.createAndRunSuiteRunners(TestNG.java:987)
+	at org.testng.TestNG.runSuitesLocally(TestNG.java:951)
+	at org.testng.TestNG.run(TestNG.java:719)
+	at org.testng.remote.RemoteTestNG.run(RemoteTestNG.java:73)
+	at org.testng.remote.RemoteTestNG.main(RemoteTestNG.java:122)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at com.intellij.rt.execution.application.AppMain.main(AppMain.java:90)
+</pre></div></td>
+</tr>
+</table><p>
+<table width='100%' border='1' class='invocation-failed'>
+<tr><td colspan='3' align='center'><b>FAILED TESTS</b></td></tr>
+<tr><td><b>Test method</b></td>
+<td width="10%"><b>Time (seconds)</b></td>
+<td width="30%"><b>Exception</b></td>
+</tr>
+<tr>
+<td title='com.wideplay.warp.jpa.EntityManagerFactoryProvisionTest.testSessionCreateOnInjection()'>testSessionCreateOnInjection</td>
+<td>0</td>
+<td><div><pre>javax.persistence.PersistenceException: No Persistence provider for EntityManager named testUnit
+	at javax.persistence.Persistence.createEntityManagerFactory(Persistence.java:89)
+	at javax.persistence.Persistence.createEntityManagerFactory(Persistence.java:60)
+	at com.wideplay.warp.jpa.JpaPersistenceService.start(JpaPersistenceService.java:31)
+	at com.wideplay.warp.jpa.EntityManagerFactoryProvisionTest.testSessionCreateOnInjection(EntityManagerFactoryProvisionTest.java:58)
+	at com.intellij.rt.execution.application.AppMain.main(AppMain.java:90)
+... Removed 25 stack frames</pre></div><a href='#' onClick='toggleBox("stack-trace9814147")'>Click to show all stack frames</a>
+<div class='stack-trace' id='stack-trace9814147'><pre>javax.persistence.PersistenceException: No Persistence provider for EntityManager named testUnit
+	at javax.persistence.Persistence.createEntityManagerFactory(Persistence.java:89)
+	at javax.persistence.Persistence.createEntityManagerFactory(Persistence.java:60)
+	at com.wideplay.warp.jpa.JpaPersistenceService.start(JpaPersistenceService.java:31)
+	at com.wideplay.warp.jpa.EntityManagerFactoryProvisionTest.testSessionCreateOnInjection(EntityManagerFactoryProvisionTest.java:58)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.testng.internal.MethodHelper.invokeMethod(MethodHelper.java:645)
+	at org.testng.internal.Invoker.invokeTestMethod(Invoker.java:479)
+	at org.testng.internal.Invoker.invokeTestMethods(Invoker.java:715)
+	at org.testng.internal.TestMethodWorker.invokeTestMethods(TestMethodWorker.java:125)
+	at org.testng.internal.TestMethodWorker.run(TestMethodWorker.java:109)
+	at org.testng.TestRunner.runWorkers(TestRunner.java:673)
+	at org.testng.TestRunner.privateRun(TestRunner.java:620)
+	at org.testng.TestRunner.run(TestRunner.java:480)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:278)
+	at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:273)
+	at org.testng.SuiteRunner.privateRun(SuiteRunner.java:253)
+	at org.testng.SuiteRunner.run(SuiteRunner.java:168)
+	at org.testng.TestNG.createAndRunSuiteRunners(TestNG.java:987)
+	at org.testng.TestNG.runSuitesLocally(TestNG.java:951)
+	at org.testng.TestNG.run(TestNG.java:719)
+	at org.testng.remote.RemoteTestNG.run(RemoteTestNG.java:73)
+	at org.testng.remote.RemoteTestNG.main(RemoteTestNG.java:122)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at com.intellij.rt.execution.application.AppMain.main(AppMain.java:90)
+</pre></div></td>
+</tr>
+</table><p>
+</body>
+</html>

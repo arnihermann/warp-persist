@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><testsuite errors="0" failures="1" name="code-monkey" tests="1" time="0.344"><properties/><testcase classname="com.wideplay.warp.jpa.EntityManagerFactoryProvisionTest" name="@AfterTest post" time="0.0"><failure type="java.lang.NullPointerException"><![CDATA[java.lang.NullPointerException
+	at com.wideplay.warp.jpa.EntityManagerFactoryProvisionTest.post(EntityManagerFactoryProvisionTest.java:48)
+	at com.intellij.rt.execution.application.AppMain.main(AppMain.java:90)
+... Removed 23 stack frames]]></failure></testcase><testcase classname="com.wideplay.warp.jpa.EntityManagerFactoryProvisionTest" name="testSessionCreateOnInjection" time="0.016"><failure message="No Persistence provider for EntityManager named testUnit" type="javax.persistence.PersistenceException"><![CDATA[javax.persistence.PersistenceException: No Persistence provider for EntityManager named testUnit
+	at javax.persistence.Persistence.createEntityManagerFactory(Persistence.java:89)
+	at javax.persistence.Persistence.createEntityManagerFactory(Persistence.java:60)
+	at com.wideplay.warp.jpa.JpaPersistenceService.start(JpaPersistenceService.java:31)
+	at com.wideplay.warp.jpa.EntityManagerFactoryProvisionTest.testSessionCreateOnInjection(EntityManagerFactoryProvisionTest.java:58)
+	at com.intellij.rt.execution.application.AppMain.main(AppMain.java:90)
+... Removed 25 stack frames]]></failure></testcase></testsuite>
