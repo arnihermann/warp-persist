@@ -16,4 +16,5 @@ import java.lang.annotation.Target;
 public @interface Transactional {
     TransactionType type() default TransactionType.READ_WRITE;
     Class<? extends Exception> [] rollbackOn() default RuntimeException.class;
+    Class<? extends Exception> [] exceptOn() default {};
 }
