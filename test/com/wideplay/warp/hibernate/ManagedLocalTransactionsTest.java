@@ -20,6 +20,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.util.Date;
 
 /**
@@ -32,6 +33,7 @@ import java.util.Date;
 public class ManagedLocalTransactionsTest {
     private Injector injector;
     private static final String UNIQUE_TEXT = "some unique text" + new Date();
+    private static final String UNIQUE_TEXT_2 = "some asda unique text" + new Date();
     private static final String TRANSIENT_UNIQUE_TEXT = "some other unique text" + new Date();
 
     @BeforeClass
@@ -97,6 +99,27 @@ public class ManagedLocalTransactionsTest {
     }
 
     @Test
+    public void testSimpleTransactionRollbackOnCheckedExcepting() {
+        try {
+            injector.getInstance(TransactionalObject.class).runOperationInTxnThrowingCheckedExcepting();
+        } catch(IOException e) {
+            //ignore
+
+            assert true : "Exception was not thrown by test txn-al method!";
+        }
+
+        Session session = injector.getInstance(Session.class);
+        assert !session.getTransaction().isActive() : "Session was not closed by transactional service (commit didnt happen?)";
+
+        //test that the data has been stored
+        session.beginTransaction();
+        Object result = session.createCriteria(HibernateTestEntity.class).add(Expression.eq("text", UNIQUE_TEXT_2)).uniqueResult();
+        session.getTransaction().commit();
+
+        assert null != result : "a result was not returned! rollback happened anyway (exceptOn failed)!!!";
+    }
+
+    @Test
     public void testSimpleTransactionRollbackOnUnchecked() {
         try {
             injector.getInstance(TransactionalObject.class).runOperationInTxnThrowingUnchecked();
@@ -133,6 +156,15 @@ public class ManagedLocalTransactionsTest {
             session.persist(entity);
             
             throw new IOException();
+        }
+
+        @Transactional(rollbackOn = IOException.class, exceptOn = FileNotFoundException.class)
+        public void runOperationInTxnThrowingCheckedExcepting() throws IOException {
+            HibernateTestEntity entity = new HibernateTestEntity();
+            entity.setText(UNIQUE_TEXT_2);
+            session.persist(entity);
+            
+            throw new FileNotFoundException();
         }
         
         @Transactional
