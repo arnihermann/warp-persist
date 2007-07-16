@@ -28,17 +28,12 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
         try {
             result = methodInvocation.proceed();
 
-            txn.commit();
         } catch (Exception e) {
             Transactional transactional = methodInvocation.getMethod().getAnnotation(Transactional.class);
 
-            //rollback only on specified exceptions
-            for (Class<? extends Exception> rollBackOn : transactional.rollbackOn()) {
-                if (rollBackOn.isInstance(e)) {
-                    txn.rollback();
-                    break;
-                }
-            }
+            //commit transaction only if rollback didnt occur
+            if (rollbackIfNecessary(transactional, e, txn))
+                txn.commit();
 
             //propagate whatever exception is thrown anyway
             throw e;
@@ -49,8 +44,52 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
             }
         }
 
+
+        //everything was normal so commit the txn (do not move into try block as it interferes with the advised method's throwing semantics)
+        txn.commit();
+
         //or return result
         return result;
+    }
+
+    /**
+     *
+     * @param transactional The metadata annotaiton of the method
+     * @param e The exception to test for rollback
+     * @param txn A Hibernate Transaction to issue rollbacks against
+     * @return returns Returns true if rollback DID NOT HAPPEN (i.e. if commit should continue)
+     */
+    private boolean rollbackIfNecessary(Transactional transactional, Exception e, EntityTransaction txn) {
+        boolean commit = true;
+
+        //check rollback clauses
+        for (Class<? extends Exception> rollBackOn : transactional.rollbackOn()) {
+
+            //if one matched, try to perform a rollback
+            if (rollBackOn.isInstance(e)) {
+                commit = false;
+
+                //check exceptOn clauses (supercedes rollback clause)
+                for (Class<? extends Exception> exceptOn : transactional.exceptOn()) {
+
+                    //An exception to the rollback clause was found, DONT rollback (i.e. commit and throw anyway)
+                    if (exceptOn.isInstance(e)) {
+                        commit = true;
+                        break;
+                    }
+                }
+
+                //rollback only if nothing matched the exceptOn check
+                if (!commit) {
+                    txn.rollback();
+                }
+                //otherwise continue to commit
+
+                break;
+            }
+        }
+
+        return commit;
     }
 
     private static boolean isUnitOfWorkTransaction() {

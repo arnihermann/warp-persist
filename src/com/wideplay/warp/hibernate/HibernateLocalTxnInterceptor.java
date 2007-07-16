@@ -20,7 +20,6 @@ class HibernateLocalTxnInterceptor implements MethodInterceptor {
         try {
             result = methodInvocation.proceed();
 
-            txn.commit();
         } catch(Exception e) {
             Transactional transactional = methodInvocation.getMethod().getAnnotation(Transactional.class);
 
@@ -32,6 +31,8 @@ class HibernateLocalTxnInterceptor implements MethodInterceptor {
             throw e;
         }
 
+        //everything was normal so commit the txn (do not move into try block as it interferes with the advised method's throwing semantics)
+        txn.commit();
 
         //or return result
         return result;
@@ -44,7 +45,7 @@ class HibernateLocalTxnInterceptor implements MethodInterceptor {
      * @param txn A Hibernate Transaction to issue rollbacks against
      * @return returns Returns true if rollback DID NOT HAPPEN (i.e. if commit should continue)
      */
-    boolean rollbackIfNecessary(Transactional transactional, Exception e, Transaction txn) {
+    private boolean rollbackIfNecessary(Transactional transactional, Exception e, Transaction txn) {
         boolean commit = true;
 
         //check rollback clauses
