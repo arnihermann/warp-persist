@@ -100,16 +100,18 @@ public class ManagedLocalTransactionsTest {
 
     @Test
     public void testSimpleTransactionRollbackOnCheckedExcepting() {
+        Exception ex = null;
         try {
             injector.getInstance(TransactionalObject.class).runOperationInTxnThrowingCheckedExcepting();
         } catch(IOException e) {
             //ignore
+            ex = e;
 
-            assert true : "Exception was not thrown by test txn-al method!";
         }
+        assert null != ex: "Exception was not thrown by test txn-al method!";
 
         Session session = injector.getInstance(Session.class);
-        assert !session.getTransaction().isActive() : "Session was not closed by transactional service (commit didnt happen?)";
+        assert !session.getTransaction().isActive() : "Txn was not closed by transactional service (commit didnt happen?)";
 
         //test that the data has been stored
         session.beginTransaction();
