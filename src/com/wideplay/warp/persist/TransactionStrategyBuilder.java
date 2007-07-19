@@ -13,8 +13,9 @@ public interface TransactionStrategyBuilder extends PersistenceModuleBuilder {
     /**
      *
      * @param transactionStrategy One of the enum TransactionStrategy (typically LOCAL or JTA).
-     *  Note that JTA requires configuring Hibernate to use the JEE container's transaction implementation.
-     *  See warp-persist website for details.
+     *  Note that JTA requires configuring Hibernate/JPA to use the JEE container's transaction implementation.
+     *  See warp-persist website for details. By default LOCAL is set.
+     * 
      * @return Returns the next step in the builder chain
      */
     TransactionStrategyBuilder transactedWith(TransactionStrategy transactionStrategy);
@@ -32,7 +33,7 @@ public interface TransactionStrategyBuilder extends PersistenceModuleBuilder {
      *  annotated with @Finder(..). Warp-persist will automagically create method bodies
      *  and provide an instance when you inject this interface anywhere in your setup.
      *  Note that you are *not* allowed to provide your own implementation/binding for such
-     *  interfaces.
+     *  interfaces. Binding errors will result if you try.
      *
      * @return Returns the next step in the builder chain
      */
