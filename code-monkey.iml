@@ -382,6 +382,10 @@
       <attribute name="URI" value="/WEB-INF/lib/warp-core.jar" />
       <url>jar://$MODULE_DIR$/lib/warp-core.jar!/</url>
     </containerElement>
+    <containerElement type="library" name="Groovy from GroovyJ 0.1.8 (Demetra)" level="application">
+      <attribute name="method" value="0" />
+      <attribute name="URI" value="/WEB-INF/lib" />
+    </containerElement>
     <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/WEB-INF/hibernate-web.xml" optional="false" version="2.4" />
     <webroots>
       <root url="file://$MODULE_DIR$/resources" relative="/" />
