@@ -9,6 +9,7 @@
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
         
         <class>com.wideplay.warp.jpa.JpaTestEntity</class>
+        <class>com.wideplay.warp.jpa.JpaParentTestEntity</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
         <properties>

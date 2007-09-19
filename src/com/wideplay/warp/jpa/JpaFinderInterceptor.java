@@ -13,10 +13,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,7 +28,7 @@ import java.util.WeakHashMap;
  * @since 1.0
  */
 class JpaFinderInterceptor implements MethodInterceptor {
-    private final Map<Method, FinderDescriptor> finderCache = new WeakHashMap<Method, FinderDescriptor>();
+    private volatile Map<Method, FinderDescriptor> finderCache = new HashMap<Method, FinderDescriptor>();
 
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
         EntityManager em = EntityManagerFactoryHolder.getCurrentEntityManager();
@@ -122,7 +119,6 @@ class JpaFinderInterceptor implements MethodInterceptor {
 
         //otherwise reflect and cache finder info...
         finderDescriptor = new JpaFinderInterceptor.FinderDescriptor();
-        finderCache.put(method, finderDescriptor);
 
         //determine return type
         finderDescriptor.returnClass = invocation.getMethod().getReturnType();
@@ -174,7 +170,26 @@ class JpaFinderInterceptor implements MethodInterceptor {
             }
         }
 
+        //cache it
+        cacheFinderDescriptor(method, finderDescriptor);
+
         return finderDescriptor;
+    }
+
+    /**
+     * Provides copy-on-write semantics
+     *
+     * @param method The key
+     * @param finderDescriptor The descriptor to cache
+     */
+    private synchronized void cacheFinderDescriptor(Method method, FinderDescriptor finderDescriptor) {
+        //create a copy
+        Map<Method, FinderDescriptor> copy = new HashMap<Method, FinderDescriptor>();
+        copy.putAll(finderCache);
+        copy.put(method, finderDescriptor);
+
+        //write to map
+        finderCache = copy;
     }
 
     private JpaFinderInterceptor.ReturnType determineReturnType(Class<?> returnClass) {

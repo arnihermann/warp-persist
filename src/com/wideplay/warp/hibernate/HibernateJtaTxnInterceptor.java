@@ -39,7 +39,11 @@ class HibernateJtaTxnInterceptor implements MethodInterceptor {
         }
 
         //everything was normal so commit the txn (do not move into try-block)
-        txn.commit();
+        try {
+            txn.commit();
+        } catch (RuntimeException re) {
+            txn.rollback();
+        }
 
 
         //or return result

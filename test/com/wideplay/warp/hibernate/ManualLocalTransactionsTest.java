@@ -18,6 +18,7 @@ import org.hibernate.context.ManagedSessionContext;
 import org.hibernate.criterion.Expression;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.testng.annotations.AfterClass;
 
 import java.util.Date;
 
@@ -32,6 +33,7 @@ public class ManualLocalTransactionsTest {
     private Injector injector;
     private static final String UNIQUE_TEXT = "some unique text" + new Date();
     private static final String UNIQUE_TEXT_2 = "some other unique text" + new Date();
+    private static final String UNIQUE_TEXT_3 = "CONSTRAINT_VIOLATING some other unique text" + new Date();
 
     @BeforeClass
     public void pre() {
@@ -54,6 +56,12 @@ public class ManualLocalTransactionsTest {
                 .start();
     }
 
+    
+    @AfterClass
+    void post() {
+        injector.getInstance(SessionFactory.class).close();
+    }
+
     @Test
     public void testSimpleCrossTxnWork() {
         org.hibernate.classic.Session session1 = injector.getInstance(SessionFactory.class).openSession();
@@ -73,6 +81,8 @@ public class ManualLocalTransactionsTest {
     }
 
 
+
+
     public static class TransactionalObject {
         @Inject
         Session session;
@@ -88,6 +98,13 @@ public class ManualLocalTransactionsTest {
 
         @Transactional
         public void runOperationInTxn2() {
+            HibernateTestEntity entity = new HibernateTestEntity();
+            entity.setText(UNIQUE_TEXT_2);
+            session.persist(entity);
+        }
+
+        @Transactional
+        public void runOperationInTxn3() {
             HibernateTestEntity entity = new HibernateTestEntity();
             entity.setText(UNIQUE_TEXT_2);
             session.persist(entity);

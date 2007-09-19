@@ -44,14 +44,22 @@ class JpaJtaTxnInterceptor implements MethodInterceptor {
             //propagate whatever exception is thrown anyway
             throw e;
         } finally {
-            
+
             //close the em if necessary
             if (isUnitOfWorkTransaction())
                 EntityManagerFactoryHolder.closeCurrentEntityManager();
         }
 
         //everything was normal so commit the txn (do not move into try-block)
-        txn.commit();
+        try {
+            txn.commit();
+        } catch(RuntimeException re) {
+            txn.rollback();
+        } finally {
+            //close the em if necessary
+            if (isUnitOfWorkTransaction())
+                EntityManagerFactoryHolder.closeCurrentEntityManager();
+        }
 
         //or return result
         return result;

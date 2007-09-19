@@ -9,10 +9,12 @@ import com.wideplay.warp.persist.PersistenceService;
 import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.UnitOfWork;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.testng.annotations.AfterClass;
 
 /**
  * Created by IntelliJ IDEA.
@@ -47,6 +49,12 @@ public class SessionProvisionTest {
         //startup persistence
         injector.getInstance(PersistenceService.class)
                 .start();
+    }
+
+
+    @AfterClass
+    void post() {
+        injector.getInstance(SessionFactory.class).close();
     }
 
     @Test

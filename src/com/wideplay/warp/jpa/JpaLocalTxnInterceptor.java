@@ -15,7 +15,7 @@ import javax.persistence.EntityTransaction;
  * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  */
 class JpaLocalTxnInterceptor implements MethodInterceptor {
-    private static UnitOfWork unitOfWork;
+    private static UnitOfWork unitOfWork = UnitOfWork.TRANSACTION;
 
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
         EntityManager em = EntityManagerFactoryHolder.getCurrentEntityManager();
@@ -46,7 +46,14 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
 
 
         //everything was normal so commit the txn (do not move into try block as it interferes with the advised method's throwing semantics)
-        txn.commit();
+        try {
+            txn.commit();
+        } finally {
+            //close the em if necessary
+            if (isUnitOfWorkTransaction()) {
+                EntityManagerFactoryHolder.closeCurrentEntityManager();
+            }
+        }
 
         //or return result
         return result;

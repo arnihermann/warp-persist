@@ -12,9 +12,11 @@ import com.wideplay.warp.persist.UnitOfWork;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.testng.annotations.AfterClass;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.EntityManagerFactory;
 import java.io.IOException;
 import java.util.Date;
 
@@ -54,6 +56,11 @@ public class ManagedLocalTransactionsTest {
     @AfterTest   //cleanup entitymanager in case some of the rollback tests left it in an open state
     public final void post() {
         EntityManagerFactoryHolder.closeCurrentEntityManager();
+    }
+
+    @AfterClass
+    public final void postClass() {
+        injector.getInstance(EntityManagerFactory.class).close();
     }
 
     @Test

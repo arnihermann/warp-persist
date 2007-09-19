@@ -10,8 +10,10 @@ import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.UnitOfWork;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.SessionFactory;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+import org.testng.annotations.AfterClass;
 
 /**
  * Created with IntelliJ IDEA.
@@ -38,6 +40,12 @@ public class SessionFactoryDuplicationAwareTest {
                             .setProperties(Initializer.loadProperties("spt-persistence.properties")));
                     }
                 });
+    }
+
+
+    @AfterClass
+    void post() {
+        injector.getInstance(SessionFactory.class).close();
     }
 
     @Test(expectedExceptions = RuntimeException.class)

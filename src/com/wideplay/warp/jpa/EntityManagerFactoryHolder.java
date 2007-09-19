@@ -56,8 +56,12 @@ class EntityManagerFactoryHolder {
         if (null != em) {
             if (em.isOpen())
                 em.close();
-            singletonEmFactoryHolder.entityManager.set(null);
+            singletonEmFactoryHolder.entityManager.remove();
         }
+    }
+
+    static EntityManager checkCurrentEntityManager() {
+        return singletonEmFactoryHolder.entityManager.get();
     }
 
     static EntityManager getCurrentEntityManager() {

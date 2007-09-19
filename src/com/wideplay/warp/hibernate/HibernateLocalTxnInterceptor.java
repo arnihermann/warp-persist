@@ -32,7 +32,17 @@ class HibernateLocalTxnInterceptor implements MethodInterceptor {
         }
 
         //everything was normal so commit the txn (do not move into try block as it interferes with the advised method's throwing semantics)
-        txn.commit();
+        Exception commitException = null;
+        try {
+            txn.commit();
+        } catch(RuntimeException re) {
+            txn.rollback();
+            commitException = re;
+        }
+
+        //propagate anyway
+        if (null != commitException)
+            throw commitException;
 
         //or return result
         return result;

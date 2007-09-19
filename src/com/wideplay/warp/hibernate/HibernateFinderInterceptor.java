@@ -13,10 +13,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,7 +26,7 @@ import java.util.WeakHashMap;
  * @since 1.0
  */
 class HibernateFinderInterceptor implements MethodInterceptor {
-    private final Map<Method, FinderDescriptor> finderCache = new WeakHashMap<Method, FinderDescriptor>();
+    private volatile Map<Method, FinderDescriptor> finderCache = new HashMap<Method, FinderDescriptor>();
 
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
         Session session = SessionFactoryHolder.getCurrentSessionFactory().getCurrentSession();
@@ -119,7 +116,6 @@ class HibernateFinderInterceptor implements MethodInterceptor {
 
         //otherwise reflect and cache finder info...
         finderDescriptor = new FinderDescriptor();
-        finderCache.put(method, finderDescriptor);
 
         //determine return type
         finderDescriptor.returnClass = invocation.getMethod().getReturnType();
@@ -171,7 +167,20 @@ class HibernateFinderInterceptor implements MethodInterceptor {
             }
         }
 
+        //cache it
+        cacheFinderDescriptor(method, finderDescriptor);
+
         return finderDescriptor;
+    }
+
+    //provides copy-on-write semantics
+    private synchronized void cacheFinderDescriptor(Method method, FinderDescriptor finderDescriptor) {
+        Map<Method, FinderDescriptor> copy = new HashMap<Method, FinderDescriptor>();
+        copy.putAll(finderCache);
+        copy.put(method, finderDescriptor);
+
+        //stash copy
+        finderCache = copy;
     }
 
     private ReturnType determineReturnType(Class<?> returnClass) {

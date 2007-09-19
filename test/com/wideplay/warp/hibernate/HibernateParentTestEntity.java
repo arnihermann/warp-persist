@@ -1,9 +1,8 @@
 package com.wideplay.warp.hibernate;
 
-import com.wideplay.warp.persist.dao.Finder;
-
 import javax.persistence.*;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,11 +12,11 @@ import java.util.List;
  * @since 1.0
  */
 @Entity
-@NamedQuery(name = HibernateTestEntity.LIST_ALL_QUERY, query = "from HibernateTestEntity")
-public class HibernateTestEntity {
+//@NamedQuery(name = HibernateParentTestEntity.LIST_ALL_QUERY, query = "from HibernateTestEntity")
+public class HibernateParentTestEntity {
     private Long id;
     private String text;
-    public static final String LIST_ALL_QUERY = "HibernateTestEntity.listAll";
+    private List<HibernateTestEntity> children = new ArrayList<HibernateTestEntity>();
 
     @Id
     @GeneratedValue
@@ -37,6 +36,12 @@ public class HibernateTestEntity {
         this.text = text;
     }
 
-    @Finder(query = "from HibernateTestEntity")
-    public List<HibernateTestEntity> listAll() { return null; }
+    @OneToMany
+    public List<HibernateTestEntity> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<HibernateTestEntity> entity) {
+        this.children = entity;
+    }
 }
