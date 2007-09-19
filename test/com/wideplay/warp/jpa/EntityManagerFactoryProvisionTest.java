@@ -10,8 +10,10 @@ import com.wideplay.warp.persist.UnitOfWork;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+import org.testng.annotations.AfterClass;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 /**
  * Created by IntelliJ IDEA.
@@ -46,6 +48,11 @@ public class EntityManagerFactoryProvisionTest {
 
     @AfterTest public final void post() {
         EntityManagerFactoryHolder.closeCurrentEntityManager();
+    }
+
+    @AfterClass
+    public final void postClass() {
+        injector.getInstance(EntityManagerFactory.class).close();
     }
 
     @Test

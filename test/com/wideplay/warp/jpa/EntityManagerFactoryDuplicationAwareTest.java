@@ -9,6 +9,9 @@ import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.UnitOfWork;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+import org.testng.annotations.AfterClass;
+
+import javax.persistence.EntityManagerFactory;
 
 /**
  * Created with IntelliJ IDEA.
@@ -35,6 +38,12 @@ public class EntityManagerFactoryDuplicationAwareTest {
                         bindConstant().annotatedWith(JpaUnit.class).to("testUnit");
                     }
                 });
+    }
+
+
+    @AfterClass
+    public final void postClass() {
+        injector.getInstance(EntityManagerFactory.class).close();
     }
 
     @Test(expectedExceptions = RuntimeException.class)

@@ -11,8 +11,10 @@ import com.wideplay.warp.persist.Transactional;
 import com.wideplay.warp.persist.UnitOfWork;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.testng.annotations.AfterClass;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 /**
  * Created by IntelliJ IDEA.
@@ -47,6 +49,12 @@ public class EntityManagerProvisionTest {
         //startup persistence
         injector.getInstance(PersistenceService.class)
                 .start();
+    }
+
+
+    @AfterClass
+    public final void postClass() {
+        injector.getInstance(EntityManagerFactory.class).close();
     }
 
     @Test
