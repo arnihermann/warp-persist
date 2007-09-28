@@ -20,7 +20,7 @@
     </target>
 
     <target name="build" depends="init" description="compiles sources">
-        <javac srcdir="src" destdir="${build}">
+        <javac srcdir="src" destdir="${build}" debug="on">
             <classpath refid="persist.classpath"/>
             <exclude name="com/wideplay/codemonkey/**"/>
         </javac>

@@ -387,7 +387,7 @@
       <attribute name="method" value="0" />
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>
-    <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/WEB-INF/hibernate-web.xml" optional="false" version="2.4" />
+    <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/WEB-INF/web.xml" optional="false" version="2.4" />
     <webroots>
       <root url="file://$MODULE_DIR$/resources" relative="/" />
       <root url="file://$MODULE_DIR$/WEB-INF" relative="/WEB-INF" />
