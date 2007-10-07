@@ -3,14 +3,11 @@
   <component name="AppServerSpecificValidatorsManager" />
   <component name="ModuleRootManager" />
   <component name="NewModuleRootManager" inherit-compiler-output="true">
-    <exclude-output />
     <exploded url="file://$MODULE_DIR$/exploded" />
     <exclude-exploded />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
-      <excludeFolder url="file://$MODULE_DIR$/build" />
-      <excludeFolder url="file://$MODULE_DIR$/test-output" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -245,6 +242,7 @@
     </orderEntry>
     <orderEntry type="library" name="Groovy from GroovyJ 0.1.8 (Demetra)" level="application" />
     <orderEntry type="library" name="Groovy from GroovyJ 0.1.9 (Demetra)" level="application" />
+    <orderEntry type="library" name="Groovy from GroovyJ 0.1.9 (Demetra)" level="application" />
     <orderEntryProperties />
   </component>
   <component name="WebModuleBuildComponent">
@@ -384,6 +382,10 @@
       <url>jar://$MODULE_DIR$/lib/warp-core.jar!/</url>
     </containerElement>
     <containerElement type="library" name="Groovy from GroovyJ 0.1.8 (Demetra)" level="application">
+      <attribute name="method" value="0" />
+      <attribute name="URI" value="/WEB-INF/lib" />
+    </containerElement>
+    <containerElement type="library" name="Groovy from GroovyJ 0.1.9 (Demetra)" level="application">
       <attribute name="method" value="0" />
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>
