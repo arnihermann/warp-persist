@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import com.wideplay.warp.persist.PersistenceService;
 import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.UnitOfWork;
+import com.wideplay.warp.persist.WorkManager;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -25,6 +26,7 @@ public class HibernateBindingSupport {
         binder.bind(Session.class).toProvider(SessionProvider.class);
 
         binder.bind(PersistenceService.class).to(HibernatePersistenceService.class).in(Singleton.class);
+        binder.bind(WorkManager.class).to(HibernateWorkManager.class);
     }
 
     public static MethodInterceptor getInterceptor(TransactionStrategy transactionStrategy) {

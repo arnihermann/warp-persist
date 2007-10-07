@@ -25,11 +25,13 @@ public class SessionPerRequestFilter implements Filter {
         //open session;
         ManagedSessionContext.bind(SessionFactoryHolder.getCurrentSessionFactory().openSession());
 
-        //continue operations
-        filterChain.doFilter(servletRequest, servletResponse);
-
-        //close up session when done
-        SessionFactoryHolder.getCurrentSessionFactory().getCurrentSession().close();
+        try {
+            //continue operations
+            filterChain.doFilter(servletRequest, servletResponse);
+        } finally {
+            //close up session when done
+            SessionFactoryHolder.getCurrentSessionFactory().getCurrentSession().close();
+        }
     }
 
     public void init(FilterConfig filterConfig) throws ServletException {}
