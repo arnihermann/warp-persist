@@ -2,6 +2,9 @@ package com.wideplay.warp.persist;
 
 import com.google.inject.Module;
 import com.google.inject.matcher.Matcher;
+import com.google.inject.matcher.Matchers;
+
+import java.lang.reflect.Method;
 
 /**
  * Created by IntelliJ IDEA.
@@ -48,6 +51,15 @@ class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, Persisten
 
     public PersistenceModuleBuilder forAll(Matcher<? super Class<?>> classMatcher) {
         persistenceModule.setClassMatcher(classMatcher);
+        persistenceModule.setMethodMatcher(Matchers.annotatedWith(Transactional.class));
+
+        return this;
+    }
+
+
+    public PersistenceModuleBuilder forAll(Matcher<? super Class<?>> classMatcher, Matcher<? super Method> methodMatcher) {
+        persistenceModule.setClassMatcher(classMatcher);
+        persistenceModule.setMethodMatcher(methodMatcher);
 
         return this;
     }

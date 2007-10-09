@@ -14,7 +14,7 @@ import java.util.Set;
  * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
-public interface TestAccessor {
+public interface HibernateTestAccessor {
 
     @Finder(query = "from HibernateTestEntity")
     List<HibernateTestEntity> listAll();

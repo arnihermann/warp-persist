@@ -1,6 +1,7 @@
 package com.wideplay.warp.hibernate;
 
 import com.wideplay.warp.persist.WorkManager;
+import com.wideplay.warp.persist.UnitOfWork;
 import org.hibernate.context.ManagedSessionContext;
 import org.hibernate.SessionFactory;
 
@@ -16,6 +17,9 @@ class HibernateWorkManager implements WorkManager {
 
 
     public void beginWork() {
+        if (UnitOfWork.TRANSACTION.equals(SessionPerRequestFilter.getUnitOfWork()))
+            throw new IllegalStateException("Cannot use WorkManager with UnitOfWork.TRANSACTION");
+
         if (ManagedSessionContext.hasBind(SessionFactoryHolder.getCurrentSessionFactory()))
             return;
 
@@ -24,6 +28,9 @@ class HibernateWorkManager implements WorkManager {
     }
 
     public void endWork() {
+        if (UnitOfWork.TRANSACTION.equals(SessionPerRequestFilter.getUnitOfWork()))
+            throw new IllegalStateException("Cannot use WorkManager with UnitOfWork.TRANSACTION");
+
         SessionFactory sessionFactory = SessionFactoryHolder.getCurrentSessionFactory();
         if (!ManagedSessionContext.hasBind(sessionFactory))
             return;

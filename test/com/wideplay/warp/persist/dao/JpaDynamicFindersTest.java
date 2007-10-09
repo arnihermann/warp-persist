@@ -11,8 +11,11 @@ import com.wideplay.warp.persist.Transactional;
 import com.wideplay.warp.persist.UnitOfWork;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.testng.annotations.AfterTest;
+import org.hibernate.SessionFactory;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -47,6 +50,12 @@ public class JpaDynamicFindersTest {
                 });
 
         injector.getInstance(PersistenceService.class).start();
+    }
+
+    @AfterTest
+    public void post() {
+        injector.getInstance(EntityManagerFactory.class).close();
+        injector = null;
     }
 
     @Test

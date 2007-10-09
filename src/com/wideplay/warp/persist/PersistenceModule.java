@@ -11,6 +11,7 @@ import org.aopalliance.intercept.MethodInterceptor;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.lang.reflect.Method;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,6 +27,7 @@ class PersistenceModule extends AbstractModule {
     private UnitOfWork unitOfWork;
     private TransactionStrategy transactionStrategy;
     private Matcher<? super Class<?>> classMatcher;
+    private Matcher<? super Method> methodMatcher;
 
     private final Set<Class<?>> accessors = new LinkedHashSet<Class<?>>();
 
@@ -34,6 +36,7 @@ class PersistenceModule extends AbstractModule {
 
         //set defaults (do *not* make these final!!)
         classMatcher = Matchers.any();
+        methodMatcher = Matchers.annotatedWith(Transactional.class);
         transactionStrategy = TransactionStrategy.LOCAL;
         unitOfWork = UnitOfWork.TRANSACTION;
     }
@@ -57,7 +60,7 @@ class PersistenceModule extends AbstractModule {
         }
 
         //bind the chosen txn interceptor
-        bindInterceptor(classMatcher, Matchers.annotatedWith(Transactional.class),
+        bindInterceptor(classMatcher, methodMatcher,
                 txnInterceptor);
 
         //bind dynamic finders
@@ -70,9 +73,14 @@ class PersistenceModule extends AbstractModule {
     @SuppressWarnings("unchecked")
     private void bindDynamicAccessors(MethodInterceptor finderInterceptor) {
         for (Class accessor : accessors) {
-            bind(accessor).toInstance(Proxy.newProxyInstance(accessor.getClassLoader(),
-                    new Class<?>[] { accessor }, new AopAllianceAdapter(finderInterceptor)));
+            //use cglib adapter to subclass the accessor (this lets us intercept both abstract classes as well as interfaces)
+            bind(accessor).toInstance(com.google.inject.cglib.proxy.Enhancer.create(accessor,
+                    new AopAllianceCglibAdapter(finderInterceptor)));
         }
+    }
+
+    public void setMethodMatcher(Matcher<? super Method> methodMatcher) {
+        this.methodMatcher = methodMatcher;
     }
 
     static enum PersistenceFlavor { HIBERNATE, JPA }

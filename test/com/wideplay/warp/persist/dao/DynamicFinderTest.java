@@ -1,10 +1,10 @@
 package com.wideplay.warp.persist.dao;
 
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.*;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import com.google.inject.Injector;
 import com.google.inject.Guice;
 import com.google.inject.AbstractModule;
@@ -32,11 +32,11 @@ public class DynamicFinderTest {
     private static final String TEXT_1 = "unique text1" + new Date();
     private static final String TEXT_2 = "unique text2" + new Date();
 
-    @BeforeTest
+    @BeforeMethod
     public void pre() {
         injector = Guice.createInjector(PersistenceService.usingHibernate()
                 .across(UnitOfWork.TRANSACTION)
-                .addAccessor(TestAccessor.class)
+                .addAccessor(HibernateTestAccessor.class)
                 .buildModule(),
 
                 new AbstractModule() {
@@ -49,6 +49,12 @@ public class DynamicFinderTest {
                 });
 
         injector.getInstance(PersistenceService.class).start();
+    }
+
+    @AfterMethod
+    public void post() {
+        injector.getInstance(SessionFactory.class).close();
+        injector = null;
     }
 
     @Test public void testDynamicFinderListAll() {
@@ -98,7 +104,7 @@ public class DynamicFinderTest {
         //now test our magic finders
         session = injector.getInstance(Session.class);
         session.beginTransaction();
-        TestAccessor accessor = injector.getInstance(TestAccessor.class);
+        HibernateTestAccessor accessor = injector.getInstance(HibernateTestAccessor.class);
         List<HibernateTestEntity> results = accessor.listAll();
         session.getTransaction().commit();
 
@@ -135,7 +141,7 @@ public class DynamicFinderTest {
         //now test our magic finders
         session = injector.getInstance(Session.class);
         session.beginTransaction();
-        TestAccessor accessor = injector.getInstance(TestAccessor.class);
+        HibernateTestAccessor accessor = injector.getInstance(HibernateTestAccessor.class);
         List<HibernateTestEntity> results = accessor.listAll(1);
         session.getTransaction().commit();
 
@@ -165,7 +171,7 @@ public class DynamicFinderTest {
         //now test our magic finders
         session = injector.getInstance(Session.class);
         session.beginTransaction();
-        TestAccessor accessor = injector.getInstance(TestAccessor.class);
+        HibernateTestAccessor accessor = injector.getInstance(HibernateTestAccessor.class);
         HibernateTestEntity[] results = accessor.listAllAsArray();
         session.getTransaction().commit();
 
@@ -195,7 +201,7 @@ public class DynamicFinderTest {
         //now test our magic finders
         session = injector.getInstance(Session.class);
         session.beginTransaction();
-        TestAccessor accessor = injector.getInstance(TestAccessor.class);
+        HibernateTestAccessor accessor = injector.getInstance(HibernateTestAccessor.class);
         List<HibernateTestEntity> results = accessor.listEverything();
         session.getTransaction().commit();
 
@@ -225,7 +231,7 @@ public class DynamicFinderTest {
         //now test our magic finders
         session = injector.getInstance(Session.class);
         session.beginTransaction();
-        TestAccessor accessor = injector.getInstance(TestAccessor.class);
+        HibernateTestAccessor accessor = injector.getInstance(HibernateTestAccessor.class);
         Set<HibernateTestEntity> results = accessor.find(TEXT_1);
         session.getTransaction().commit();
 
@@ -255,7 +261,7 @@ public class DynamicFinderTest {
         //now test our magic finders
         session = injector.getInstance(Session.class);
         session.beginTransaction();
-        TestAccessor accessor = injector.getInstance(TestAccessor.class);
+        HibernateTestAccessor accessor = injector.getInstance(HibernateTestAccessor.class);
         HibernateTestEntity result = accessor.fetch(entity.getId());
         session.getTransaction().commit();
 
@@ -284,7 +290,7 @@ public class DynamicFinderTest {
         //now test our magic finders
         session = injector.getInstance(Session.class);
         session.beginTransaction();
-        TestAccessor accessor = injector.getInstance(TestAccessor.class);
+        HibernateTestAccessor accessor = injector.getInstance(HibernateTestAccessor.class);
         HibernateTestEntity result = accessor.fetchById(entity.getId(), 1, TEXT_2);
         session.getTransaction().commit();
 

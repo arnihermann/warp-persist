@@ -6,7 +6,7 @@ import com.google.inject.Injector;
 import com.google.inject.matcher.Matchers;
 import com.wideplay.codemonkey.web.startup.Initializer;
 import com.wideplay.warp.hibernate.HibernateTestEntity;
-import com.wideplay.warp.persist.dao.TestAccessor;
+import com.wideplay.warp.persist.dao.HibernateTestAccessor;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.testng.annotations.Test;
@@ -23,7 +23,7 @@ public class EdslBuilderTest {
         PersistenceService.usingHibernate().buildModule();
 
         PersistenceService.usingHibernate().across(UnitOfWork.REQUEST)
-                .addAccessor(TestAccessor.class)
+                .addAccessor(HibernateTestAccessor.class)
                 .buildModule();
 
         PersistenceService.usingHibernate().across(UnitOfWork.TRANSACTION).forAll(Matchers.any()).buildModule();

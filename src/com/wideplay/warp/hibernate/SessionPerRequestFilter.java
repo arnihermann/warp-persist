@@ -40,4 +40,8 @@ public class SessionPerRequestFilter implements Filter {
     static void setUnitOfWork(UnitOfWork unitOfWork) {
         SessionPerRequestFilter.unitOfWork = unitOfWork;
     }
+
+    static UnitOfWork getUnitOfWork() {
+        return unitOfWork;
+    }
 }
