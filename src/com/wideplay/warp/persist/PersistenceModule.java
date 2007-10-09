@@ -76,7 +76,7 @@ class PersistenceModule extends AbstractModule {
 
             if (accessor.isInterface()) {
                 bind(accessor).toInstance(Proxy.newProxyInstance(accessor.getClassLoader(),
-                        new Class<?>[] { accessor }, new AopAllianceAdapter(finderInterceptor)));
+                        new Class<?>[] { accessor }, new AopAllianceJdkProxyAdapter(finderInterceptor)));
             } else
     
                 //use cglib adapter to subclass the accessor (this lets us intercept both abstract classes as well as interfaces)

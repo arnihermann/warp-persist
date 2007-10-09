@@ -19,10 +19,10 @@ import java.lang.reflect.Method;
  * @author dprasanna
  * @since 1.0
  */
-class AopAllianceAdapter implements InvocationHandler {
+class AopAllianceJdkProxyAdapter implements InvocationHandler {
     private final MethodInterceptor interceptor;
 
-    public AopAllianceAdapter(MethodInterceptor interceptor) {
+    public AopAllianceJdkProxyAdapter(MethodInterceptor interceptor) {
         this.interceptor = interceptor;
     }
 
