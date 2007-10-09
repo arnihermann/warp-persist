@@ -73,9 +73,15 @@ class PersistenceModule extends AbstractModule {
     @SuppressWarnings("unchecked")
     private void bindDynamicAccessors(MethodInterceptor finderInterceptor) {
         for (Class accessor : accessors) {
-            //use cglib adapter to subclass the accessor (this lets us intercept both abstract classes as well as interfaces)
-            bind(accessor).toInstance(com.google.inject.cglib.proxy.Enhancer.create(accessor,
-                    new AopAllianceCglibAdapter(finderInterceptor)));
+
+            if (accessor.isInterface()) {
+                bind(accessor).toInstance(Proxy.newProxyInstance(accessor.getClassLoader(),
+                        new Class<?>[] { accessor }, new AopAllianceAdapter(finderInterceptor)));
+            } else
+    
+                //use cglib adapter to subclass the accessor (this lets us intercept both abstract classes as well as interfaces)
+                bind(accessor).toInstance(com.google.inject.cglib.proxy.Enhancer.create(accessor,
+                        new AopAllianceCglibAdapter(finderInterceptor)));
         }
     }
 
