@@ -1,6 +1,5 @@
 package com.wideplay.warp.persist;
 
-import com.google.inject.cglib.proxy.Callback;
 import com.google.inject.cglib.proxy.MethodProxy;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -26,6 +25,13 @@ class AopAllianceCglibAdapter implements com.google.inject.cglib.proxy.MethodInt
 
     public Object intercept(final Object object, final Method method, final Object[] args,
                             final MethodProxy methodProxy) throws Throwable {
+
+        //ignore the dispatch for methods that are not finder-annotated
+        if (!PersistenceService.isDynamicFinder(method))
+            return methodProxy.invokeSuper(object, args);
+
+
+        //otherwise dispatch to finder logic
         return finderInterceptor.invoke(new MethodInvocation() {
 
             public Method getMethod() {

@@ -39,4 +39,7 @@ public class HibernateTestEntity {
 
     @Finder(query = "from HibernateTestEntity")
     public List<HibernateTestEntity> listAll() { return null; }
+
+    @Finder(query = "from HibernateTestEntity where text = ? or text = ?")
+    public List<HibernateTestEntity> listAllMatching(String s1, String s2) { return null; }
 }

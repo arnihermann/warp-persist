@@ -79,7 +79,7 @@ class PersistenceModule extends AbstractModule {
                         new Class<?>[] { accessor }, new AopAllianceJdkProxyAdapter(finderInterceptor)));
             } else
     
-                //use cglib adapter to subclass the accessor (this lets us intercept both abstract classes as well as interfaces)
+                //use cglib adapter to subclass the accessor (this lets us intercept abstract classes)
                 bind(accessor).toInstance(com.google.inject.cglib.proxy.Enhancer.create(accessor,
                         new AopAllianceCglibAdapter(finderInterceptor)));
         }

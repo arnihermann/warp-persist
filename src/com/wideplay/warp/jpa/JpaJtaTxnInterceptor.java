@@ -67,7 +67,7 @@ class JpaJtaTxnInterceptor implements MethodInterceptor {
 
     /**
      *
-     * @param transactional The metadata annotaiton of the method
+     * @param transactional The metadata annotation of the method
      * @param e The exception to test for rollback
      * @param txn A Hibernate Transaction to issue rollbacks against
      * @return returns Returns true if rollback DID NOT HAPPEN (i.e. if commit should continue)
@@ -77,7 +77,7 @@ class JpaJtaTxnInterceptor implements MethodInterceptor {
     private boolean rollbackIfNecessary(Transactional transactional, Exception e, UserTransaction txn) throws SystemException {
         boolean commit = true;
 
-        //check rollback clauses                                                                        t
+        //check rollback clauses
         for (Class<? extends Exception> rollBackOn : transactional.rollbackOn()) {
 
             //if one matched, try to perform a rollback

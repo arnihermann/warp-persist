@@ -26,7 +26,7 @@ import java.util.Set;
  * @author dprasanna
  * @since 1.0
  */
-public class HibernateDynamicFinderWithAbstractsTest {
+public class HibernateDynamicFinderWithIsolationTest {
     private Injector injector;
     private static final String TEXT_1 = "unique text1" + new Date();
     private static final String TEXT_2 = "unique text2" + new Date();

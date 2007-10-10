@@ -31,7 +31,7 @@ public class EdslBuilderTest {
 
     @Test public void testHibernateConfig() {
         Injector injector = Guice.createInjector(PersistenceService.usingHibernate().across(UnitOfWork.TRANSACTION)
-                .transactedWith(TransactionStrategy.JTA).buildModule(),
+                .transactedWith(TransactionStrategy.LOCAL).buildModule(),
                 new AbstractModule() {
 
                     protected void configure() {

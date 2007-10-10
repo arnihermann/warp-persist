@@ -32,6 +32,9 @@ public class HibernateDynamicFindersTest {
     private static final String TEXT_1 = "unique text1" + new Date();
     private static final String TEXT_2 = "unique text2" + new Date();
 
+    private static final String UNIQUE_TEXT_1 = "some other unique text1" + new Date();
+    private static final String UNIQUE_TEXT_2 = "and different unique text2" + new Date();
+
     @BeforeClass
     public void pre() {
         injector = Guice.createInjector(PersistenceService.usingHibernate()
@@ -57,16 +60,16 @@ public class HibernateDynamicFindersTest {
         injector = null;
     }
 
-    @Test public void testDynamicFinderListAll() {
+    @Test public void testDynamicFinderListAllMatching() {
         Session session = injector.getInstance(Session.class);
         session.beginTransaction();
 
         HibernateTestEntity entity = new HibernateTestEntity();
-        entity.setText(TEXT_1);
+        entity.setText(UNIQUE_TEXT_1);
         session.save(entity);
 
         entity = new HibernateTestEntity();
-        entity.setText(TEXT_2);
+        entity.setText(UNIQUE_TEXT_2);
         session.save(entity);
 
         session.getTransaction().commit();
@@ -75,14 +78,14 @@ public class HibernateDynamicFindersTest {
         session = injector.getInstance(Session.class);
         session.beginTransaction();
         HibernateTestEntity accessor = injector.getInstance(HibernateTestEntity.class);
-        List<HibernateTestEntity> results = accessor.listAll();
+        List<HibernateTestEntity> results = accessor.listAllMatching(UNIQUE_TEXT_1, UNIQUE_TEXT_2);
         session.getTransaction().commit();
 
         //assert them
-        assert results.size() >= 2 : "atleast 2 results expected! was: " + results.size();
+        assert results.size() == 2 : "atleast 2 results expected! was: " + results.size();
 
-        assert results.get(0).getText().equals(TEXT_1) || results.get(0).getText().equals(TEXT_2) : "attribs not persisted correctly";
-        assert results.get(1).getText().equals(TEXT_1) || results.get(1).getText().equals(TEXT_2) : "attribs not persisted correctly";
+        assert results.get(0).getText().equals(UNIQUE_TEXT_1) || results.get(0).getText().equals(UNIQUE_TEXT_2) : "attribs not persisted correctly";
+        assert results.get(1).getText().equals(UNIQUE_TEXT_1) || results.get(1).getText().equals(UNIQUE_TEXT_2) : "attribs not persisted correctly";
 
     }
 
@@ -111,8 +114,7 @@ public class HibernateDynamicFindersTest {
         //assert them
         assert results.size() >= 2 : "atleast 2 results expected! was: " + results.size();
 
-        assert results.get(0).getText().equals(TEXT_1) || results.get(0).getText().equals(TEXT_2) : "attribs not persisted correctly";
-        assert results.get(1).getText().equals(TEXT_1) || results.get(1).getText().equals(TEXT_2) : "attribs not persisted correctly";
+        System.out.println("Results: " + results);
 
     }
 
@@ -147,9 +149,6 @@ public class HibernateDynamicFindersTest {
 
         //assert them
         assert results.size() == 1 : "only 1 result expected! was: " + results.size();
-
-        assert results.get(0).getText().equals(TEXT_1) || results.get(0).getText().equals(TEXT_2) : "attribs not persisted correctly";
-
     }
 
     //an accessor is an interface bound to web-ext with finder methods
@@ -184,7 +183,7 @@ public class HibernateDynamicFindersTest {
     }
 
     //an accessor is an interface bound to web-ext with finder methods
-    @Test public void testDynamicAccessorNamedQuery() {
+    @Test public void testDynamicAccessorNamedQueryListAll() {
         Session session = injector.getInstance(Session.class);
         session.beginTransaction();
 
@@ -208,8 +207,6 @@ public class HibernateDynamicFindersTest {
         //assert them
         assert results.size() >= 2 : "atleast 2 results expected! was: " + results.size();
 
-        assert results.get(0).getText().equals(TEXT_1) || results.get(0).getText().equals(TEXT_2) : "attribs not persisted correctly";
-        assert results.get(1).getText().equals(TEXT_1) || results.get(1).getText().equals(TEXT_2) : "attribs not persisted correctly";
 
     }
 
