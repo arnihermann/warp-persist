@@ -156,6 +156,7 @@
         </JAVADOC>
         <SOURCES>
           <root url="file://$MODULE_DIR$/../lib/hibernate-3.2/src" />
+          <root url="file://$MODULE_DIR$/../../lib/hibernate3" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -243,6 +244,15 @@
     <orderEntry type="library" name="Groovy from GroovyJ 0.1.8 (Demetra)" level="application" />
     <orderEntry type="library" name="Groovy from GroovyJ 0.1.9 (Demetra)" level="application" />
     <orderEntry type="library" name="Groovy from GroovyJ 0.1.9 (Demetra)" level="application" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/easymock.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
     <orderEntryProperties />
   </component>
   <component name="WebModuleBuildComponent">
@@ -290,6 +300,11 @@
       <attribute name="method" value="1" />
       <attribute name="URI" value="/WEB-INF/lib/dom4j-1.6.1.jar" />
       <url>jar://$MODULE_DIR$/lib/dom4j-1.6.1.jar!/</url>
+    </containerElement>
+    <containerElement type="library" level="module">
+      <attribute name="method" value="1" />
+      <attribute name="URI" value="/WEB-INF/lib/easymock.jar" />
+      <url>jar://$MODULE_DIR$/lib/easymock.jar!/</url>
     </containerElement>
     <containerElement type="library" level="module">
       <attribute name="method" value="1" />

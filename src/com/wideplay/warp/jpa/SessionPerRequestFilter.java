@@ -24,11 +24,13 @@ public class SessionPerRequestFilter implements Filter {
         //open a new EM
         EntityManagerFactoryHolder.getCurrentEntityManager();
 
-        //continue operations
-        filterChain.doFilter(servletRequest, servletResponse);
-
-        //close up em when done
-        EntityManagerFactoryHolder.closeCurrentEntityManager();
+        try {
+            //continue operations
+            filterChain.doFilter(servletRequest, servletResponse);
+        } finally {
+            //close up em when done
+            EntityManagerFactoryHolder.closeCurrentEntityManager();
+        }
     }
 
     public void init(FilterConfig filterConfig) throws ServletException {}
