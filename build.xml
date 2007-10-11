@@ -1,4 +1,4 @@
-<project name="warp-persist" default="assemble.jar">
+<project name="warp-persist" default="make">
     <description>Persistence support for Warp, or any guice-based project using hibernate or JPA</description>
 
     <property file="build.properties"/>
@@ -12,24 +12,85 @@
     <target name="clean" description="cleans up build residues">
         <!--<delete dir="${dist}"/>-->
         <delete dir="${build}"/>
+        <delete dir="${test}"/>
     </target>
 
     <target name="init" description="sets up build dirs">
         <mkdir dir="${build}"/>
         <mkdir dir="${dist}"/>
+        <mkdir dir="${test}"/>
     </target>
 
-    <target name="build" depends="init" description="compiles sources">
+    <target name="compile" depends="init" description="compiles sources">
         <javac srcdir="src" destdir="${build}" debug="on">
             <classpath refid="persist.classpath"/>
             <exclude name="com/wideplay/codemonkey/**"/>
         </javac>
+
+        <javac srcdir="test" destdir="${test}" debug="on">
+            <classpath>
+                <path refid="persist.classpath"/>
+                <pathelement location="${build}"/>
+            </classpath>
+        </javac>
+        
+        <!-- copy necessary config stuff for tests -->
+        <copy todir="${test}">
+            <fileset dir="test">
+                <include name="**/*.properties"/>
+                <include name="**/*.xml"/>
+            </fileset>
+        </copy>
     </target>
 
-    <target name="assemble.jar" depends="build"
+    <target name="make" depends="compile" description="compiles sources">
+
+
+        <taskdef name="testng" classname="org.testng.TestNGAntTask">
+            <classpath refid="persist.classpath"/>
+        </taskdef>
+
+        <!-- run them with testng -->
+        <testng haltonfailure="true" verbose="2" suitename="warp-persist unit tests">
+            <classpath>
+                <path refid="persist.classpath"/>
+
+                <pathelement location="${test}"/>
+                <pathelement location="${build}"/>
+            </classpath>
+
+            <classfileset dir="${test}" includes="**/*Test.class"/>
+        </testng>
+    </target>
+    
+
+    <target name="assemble.jar" depends="make"
             description="builds and assembles a library jar for drop in persistence support in guice injectors">
+        <!-- build distro first -->
         <jar basedir="${build}" destfile="${dist}/warp-persist.jar"
              description="Persistence support for Warp, or any guice-based project using hibernate or JPA (www.wideplay.com)">
         </jar>
+    </target>
+
+
+    
+    <target name="test.dist" depends="compile"
+            description="tests against distribution jar (assumes you have already built one in dist)">
+        <!-- then test against it -->
+        <taskdef name="testng" classname="org.testng.TestNGAntTask">
+            <classpath refid="persist.classpath"/>
+        </taskdef>
+
+        <!-- run them with testng -->
+        <testng haltonfailure="true" verbose="2" suitename="warp-persist unit tests">
+            <classpath>
+                <path refid="persist.classpath"/>
+
+                <pathelement location="${test}"/>
+                <pathelement location="${dist}/warp-persist.jar"/>
+            </classpath>
+
+            <classfileset dir="${test}" includes="**/*Test.class"/>
+        </testng>
     </target>
 </project>

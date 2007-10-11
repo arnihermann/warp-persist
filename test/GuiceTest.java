@@ -16,7 +16,9 @@ public class GuiceTest {
 
     public GuiceTest() {}
 
-    @Test public final void testProvider() {
+    //just some scratch code
+    @Test(expectedExceptions = RuntimeException.class) 
+    public final void testProvider() {
         assert null != Guice.createInjector(new AbstractModule() {
             protected void configure() {
                 bind(GuiceTest.class).toProvider(GuiceTestProvider.class);

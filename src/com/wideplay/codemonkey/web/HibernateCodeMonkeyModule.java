@@ -3,7 +3,7 @@ package com.wideplay.codemonkey.web;
 import com.google.inject.AbstractModule;
 import com.google.inject.matcher.Matchers;
 import com.wideplay.codemonkey.model.SourceArtifact;
-import com.wideplay.codemonkey.web.startup.Initializer;
+import com.wideplay.codemonkey.web.startup.InitializerWeb;
 import com.wideplay.warp.Warp;
 import com.wideplay.warp.WarpModule;
 import com.wideplay.warp.persist.PersistenceService;
@@ -36,9 +36,9 @@ public class HibernateCodeMonkeyModule implements WarpModule {
             protected void configure() {
                 bind(Configuration.class).toInstance(new AnnotationConfiguration()
                     .addAnnotatedClass(SourceArtifact.class)
-                    .setProperties(Initializer.loadProperties("persistence.properties")));
+                    .setProperties(InitializerWeb.loadProperties("persistence.properties")));
                 
-                bind(Initializer.class).asEagerSingleton();
+                bind(InitializerWeb.class).asEagerSingleton();
             }
         });
     }

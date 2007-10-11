@@ -2,15 +2,15 @@ package com.wideplay.codemonkey.web;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.matcher.Matchers;
-import com.wideplay.warp.persist.TransactionStrategy;
-import com.wideplay.warp.persist.UnitOfWork;
-import com.wideplay.warp.persist.PersistenceService;
-import com.wideplay.codemonkey.web.startup.Initializer;
 import com.wideplay.codemonkey.model.SourceArtifact;
+import com.wideplay.codemonkey.web.startup.InitializerWeb;
 import com.wideplay.warp.Warp;
 import com.wideplay.warp.WarpModule;
-import org.hibernate.cfg.Configuration;
+import com.wideplay.warp.persist.PersistenceService;
+import com.wideplay.warp.persist.TransactionStrategy;
+import com.wideplay.warp.persist.UnitOfWork;
 import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.cfg.Configuration;
 
 /**
  * Created with IntelliJ IDEA.
@@ -36,9 +36,9 @@ public class CodeMonkeyModule implements WarpModule {
             protected void configure() {
                 bind(Configuration.class).toInstance(new AnnotationConfiguration()
                     .addAnnotatedClass(SourceArtifact.class)
-                    .setProperties(Initializer.loadProperties("persistence.properties")));
+                    .setProperties(InitializerWeb.loadProperties("persistence.properties")));
                 
-                bind(Initializer.class).asEagerSingleton();
+                bind(InitializerWeb.class).asEagerSingleton();
             }
         });
     }
