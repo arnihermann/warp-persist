@@ -7,6 +7,7 @@ import org.aopalliance.intercept.MethodInvocation;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import java.lang.reflect.Method;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,6 +17,10 @@ import javax.persistence.EntityTransaction;
  */
 class JpaLocalTxnInterceptor implements MethodInterceptor {
     private static UnitOfWork unitOfWork = UnitOfWork.TRANSACTION;
+
+    //TODO this is a clunky hack, make a TransactionalImpl and make it customizable 
+    @Transactional
+    private static class Internal { }
 
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
         EntityManager em = EntityManagerFactoryHolder.getCurrentEntityManager();
@@ -29,7 +34,14 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
             result = methodInvocation.proceed();
 
         } catch (Exception e) {
-            Transactional transactional = methodInvocation.getMethod().getAnnotation(Transactional.class);
+            Transactional transactional;
+            Method method = methodInvocation.getMethod();
+
+            //if there is no transactional annotation of Warp's present, use the default
+            if (method.isAnnotationPresent(Transactional.class))
+                transactional = method.getAnnotation(Transactional.class);
+            else
+                transactional = Internal.class.getAnnotation(Transactional.class);
 
             //commit transaction only if rollback didnt occur
             if (rollbackIfNecessary(transactional, e, txn))

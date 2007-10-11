@@ -5,6 +5,8 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.hibernate.Transaction;
 
+import java.lang.reflect.Method;
+
 /**
  * Created with IntelliJ IDEA.
  * On: May 26, 2007 3:07:46 PM
@@ -12,6 +14,10 @@ import org.hibernate.Transaction;
  * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  */
 class HibernateLocalTxnInterceptor implements MethodInterceptor {
+
+    //TODO make this customizable if there is a demand for it
+    @Transactional
+    private static class Internal { }
 
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
         Transaction txn = SessionFactoryHolder.getCurrentSessionFactory().getCurrentSession().beginTransaction();
@@ -21,7 +27,14 @@ class HibernateLocalTxnInterceptor implements MethodInterceptor {
             result = methodInvocation.proceed();
 
         } catch(Exception e) {
-            Transactional transactional = methodInvocation.getMethod().getAnnotation(Transactional.class);
+            Transactional transactional;
+            Method method = methodInvocation.getMethod();
+
+            //if there is no transactional annotation of Warp's present, use the default
+            if (method.isAnnotationPresent(Transactional.class))
+                transactional = method.getAnnotation(Transactional.class);
+            else
+                transactional = Internal.class.getAnnotation(Transactional.class);
 
             //commit transaction only if rollback didnt occur
             if (rollbackIfNecessary(transactional, e, txn))

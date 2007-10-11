@@ -8,7 +8,7 @@ import java.lang.annotation.*;
  *
  * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  */
-@Target(ElementType.METHOD)
+@Target({ ElementType.METHOD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Transactional {
     TransactionType type() default TransactionType.READ_WRITE;
