@@ -1,9 +1,9 @@
 This is a cumulative list of features (after the basic integration).
 
-- Method matcher now customizable for transactional methods (use spring's @Transactional if u like =)
-- Abstract classes + abstract methods can now be DynamicFinders
+- Method matcher now customizable for transactional methods (use spring's @Transactional if u like =), use .forAll(..) in builder
+- Abstract classes + abstract methods can now be DynamicFinders (use .addAccessor on abstract classes)
 - Plenty of tests for veracity of DF services, unit-of-work semantics etc.
-- WorkManager added to define custom units-of-work (for example, using SPR strategy but doing work in background threads)
-- SPR filters tightened up to avoid leaks in case of exceptions/errors
-- Transactional methods can be nested with the inner ones joining the enclosing transaction context safely/silently
-- Tests now run on ant build, plus tests against the distro jar added
+- WorkManager added to define custom units-of-work (for example, using SPR strategy but doing work in background threads--outside a request)
+- SPR filters tightened up to avoid leaks in case of exceptions/errors + tests
+- @Transactional methods can now be nested safely; with the inner ones joining the enclosing transaction context silently
+- Tests now run on ant build, plus tests against the distro jar have been added
