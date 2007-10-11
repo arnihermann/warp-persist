@@ -15,8 +15,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Expression;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.FileNotFoundException;
@@ -30,13 +30,13 @@ import java.util.Date;
  * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
-public class ManagedLocalTransactionsTest {
+public class JoiningLocalTransactionsTest {
     private Injector injector;
-    private static final String UNIQUE_TEXT = "some unique text" + new Date();
-    private static final String UNIQUE_TEXT_2 = "some asda unique text" + new Date();
-    private static final String TRANSIENT_UNIQUE_TEXT = "some other unique text" + new Date();
+    private static final String UNIQUE_TEXT = JoiningLocalTransactionsTest.class + "some unique text" + new Date();
+    private static final String UNIQUE_TEXT_2 = JoiningLocalTransactionsTest.class + "some asda unique text" + new Date();
+    private static final String TRANSIENT_UNIQUE_TEXT = JoiningLocalTransactionsTest.class + "some other unique text" + new Date();
 
-    @BeforeMethod
+    @BeforeClass
     public void pre() {
         injector = Guice.createInjector(PersistenceService.usingHibernate()
             .across(UnitOfWork.TRANSACTION)
@@ -58,15 +58,14 @@ public class ManagedLocalTransactionsTest {
                 .start();
     }
 
-    @AfterMethod
+    @AfterClass
     void post() {
         injector.getInstance(SessionFactory.class).close();
-        injector = null;
     }
 
     @Test
     public void testSimpleTransaction() {
-        injector.getInstance(TransactionalObject.class).runOperationInTxn();
+        injector.getInstance(JoiningLocalTransactionsTest.TransactionalObject.class).runOperationInTxn();
 
         Session session = injector.getInstance(Session.class);
         assert !session.getTransaction().isActive() : "Session was not closed by transactional service";
@@ -84,7 +83,7 @@ public class ManagedLocalTransactionsTest {
     @Test
     public void testSimpleTransactionRollbackOnChecked() {
         try {
-            injector.getInstance(TransactionalObject.class).runOperationInTxnThrowingChecked();
+            injector.getInstance(JoiningLocalTransactionsTest.TransactionalObject.class).runOperationInTxnThrowingChecked();
         } catch(IOException e) {
             //ignore
         }
@@ -104,7 +103,7 @@ public class ManagedLocalTransactionsTest {
     public void testSimpleTransactionRollbackOnCheckedExcepting() {
         Exception ex = null;
         try {
-            injector.getInstance(TransactionalObject.class).runOperationInTxnThrowingCheckedExcepting();
+            injector.getInstance(JoiningLocalTransactionsTest.TransactionalObject.class).runOperationInTxnThrowingCheckedExcepting();
         } catch(IOException e) {
             //ignore
             ex = e;
@@ -126,7 +125,7 @@ public class ManagedLocalTransactionsTest {
     @Test
     public void testSimpleTransactionRollbackOnUnchecked() {
         try {
-            injector.getInstance(TransactionalObject.class).runOperationInTxnThrowingUnchecked();
+            injector.getInstance(JoiningLocalTransactionsTest.TransactionalObject.class).runOperationInTxnThrowingUnchecked();
         } catch(RuntimeException re) {
             //ignore
         }
@@ -144,35 +143,62 @@ public class ManagedLocalTransactionsTest {
 
 
     public static class TransactionalObject {
-        @Inject Session session;
+        @Inject
+        Session session;
 
         @Transactional
         public void runOperationInTxn() {
+            runOperationInTxnInternal();
+        }
+
+        @Transactional(rollbackOn = IOException.class)
+        public void runOperationInTxnInternal() {
             HibernateTestEntity entity = new HibernateTestEntity();
             entity.setText(UNIQUE_TEXT);
             session.persist(entity);
         }
 
+        // -------------
         @Transactional(rollbackOn = IOException.class)
         public void runOperationInTxnThrowingChecked() throws IOException {
+            runOperationInTxnThrowingCheckedInternal();
+        }
+
+        @Transactional
+        public void runOperationInTxnThrowingCheckedInternal() throws IOException {
             HibernateTestEntity entity = new HibernateTestEntity();
             entity.setText(TRANSIENT_UNIQUE_TEXT);
             session.persist(entity);
-            
+
             throw new IOException();
         }
 
+
+        // -------------
         @Transactional(rollbackOn = IOException.class, exceptOn = FileNotFoundException.class)
         public void runOperationInTxnThrowingCheckedExcepting() throws IOException {
+            runOperationInTxnThrowingCheckedExceptingInternal();
+        }
+
+        @Transactional        
+        public void runOperationInTxnThrowingCheckedExceptingInternal() throws IOException {
             HibernateTestEntity entity = new HibernateTestEntity();
             entity.setText(UNIQUE_TEXT_2);
             session.persist(entity);
-            
+
             throw new FileNotFoundException();
         }
-        
+
+
+
+        // -------------
         @Transactional
         public void runOperationInTxnThrowingUnchecked() {
+            runOperationInTxnThrowingUncheckedInternal();
+        }
+
+        @Transactional(rollbackOn = IOException.class, exceptOn = FileNotFoundException.class)        
+        private void runOperationInTxnThrowingUncheckedInternal() {
             HibernateTestEntity entity = new HibernateTestEntity();
             entity.setText(TRANSIENT_UNIQUE_TEXT);
             session.persist(entity);

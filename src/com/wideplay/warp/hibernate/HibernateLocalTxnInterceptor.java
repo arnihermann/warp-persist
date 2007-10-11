@@ -4,6 +4,7 @@ import com.wideplay.warp.persist.Transactional;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.hibernate.Transaction;
+import org.hibernate.classic.Session;
 
 import java.lang.reflect.Method;
 
@@ -20,7 +21,14 @@ class HibernateLocalTxnInterceptor implements MethodInterceptor {
     private static class Internal { }
 
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-        Transaction txn = SessionFactoryHolder.getCurrentSessionFactory().getCurrentSession().beginTransaction();
+        Session session = SessionFactoryHolder.getCurrentSessionFactory().getCurrentSession();
+
+        //allow silent joining of enclosing transactional methods
+        if (session.getTransaction().isActive())
+            return methodInvocation.proceed();
+
+        //no transaction already started, so start one and enforce its semantics
+        Transaction txn = session.beginTransaction();
         Object result;
 
         try {

@@ -25,6 +25,12 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
         EntityManager em = EntityManagerFactoryHolder.getCurrentEntityManager();
 
+        //allow joining of transactions if there is an enclosing @Transactional method
+        if (em.getTransaction().isActive())
+            return methodInvocation.proceed();
+
+        //otherwise...
+
         //start txn
         final EntityTransaction txn = em.getTransaction();
         txn.begin();

@@ -5,3 +5,4 @@ This is a cumulative list of features (after the basic integration).
 - Plenty of tests for veracity of DF services, unit-of-work semantics etc.
 - WorkManager added to define custom units-of-work (for example, using SPR strategy but doing work in background threads)
 - SPR filters tightened up to avoid leaks in case of exceptions/errors
+- Transactional methods can be nested with the inner ones joining the enclosing transaction context safely/silently  
