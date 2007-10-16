@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.wideplay.warp.persist.PersistenceService;
 
 import javax.persistence.Persistence;
+import java.util.Properties;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,6 +16,7 @@ import javax.persistence.Persistence;
 class JpaPersistenceService extends PersistenceService {
     private final EntityManagerFactoryHolder emFactoryHolder;
     private final String persistenceUnitName;
+    private Properties customProperties;
 
     private static final String JTA_USER_TRANSACTION = "jta.UserTransaction";
 
@@ -28,9 +30,19 @@ class JpaPersistenceService extends PersistenceService {
     }
 
     public void start() {
-        emFactoryHolder.setEntityManagerFactory(Persistence.createEntityManagerFactory(persistenceUnitName));
+        //create with custom properties if necessary
+        if (null != customProperties)
+            emFactoryHolder.setEntityManagerFactory(Persistence.createEntityManagerFactory(persistenceUnitName, customProperties));
+        else
+            emFactoryHolder.setEntityManagerFactory(Persistence.createEntityManagerFactory(persistenceUnitName));
 
         //if necessary, set the JNDI lookup name of the JTA txn
+    }
+
+
+    @Inject(optional = true)
+    public void setCustomProperties(@JpaUnit Properties customProperties) {
+        this.customProperties = customProperties;
     }
 
     @Override
