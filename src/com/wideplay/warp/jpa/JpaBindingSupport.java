@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import com.wideplay.warp.persist.PersistenceService;
 import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.UnitOfWork;
+import com.wideplay.warp.persist.WorkManager;
 import org.aopalliance.intercept.MethodInterceptor;
 
 import javax.persistence.EntityManager;
@@ -30,6 +31,7 @@ public class JpaBindingSupport {
         binder.bind(EntityManager.class).toProvider(EntityManagerProvider.class);
 
         binder.bind(PersistenceService.class).to(JpaPersistenceService.class).in(Singleton.class);
+        binder.bind(WorkManager.class).to(JpaWorkManager.class);
     }
 
     //how ugly this static setup stuff is, ick. Please give us managed interceptors already guice!!! And use Warp people!
