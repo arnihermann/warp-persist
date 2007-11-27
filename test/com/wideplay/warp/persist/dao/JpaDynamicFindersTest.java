@@ -75,6 +75,24 @@ public class JpaDynamicFindersTest {
         assert results.get(1).getText().equals(TEXT_1) || results.get(1).getText().equals(TEXT_2) : "attribs not persisted correctly";
     }
 
+    @Test
+    public void testListAllDDD() {
+
+        //set up some test data
+        injector.getInstance(FinderDao.class).store();
+
+        //now attempt to query it out
+
+        List<JpaTestEntity> results = injector.getInstance(JpaTestEntity.class).listAll();
+
+        assert null != results : "Finder did not intercept annotated DDD method!";
+
+        assert results.size() >= 2 : "all results not returned!";
+
+        assert results.get(0).getText().equals(TEXT_1) || results.get(0).getText().equals(TEXT_2) : "attribs not persisted correctly";
+        assert results.get(1).getText().equals(TEXT_1) || results.get(1).getText().equals(TEXT_2) : "attribs not persisted correctly";
+    }
+
 
     @Test
     public void testReturnAsSet() {
