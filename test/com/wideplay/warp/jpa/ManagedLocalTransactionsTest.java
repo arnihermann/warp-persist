@@ -33,25 +33,28 @@ public class ManagedLocalTransactionsTest {
     private static final String UNIQUE_TEXT = "some unique text" + new Date();
     private static final String TRANSIENT_UNIQUE_TEXT = "some other unique text" + new Date();
 
+
     @BeforeClass
     public void pre() {
-        injector = Guice.createInjector(PersistenceService.usingJpa()
-            .across(UnitOfWork.TRANSACTION)
-            .transactedWith(TransactionStrategy.LOCAL)
-            .forAll(Matchers.any())
-            .buildModule(),
+        injector = Guice.createInjector(
                 new AbstractModule() {
 
                     protected void configure() {
                         //tell Warp the name of the jpa persistence unit
                         bindConstant().annotatedWith(JpaUnit.class).to("testUnit");
                     }
-                });
+                },
+                PersistenceService.usingJpa()
+            .across(UnitOfWork.TRANSACTION)
+            .transactedWith(TransactionStrategy.LOCAL)
+            .forAll(Matchers.any())
+            .buildModule());
 
         //startup persistence
         injector.getInstance(PersistenceService.class)
                 .start();
     }
+
 
     @AfterTest   //cleanup entitymanager in case some of the rollback tests left it in an open state
     public final void post() {
