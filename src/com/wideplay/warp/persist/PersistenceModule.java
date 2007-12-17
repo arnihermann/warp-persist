@@ -89,7 +89,7 @@ class PersistenceModule extends AbstractModule {
         this.methodMatcher = methodMatcher;
     }
 
-    static enum PersistenceFlavor { HIBERNATE, JPA }
+    static enum PersistenceFlavor { HIBERNATE, JPA, DB4O }
 
 
     //builder config hooks  

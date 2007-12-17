@@ -25,4 +25,8 @@ public abstract class PersistenceService {
     public static boolean isDynamicFinder(Method method) {
         return method.isAnnotationPresent(Finder.class);
     }
+
+    public static SessionStrategyBuilder usingDb4o() {
+        return new PersistenceServiceBuilderImpl(new PersistenceModule(PersistenceModule.PersistenceFlavor.JPA));
+    }
 }

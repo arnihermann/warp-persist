@@ -1,8 +1,10 @@
 package com.wideplay.warp.hibernate;
 
+import com.wideplay.warp.persist.TransactionType;
 import com.wideplay.warp.persist.Transactional;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.hibernate.FlushMode;
 import org.hibernate.Transaction;
 import org.hibernate.classic.Session;
 
@@ -16,57 +18,78 @@ import java.lang.reflect.Method;
  */
 class HibernateLocalTxnInterceptor implements MethodInterceptor {
 
-    //TODO make this customizable if there is a demand for it
+    //make this customizable if there is a demand for it?
     @Transactional
     private static class Internal { }
 
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
         Session session = SessionFactoryHolder.getCurrentSessionFactory().getCurrentSession();
 
-        //allow silent joining of enclosing transactional methods
+        //allow silent joining of enclosing transactional methods (NOTE: this ignores the current method's txn-al settings)
         if (session.getTransaction().isActive())
             return methodInvocation.proceed();
 
-        //no transaction already started, so start one and enforce its semantics
-        Transaction txn = session.beginTransaction();
-        Object result;
+        //read out transaction settings
+        Transactional transactional = readTransactionMetadata(methodInvocation);
+
+        //read-only txn?
+        FlushMode savedFlushMode = FlushMode.AUTO;
+        if (TransactionType.READ_ONLY.equals(transactional.type()))
+            session.setFlushMode(FlushMode.MANUAL);
 
         try {
-            result = methodInvocation.proceed();
+            //no transaction already started, so start one and enforce its semantics
+            Transaction txn = session.beginTransaction();
+            Object result;
 
-        } catch(Exception e) {
-            Transactional transactional;
-            Method method = methodInvocation.getMethod();
+            try {
+                result = methodInvocation.proceed();
 
-            //if there is no transactional annotation of Warp's present, use the default
-            if (method.isAnnotationPresent(Transactional.class))
-                transactional = method.getAnnotation(Transactional.class);
-            else
-                transactional = Internal.class.getAnnotation(Transactional.class);
+            } catch(Exception e) {
 
-            //commit transaction only if rollback didnt occur
-            if (rollbackIfNecessary(transactional, e, txn))
+
+
+                //commit transaction only if rollback didnt occur
+                if (rollbackIfNecessary(transactional, e, txn))
+                    txn.commit();
+
+                //propagate whatever exception is thrown anyway
+                throw e;
+            }
+
+            //everything was normal so commit the txn (do not move into try block as it interferes with the advised method's throwing semantics)
+            Exception commitException = null;
+            try {
                 txn.commit();
+            } catch(RuntimeException re) {
+                txn.rollback();
+                commitException = re;
+            }
 
-            //propagate whatever exception is thrown anyway
-            throw e;
+            //propagate anyway
+            if (null != commitException)
+                throw commitException;
+
+            //or return result
+            return result;
+        } finally {
+
+            //if read-only txn, then restore flushmode, default is automatic flush
+            if (TransactionType.READ_ONLY.equals(transactional.type()))
+                session.setFlushMode(savedFlushMode);
         }
+    }
 
-        //everything was normal so commit the txn (do not move into try block as it interferes with the advised method's throwing semantics)
-        Exception commitException = null;
-        try {
-            txn.commit();
-        } catch(RuntimeException re) {
-            txn.rollback();
-            commitException = re;
-        }
+    private Transactional readTransactionMetadata(MethodInvocation methodInvocation) {
+        Transactional transactional;
+        Method method = methodInvocation.getMethod();
+        //if there is no transactional annotation of Warp's present, use the default
 
-        //propagate anyway
-        if (null != commitException)
-            throw commitException;
-
-        //or return result
-        return result;
+        if (method.isAnnotationPresent(Transactional.class))
+            transactional = method.getAnnotation(Transactional.class);
+        else
+            transactional = Internal.class.getAnnotation(Transactional.class);
+        return transactional;
     }
 
     /**

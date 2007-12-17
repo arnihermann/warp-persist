@@ -45,6 +45,16 @@ public class EdslBuilderTest {
         injector.getInstance(TransactionalObject.class).txnMethod();
     }
 
+//    @Test TODO working on this... 
+    public final void testDb4oConfig() {
+        Guice.createInjector(PersistenceService.usingDb4o()
+                .across(UnitOfWork.TRANSACTION)
+                .transactedWith(TransactionStrategy.LOCAL)
+                .forAll(Matchers.any(), Matchers.annotatedWith(Transactional.class))
+                .buildModule()
+        );
+    }
+
     static class TransactionalObject {
         @Transactional public void txnMethod() {
             
