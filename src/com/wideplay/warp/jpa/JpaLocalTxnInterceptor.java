@@ -56,7 +56,7 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
             //propagate whatever exception is thrown anyway
             throw e;
         } finally {
-            //close the em if necessary
+            //close the em if necessary (this code doesnt run unless above catch/rethrow fired)
             if (isUnitOfWorkTransaction() && !txn.isActive()) {
                 EntityManagerFactoryHolder.closeCurrentEntityManager();
             }
