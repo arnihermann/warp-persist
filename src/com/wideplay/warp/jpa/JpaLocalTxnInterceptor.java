@@ -40,14 +40,7 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
             result = methodInvocation.proceed();
 
         } catch (Exception e) {
-            Transactional transactional;
-            Method method = methodInvocation.getMethod();
-
-            //if there is no transactional annotation of Warp's present, use the default
-            if (method.isAnnotationPresent(Transactional.class))
-                transactional = method.getAnnotation(Transactional.class);
-            else
-                transactional = Internal.class.getAnnotation(Transactional.class);
+            Transactional transactional = readTransactionMetadata(methodInvocation);
 
             //commit transaction only if rollback didnt occur
             if (rollbackIfNecessary(transactional, e, txn))
@@ -75,6 +68,25 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
 
         //or return result
         return result;
+    }
+
+    private Transactional readTransactionMetadata(MethodInvocation methodInvocation) {
+        Transactional transactional;
+        Method method = methodInvocation.getMethod();
+
+        //if none on method, try the class
+        Class<?> targetClass = methodInvocation.getThis().getClass().getSuperclass();
+
+        //if there is no transactional annotation of Warp's present, use the default
+        if (method.isAnnotationPresent(Transactional.class))
+            transactional = method.getAnnotation(Transactional.class);
+
+        else if (targetClass.isAnnotationPresent(Transactional.class))
+            transactional = targetClass.getAnnotation(Transactional.class);
+        
+        else
+            transactional = Internal.class.getAnnotation(Transactional.class);
+        return transactional;
     }
 
     /**

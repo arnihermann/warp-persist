@@ -50,4 +50,5 @@ public class GuiceTest {
 
         throw new AssertionError();
     }
+
 }

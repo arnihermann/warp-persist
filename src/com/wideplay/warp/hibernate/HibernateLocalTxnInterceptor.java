@@ -83,11 +83,17 @@ class HibernateLocalTxnInterceptor implements MethodInterceptor {
     private Transactional readTransactionMetadata(MethodInvocation methodInvocation) {
         Transactional transactional;
         Method method = methodInvocation.getMethod();
-        //if there is no transactional annotation of Warp's present, use the default
+
+        //try the class if there's nothing on the method (only go up one level in the hierarchy, to skip the proxy)
+        Class<?> targetClass = methodInvocation.getThis().getClass().getSuperclass();
 
         if (method.isAnnotationPresent(Transactional.class))
             transactional = method.getAnnotation(Transactional.class);
+        
+        else if (targetClass.isAnnotationPresent(Transactional.class))
+            transactional = targetClass.getAnnotation(Transactional.class);
         else
+            //if there is no transactional annotation of Warp's present, use the default
             transactional = Internal.class.getAnnotation(Transactional.class);
         return transactional;
     }
