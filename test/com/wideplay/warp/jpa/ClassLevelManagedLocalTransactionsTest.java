@@ -28,6 +28,13 @@ import java.util.List;
  * Created with IntelliJ IDEA.
  * On: 2/06/2007
  *
+ *
+ * This test asserts class level @Transactional annotation behavior (see the forAll(..) statement
+ * below in method pre()).
+ *
+ * Class-level @Transactional is a shortcut if all non-private
+ * methods in the class are meant to be transactional. 
+ *
  * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */

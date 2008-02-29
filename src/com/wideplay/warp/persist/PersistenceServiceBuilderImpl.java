@@ -11,9 +11,10 @@ import java.lang.reflect.Method;
  * User: dprasanna
  * Date: 31/05/2007
  * Time: 11:54:45
- * <p/>
+ * <p>
  *
  * Configures and builds a Module for use in a Guice injector to enable the PersistenceService.
+ * </p>
  *
  * @author dprasanna
  * @since 1.0

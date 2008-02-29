@@ -6,19 +6,29 @@ package com.wideplay.warp.persist;
  * Date: Oct 7, 2007
  * Time: 8:48:33 PM
  *
- * This interface is used to gain manual control over the unit of work.
+ * <p>
+ * This interface is used to gain manual control over the unit of work. This
+ * is mostly to do work in non-request, non-transactional threads. Or where more
+ * fine-grained control over the unit of work is required. Starting and ending a
+ * unit of work directly corresponds to opening and closing a {@code Session},
+ * {@code EntityManager} or {@code ObjectContainer} respectively.
+ * </p>
  *
+ * <p>
  * The Unit of Work referred to by WorkManager will always be local to the
  * calling thread. Be careful to endWork() in a finally block. Neither JPA,
  * nor Hibernate supports threadsafe sessions (reasoning behind thread-locality
  * of Unit of Work semantics).
+ * </p>
  *
- * Using WorkManager with the SPR Filter inside a request is not recommended.
+ * <ul>
+ *   <li>Using WorkManager with the SPR Filter inside a request is not recommended.</li>
  *
- * Using WorkManager with session-per-txn strategy is not terribly clever either.
+ *   <li>Using WorkManager with session-per-txn strategy is not terribly clever either.</li>
  *
- * Using WorkManager with session-per-request strategy but *outside* a request
- * (i.e. in a background or bootstrap thread) is probably a good use case.
+ *   <li>Using WorkManager with session-per-request strategy but *outside* a request
+ * (i.e. in a background or bootstrap thread) is probably a good use case.</li>
+ * </ul>
  *
  * @author Dhanji R. Prasanna (dhanji gmail com)
  */
@@ -29,6 +39,8 @@ public interface WorkManager {
      * the data layer to be opened. If there is already one open,
      * the invocation will do nothing. In this way, you can define
      * arbitrary units-of-work that nest within one another safely.
+     *
+     * Transaction semantics are not affected.
      */
     void beginWork();
 
@@ -37,6 +49,8 @@ public interface WorkManager {
      * open session to the data layer to close. If there is no Unit of work
      * open, then the call returns silently. You can safely invoke endWork()
      * repeatedly.
+     *
+     * Transaction semantics are not affected.
      *
      */
     void endWork();

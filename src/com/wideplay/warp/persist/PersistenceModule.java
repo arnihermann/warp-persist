@@ -17,6 +17,11 @@ import java.lang.reflect.Method;
  * Created with IntelliJ IDEA.
  * On: 30/04/2007
  *
+ * <p>
+ * The module built by {@code PersistenceService.using...} that is eventually passed
+ * to Guice.
+ * </p>
+ *
  * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */

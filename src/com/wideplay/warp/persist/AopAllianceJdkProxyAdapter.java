@@ -12,9 +12,11 @@ import java.lang.reflect.Method;
  * User: dprasanna
  * Date: 4/06/2007
  * Time: 14:40:15
- * <p/>
+ * <p>
  *
- * This is a simple adaptor to convert a JDK dynamic proxy invocation into an aopalliance invocation.
+ * This is a simple adapter to convert a JDK dynamic proxy invocation into an aopalliance invocation.
+ * Mainly for supporting {@code @Finder} on interface methods.
+ * </p>
  *
  * @author dprasanna
  * @since 1.0

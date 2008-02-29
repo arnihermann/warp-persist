@@ -9,8 +9,14 @@ import java.io.IOException;
  * Created with IntelliJ IDEA.
  * On: 2/06/2007
  *
+ *
+ * <p>
+ * Apply this filter in web.xml to enable the HTTP Request unit of work.
+ * </p>
+ *
  * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
+ * @see com.wideplay.warp.persist.UnitOfWork
  */
 public class SessionPerRequestFilter implements Filter {
     private static UnitOfWork unitOfWork;
