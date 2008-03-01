@@ -5,13 +5,8 @@ import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.matcher.Matchers;
-import com.wideplay.warp.persist.PersistenceService;
-import com.wideplay.warp.persist.TransactionStrategy;
-import com.wideplay.warp.persist.Transactional;
-import com.wideplay.warp.persist.UnitOfWork;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-import org.testng.annotations.AfterClass;
+import com.wideplay.warp.persist.*;
+import org.testng.annotations.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -57,6 +52,16 @@ public class ManualLocalTransactionsTest {
         injector.getInstance(EntityManagerFactory.class).close();
     }
 
+    @BeforeMethod
+    public void startRequest() {
+        injector.getInstance(WorkManager.class).beginWork();
+    }
+
+    @AfterMethod
+    public void endRequest() {
+        injector.getInstance(WorkManager.class).endWork();
+    }
+
     @Test
     public void testSimpleCrossTxnWork() {
         //pretend that the request was started here
@@ -71,6 +76,7 @@ public class ManualLocalTransactionsTest {
         assert em.isOpen() : "EntityManager appears to have been closed across txns!";
 
         EntityManagerFactoryHolder.closeCurrentEntityManager();
+        EntityManagerFactoryHolder.getCurrentEntityManager();
 
         //try to query them back out
         em = injector.getInstance(EntityManager.class);

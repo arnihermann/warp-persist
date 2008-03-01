@@ -67,6 +67,6 @@ public abstract class PersistenceService {
      * @return Returns the next step in the configuration chain.
      */
     public static SessionStrategyBuilder usingDb4o() {
-        return new PersistenceServiceBuilderImpl(new PersistenceModule(PersistenceModule.PersistenceFlavor.JPA));
+        return new PersistenceServiceBuilderImpl(new PersistenceModule(PersistenceModule.PersistenceFlavor.DB4O));
     }
 }

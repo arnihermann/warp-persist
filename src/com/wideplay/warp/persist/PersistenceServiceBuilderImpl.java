@@ -16,6 +16,7 @@ import net.jcip.annotations.NotThreadSafe;
  * <p>
  *
  * Configures and builds a Module for use in a Guice injector to enable the PersistenceService.
+ * see the website for the EDSL binder language.
  * </p>
  *
  * @author dprasanna

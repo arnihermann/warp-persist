@@ -32,6 +32,7 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
         if (em.getTransaction().isActive())
             return methodInvocation.proceed();
 
+
         //otherwise...
 
         //start txn

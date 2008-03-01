@@ -21,7 +21,7 @@ import net.jcip.annotations.Immutable;
  * @since 1.0
  */
 @Immutable
-public class JpaBindingSupport {
+public final class JpaBindingSupport {
 
     private JpaBindingSupport() {
     }

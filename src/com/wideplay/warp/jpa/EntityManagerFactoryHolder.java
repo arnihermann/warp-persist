@@ -81,7 +81,7 @@ class EntityManagerFactoryHolder {
         EntityManager em = singletonEmFactoryHolder.entityManager.get();
 
         //create if absent
-        if (null == em) {
+        if (null == em ) {
             em = getCurrentEntityManagerFactory().createEntityManager();
             singletonEmFactoryHolder.entityManager.set(em);
         }

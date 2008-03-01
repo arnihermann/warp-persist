@@ -24,8 +24,8 @@ class JpaJtaTxnInterceptor implements MethodInterceptor {
 
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
         //create new entity manager if necessary
-        if (isUnitOfWorkTransaction())
-            EntityManagerFactoryHolder.getCurrentEntityManager();
+        if (isUnitOfWorkTransaction())  //TODO BROKEN!! DO NOT USE!
+            EntityManagerFactoryHolder.checkCurrentEntityManager();
 
         UserTransaction txn = (UserTransaction) new InitialContext().lookup(USER_TRANSACTION_JNDI_NAME);
         Object result;

@@ -7,6 +7,7 @@ import com.google.inject.matcher.Matchers;
 import com.wideplay.warp.hibernate.HibernateBindingSupport;
 import com.wideplay.warp.jpa.JpaBindingSupport;
 import com.wideplay.warp.persist.dao.Finder;
+import com.wideplay.warp.db4o.Db4oBindingSupport;
 import org.aopalliance.intercept.MethodInterceptor;
 
 import java.util.LinkedHashSet;
@@ -64,6 +65,13 @@ class PersistenceModule extends AbstractModule {
                 txnInterceptor = JpaBindingSupport.getInterceptor(transactionStrategy);
                 JpaBindingSupport.setUnitOfWork(unitOfWork);
                 finderInterceptor = JpaBindingSupport.getFinderInterceptor();
+                break;
+            case DB4O:
+                Db4oBindingSupport.addBindings(binder());
+                txnInterceptor = Db4oBindingSupport.getInterceptor(transactionStrategy);
+                Db4oBindingSupport.setUnitOfWork(unitOfWork);
+
+                //no DF for db4o (yet)
                 break;
         }
 

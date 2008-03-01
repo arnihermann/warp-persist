@@ -19,7 +19,10 @@ import net.jcip.annotations.Immutable;
  * @since 1.0
  */
 @Immutable
-public class HibernateBindingSupport {
+public final class HibernateBindingSupport {
+    private HibernateBindingSupport() {
+    }
+
     public static void addBindings(Binder binder) {
 
         binder.bind(SessionFactoryHolder.class).in(Singleton.class);
@@ -35,8 +38,8 @@ public class HibernateBindingSupport {
         switch (transactionStrategy) {
             case LOCAL:
                 return new HibernateLocalTxnInterceptor();
-            case JTA:
-                return new HibernateJtaTxnInterceptor();
+//            case JTA:
+//                return new HibernateJtaTxnInterceptor();
         }
 
         throw new IllegalArgumentException("No such transaction strategy known: " + transactionStrategy);

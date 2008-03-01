@@ -1,11 +1,6 @@
 package com.wideplay.warp.jpa;
 
 import com.wideplay.warp.persist.WorkManager;
-import com.wideplay.warp.persist.UnitOfWork;
-import org.hibernate.context.ManagedSessionContext;
-import org.hibernate.SessionFactory;
-
-import javax.persistence.EntityManager;
 
 import net.jcip.annotations.Immutable;
 
@@ -27,16 +22,18 @@ class JpaWorkManager implements WorkManager {
     }
 
     public void endWork() {
-        //do nothing if there is no em
-        if (null == EntityManagerFactoryHolder.checkCurrentEntityManager())
-            return;
+        EntityManagerFactoryHolder.closeCurrentEntityManager();
 
-        //check if it has been closed yet
-        final EntityManager currentEntityManager = EntityManagerFactoryHolder.getCurrentEntityManager();
-        if (!currentEntityManager.isOpen())
-            return;
-
-        //close up session when done
-        currentEntityManager.close();
+//        //do nothing if there is no em
+//        if (null == EntityManagerFactoryHolder.checkCurrentEntityManager())
+//            return;
+//
+//        //check if it has been closed yet
+//        final EntityManager currentEntityManager = EntityManagerFactoryHolder.checkCurrentEntityManager();
+//        if (!currentEntityManager.isOpen())
+//            return;
+//
+//        //close up session when done
+//        currentEntityManager.close();
     }
 }

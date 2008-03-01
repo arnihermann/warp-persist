@@ -114,7 +114,7 @@ public class ManagedLocalTransactionsTest {
 
         EntityManager em = EntityManagerFactoryHolder.getCurrentEntityManager();
 
-        assert !em.getTransaction().isActive() : "EM was not closed by transactional service (rollback didnt happen?)";
+        assert !em.getTransaction().isActive() : "Previous EM was not closed by transactional service (rollback didnt happen?)";
 
         //test that the data has been stored
         Object result = em.createQuery("from JpaTestEntity where text = :text").setParameter("text", TRANSIENT_UNIQUE_TEXT).getSingleResult();

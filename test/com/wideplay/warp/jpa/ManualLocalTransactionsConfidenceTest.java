@@ -9,8 +9,6 @@ import com.wideplay.warp.persist.PersistenceService;
 import com.wideplay.warp.persist.UnitOfWork;
 import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.Transactional;
-import com.wideplay.warp.hibernate.HibernateTestEntity;
-import com.wideplay.warp.hibernate.HibernateParentTestEntity;
 
 import java.util.Date;
 
