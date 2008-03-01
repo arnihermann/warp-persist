@@ -1,0 +1,6 @@
+com.wideplay.warp.db4o
+com.wideplay.warp.hibernate
+com.wideplay.warp.jpa
+com.wideplay.warp.persist
+com.wideplay.warp.persist.dao
+com.wideplay.warp.util
