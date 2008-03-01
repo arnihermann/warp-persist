@@ -15,6 +15,7 @@ import javax.transaction.SystemException;
  *
  * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  */
+@Deprecated
 class JpaJtaTxnInterceptor implements MethodInterceptor {
     private static UnitOfWork unitOfWork;
 

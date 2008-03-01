@@ -7,6 +7,9 @@ import org.aopalliance.intercept.MethodInvocation;
 import java.lang.reflect.Method;
 import java.lang.reflect.AccessibleObject;
 
+import net.jcip.annotations.ThreadSafe;
+import net.jcip.annotations.Immutable;
+
 /**
  * Created with IntelliJ IDEA.
  * User: dhanji
@@ -20,6 +23,7 @@ import java.lang.reflect.AccessibleObject;
  *
  * @author Dhanji R. Prasanna (dhanji gmail com)
  */
+@Immutable
 class AopAllianceCglibAdapter implements com.google.inject.cglib.proxy.MethodInterceptor {
     private final MethodInterceptor finderInterceptor;
 

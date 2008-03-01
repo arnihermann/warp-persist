@@ -14,6 +14,7 @@ import javax.transaction.SystemException;
  *
  * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  */
+@Deprecated
 class HibernateJtaTxnInterceptor implements MethodInterceptor {
 
     //do not make this final! the default must be overridable (ugh, hacky! but no other choice until guice1.1)

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import net.jcip.annotations.Immutable;
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,7 +12,9 @@ import org.hibernate.SessionFactory;
  *
  * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  */
+@Immutable
 class SessionProvider implements Provider<Session> {
+    //factory is thread safe (presumably!)
     private final SessionFactory factory;
 
     @Inject

@@ -6,6 +6,8 @@ import com.wideplay.warp.persist.PersistenceService;
 import javax.persistence.Persistence;
 import java.util.Properties;
 
+import net.jcip.annotations.ThreadSafe;
+
 /**
  * Created with IntelliJ IDEA.
  * On: 30/04/2007
@@ -13,11 +15,13 @@ import java.util.Properties;
  * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
+@ThreadSafe
 class JpaPersistenceService extends PersistenceService {
     private final EntityManagerFactoryHolder emFactoryHolder;
     private final String persistenceUnitName;
-    private Properties customProperties;
+    private volatile Properties customProperties;
 
+    @Deprecated
     private static final String JTA_USER_TRANSACTION = "jta.UserTransaction";
 
     @Inject
@@ -29,7 +33,7 @@ class JpaPersistenceService extends PersistenceService {
                 : "Persistence unit name was not set! (please bindConstant().annotatedWith(JpaUnit.class) to the name of a persistence unit";
     }
 
-    public void start() {
+    public synchronized void start() {
         //create with custom properties if necessary
         if (null != customProperties)
             emFactoryHolder.setEntityManagerFactory(Persistence.createEntityManagerFactory(persistenceUnitName, customProperties));
@@ -47,7 +51,9 @@ class JpaPersistenceService extends PersistenceService {
 
     @Override
     public boolean equals(Object obj) {
-        return emFactoryHolder.equals( ((JpaPersistenceService) obj).emFactoryHolder);
+        return  obj instanceof JpaPersistenceService &&
+
+                emFactoryHolder.equals( ((JpaPersistenceService) obj).emFactoryHolder);
     }
 
     @Override

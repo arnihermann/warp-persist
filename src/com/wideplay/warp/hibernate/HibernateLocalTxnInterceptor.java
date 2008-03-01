@@ -10,12 +10,15 @@ import org.hibernate.classic.Session;
 
 import java.lang.reflect.Method;
 
+import net.jcip.annotations.Immutable;
+
 /**
  * Created with IntelliJ IDEA.
  * On: May 26, 2007 3:07:46 PM
  *
  * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  */
+@Immutable
 class HibernateLocalTxnInterceptor implements MethodInterceptor {
 
     //make this customizable if there is a demand for it?

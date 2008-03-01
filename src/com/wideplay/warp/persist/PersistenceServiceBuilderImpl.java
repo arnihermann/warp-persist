@@ -6,6 +6,8 @@ import com.google.inject.matcher.Matchers;
 
 import java.lang.reflect.Method;
 
+import net.jcip.annotations.NotThreadSafe;
+
 /**
  * Created by IntelliJ IDEA.
  * User: dprasanna
@@ -19,6 +21,7 @@ import java.lang.reflect.Method;
  * @author dprasanna
  * @since 1.0
  */
+@NotThreadSafe
 class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, PersistenceModuleBuilder, TransactionStrategyBuilder {
     private final PersistenceModule persistenceModule;
 

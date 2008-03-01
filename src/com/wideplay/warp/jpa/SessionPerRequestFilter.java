@@ -5,6 +5,8 @@ import com.wideplay.warp.persist.UnitOfWork;
 import javax.servlet.*;
 import java.io.IOException;
 
+import net.jcip.annotations.ThreadSafe;
+
 /**
  * Created with IntelliJ IDEA.
  * On: 2/06/2007
@@ -18,8 +20,9 @@ import java.io.IOException;
  * @since 1.0
  * @see com.wideplay.warp.persist.UnitOfWork
  */
+@ThreadSafe
 public class SessionPerRequestFilter implements Filter {
-    private static UnitOfWork unitOfWork;
+    private static volatile UnitOfWork unitOfWork;
 
     public void destroy() {}
 

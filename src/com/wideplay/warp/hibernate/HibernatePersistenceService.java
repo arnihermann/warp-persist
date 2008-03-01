@@ -8,6 +8,8 @@ import org.hibernate.cfg.Configuration;
 import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+import net.jcip.annotations.Immutable;
+
 /**
  * Created with IntelliJ IDEA.
  * On: 30/04/2007
@@ -15,6 +17,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
+@Immutable
 class HibernatePersistenceService extends PersistenceService {
     private final SessionFactoryHolder sessionFactoryHolder;
     private final Configuration configuration;

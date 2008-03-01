@@ -14,6 +14,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,8 +28,9 @@ import java.util.*;
  * @author dprasanna
  * @since 1.0
  */
+@ThreadSafe
 class HibernateFinderInterceptor implements MethodInterceptor {
-    private volatile Map<Method, FinderDescriptor> finderCache = new HashMap<Method, FinderDescriptor>();
+    private final Map<Method, FinderDescriptor> finderCache = new ConcurrentHashMap<Method, FinderDescriptor>();
 
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
         Session session = SessionFactoryHolder.getCurrentSessionFactory().getCurrentSession();
@@ -108,6 +112,13 @@ class HibernateFinderInterceptor implements MethodInterceptor {
         }
     }
 
+    /**
+     *
+     * Gets a cached descriptor for the DF or creates one if necessary
+     *
+     * @param invocation A method invocation on a finder method
+     * @return Returns the finder descriptor for this DF
+     */
     private FinderDescriptor getFinderDescriptor(MethodInvocation invocation) {
         Method method = invocation.getMethod();
         FinderDescriptor finderDescriptor = finderCache.get(method);
@@ -167,20 +178,16 @@ class HibernateFinderInterceptor implements MethodInterceptor {
             }
         }
 
-        //cache it
+        //cache it (we are ok if concurrent threads overwrite each others values)
         cacheFinderDescriptor(method, finderDescriptor);
 
         return finderDescriptor;
     }
 
-    //provides copy-on-write semantics
-    private synchronized void cacheFinderDescriptor(Method method, FinderDescriptor finderDescriptor) {
-        Map<Method, FinderDescriptor> copy = new HashMap<Method, FinderDescriptor>();
-        copy.putAll(finderCache);
-        copy.put(method, finderDescriptor);
-
+    //concurrent writes ok--this is a CHM underneath
+    private void cacheFinderDescriptor(Method method, FinderDescriptor finderDescriptor) {
         //stash copy
-        finderCache = copy;
+        finderCache.put(method, finderDescriptor);
     }
 
     private ReturnType determineReturnType(Class<?> returnClass) {

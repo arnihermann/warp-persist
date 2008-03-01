@@ -9,14 +9,17 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import java.lang.reflect.Method;
 
+import net.jcip.annotations.ThreadSafe;
+
 /**
  * Created with IntelliJ IDEA.
  * On: May 26, 2007 3:07:46 PM
  *
  * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  */
+@ThreadSafe
 class JpaLocalTxnInterceptor implements MethodInterceptor {
-    private static UnitOfWork unitOfWork = UnitOfWork.TRANSACTION;
+    private static volatile UnitOfWork unitOfWork = UnitOfWork.TRANSACTION;
 
     //TODO this is a clunky hack, make a TransactionalImpl and make it customizable 
     @Transactional

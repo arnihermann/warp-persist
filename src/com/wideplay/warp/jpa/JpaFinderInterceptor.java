@@ -14,6 +14,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,13 +25,14 @@ import java.util.*;
  * Time: 14:54:52
  * <p/>
  *
- * TODO maybe factor out common bits of this class with HibernateFinderInterceptor ?
+ *
  *
  * @author dprasanna
  * @since 1.0
  */
+@ThreadSafe
 class JpaFinderInterceptor implements MethodInterceptor {
-    private volatile Map<Method, FinderDescriptor> finderCache = new HashMap<Method, FinderDescriptor>();
+    private final Map<Method, FinderDescriptor> finderCache = new ConcurrentHashMap<Method, FinderDescriptor>();
 
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
         EntityManager em = EntityManagerFactoryHolder.getCurrentEntityManager();
@@ -177,19 +181,14 @@ class JpaFinderInterceptor implements MethodInterceptor {
     }
 
     /**
-     * Provides copy-on-write semantics
+     * writes to a chm (used to provide copy-on-write but this is bettah!)
      *
      * @param method The key
      * @param finderDescriptor The descriptor to cache
      */
-    private synchronized void cacheFinderDescriptor(Method method, FinderDescriptor finderDescriptor) {
-        //create a copy
-        Map<Method, FinderDescriptor> copy = new HashMap<Method, FinderDescriptor>();
-        copy.putAll(finderCache);
-        copy.put(method, finderDescriptor);
-
-        //write to map
-        finderCache = copy;
+    private void cacheFinderDescriptor(Method method, FinderDescriptor finderDescriptor) {
+        //write to concurrent map
+        finderCache.put(method, finderDescriptor);
     }
 
     private JpaFinderInterceptor.ReturnType determineReturnType(Class<?> returnClass) {
@@ -205,14 +204,15 @@ class JpaFinderInterceptor implements MethodInterceptor {
     /**
      * A wrapper data class that caches information about a finder method.
      */
+    @ThreadSafe
     private static class FinderDescriptor {
-        private boolean isKeyedQuery = false;
-        boolean isBindAsRawParameters = true;   //should we treat the query as having ? instead of :named params
-        JpaFinderInterceptor.ReturnType returnType;
-        Class<?> returnClass;
-        Class<? extends Collection> returnCollectionType;
-        Constructor returnCollectionTypeConstructor;
-        Object[] parameterAnnotations;  //contract is: null = no bind, @Named = param, @FirstResult/@MaxResults for paging
+        private volatile boolean isKeyedQuery = false;
+        volatile boolean isBindAsRawParameters = true;   //should we treat the query as having ? instead of :named params
+        volatile JpaFinderInterceptor.ReturnType returnType;
+        volatile Class<?> returnClass;
+        volatile Class<? extends Collection> returnCollectionType;
+        volatile Constructor returnCollectionTypeConstructor;
+        volatile Object[] parameterAnnotations;  //contract is: null = no bind, @Named = param, @FirstResult/@MaxResults for paging
 
         private String query;
         private String name;

@@ -9,6 +9,7 @@ import com.wideplay.warp.persist.WorkManager;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import net.jcip.annotations.Immutable;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,6 +18,7 @@ import org.hibernate.SessionFactory;
  * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
+@Immutable
 public class HibernateBindingSupport {
     public static void addBindings(Binder binder) {
 

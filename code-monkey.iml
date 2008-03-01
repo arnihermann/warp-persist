@@ -420,13 +420,30 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="Groovy from GroovyJ 0.1.8 (Demetra)" level="application" />
     <orderEntry type="library" name="Groovy from GroovyJ 0.1.9 (Demetra)" level="application" />
     <orderEntry type="library" name="Groovy from GroovyJ 0.1.9 (Demetra)" level="application" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/easymock.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/db4o-6.4.14.8131-java5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/warp-jcip-annotations.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

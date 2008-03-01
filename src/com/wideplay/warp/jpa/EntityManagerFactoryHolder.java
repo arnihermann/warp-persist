@@ -1,5 +1,8 @@
 package com.wideplay.warp.jpa;
 
+import net.jcip.annotations.GuardedBy;
+import net.jcip.annotations.ThreadSafe;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
@@ -17,8 +20,10 @@ import javax.persistence.EntityManagerFactory;
  * @author dprasanna
  * @since 1.0
  */
+@ThreadSafe
 class EntityManagerFactoryHolder {
-    private EntityManagerFactory entityManagerFactory;
+    @GuardedBy("setEntityManagerFactory") //BUT read concurrently, so has to be volatile...
+    private volatile EntityManagerFactory entityManagerFactory;
 
     //A hack to provide the EntityManager factory statically to non-guice objects (interceptors), that can be thrown away come guice1.1
     private static volatile EntityManagerFactoryHolder singletonEmFactoryHolder;
@@ -50,20 +55,28 @@ class EntityManagerFactoryHolder {
 
 
 
+    //@ThreadLocal
     static void closeCurrentEntityManager() {
         EntityManager em = singletonEmFactoryHolder.entityManager.get();
 
         if (null != em) {
-            if (em.isOpen())
-                em.close();
-            singletonEmFactoryHolder.entityManager.remove();
+            try {
+                if (em.isOpen())
+                    em.close();
+            } finally {
+                singletonEmFactoryHolder.entityManager.remove();
+            }
         }
     }
 
+
+    //@ThreadLocal
     static EntityManager checkCurrentEntityManager() {
         return singletonEmFactoryHolder.entityManager.get();
     }
 
+
+    //@ThreadLocal
     static EntityManager getCurrentEntityManager() {
         EntityManager em = singletonEmFactoryHolder.entityManager.get();
 
@@ -77,9 +90,10 @@ class EntityManagerFactoryHolder {
     }
 
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || !(o instanceof EntityManagerFactoryHolder)) return false;
 
         EntityManagerFactoryHolder that = (EntityManagerFactoryHolder) o;
 
@@ -87,10 +101,13 @@ class EntityManagerFactoryHolder {
 
     }
 
+    @Override
     public int hashCode() {
         return (entityManagerFactory != null ? entityManagerFactory.hashCode() : 0);
     }
 
+
+    //@ThreadLocal
     public EntityManager getEntityManager() {
         return getCurrentEntityManager();
     }

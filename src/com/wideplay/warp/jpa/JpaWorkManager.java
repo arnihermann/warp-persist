@@ -7,6 +7,8 @@ import org.hibernate.SessionFactory;
 
 import javax.persistence.EntityManager;
 
+import net.jcip.annotations.Immutable;
+
 /**
  * Created with IntelliJ IDEA.
  * User: dhanji
@@ -15,10 +17,12 @@ import javax.persistence.EntityManager;
  *
  * @author Dhanji R. Prasanna (dhanji gmail com)
  */
+@Immutable
 class JpaWorkManager implements WorkManager {
 
 
     public void beginWork() {
+        //triggers an em creation
         EntityManagerFactoryHolder.getCurrentEntityManager();
     }
 

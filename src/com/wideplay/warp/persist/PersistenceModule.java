@@ -13,6 +13,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.lang.reflect.Method;
 
+import net.jcip.annotations.NotThreadSafe;
+
 /**
  * Created with IntelliJ IDEA.
  * On: 30/04/2007
@@ -25,6 +27,7 @@ import java.lang.reflect.Method;
  * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
+@NotThreadSafe
 class PersistenceModule extends AbstractModule {
 
     private final PersistenceFlavor flavor;

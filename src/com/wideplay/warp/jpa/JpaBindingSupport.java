@@ -11,6 +11,8 @@ import org.aopalliance.intercept.MethodInterceptor;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
+import net.jcip.annotations.Immutable;
+
 /**
  * Created with IntelliJ IDEA.
  * On: 2/06/2007
@@ -18,6 +20,7 @@ import javax.persistence.EntityManagerFactory;
  * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
+@Immutable
 public class JpaBindingSupport {
 
     private JpaBindingSupport() {
@@ -46,8 +49,8 @@ public class JpaBindingSupport {
         switch (transactionStrategy) {
             case LOCAL:
                 return new JpaLocalTxnInterceptor();
-            case JTA:
-                return new JpaJtaTxnInterceptor();
+//            case JTA:
+//                return new JpaJtaTxnInterceptor();
         }
 
         throw new IllegalArgumentException("No such transaction strategy known: " + transactionStrategy);

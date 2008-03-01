@@ -3,6 +3,7 @@ package com.wideplay.warp.hibernate;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.hibernate.SessionFactory;
+import net.jcip.annotations.Immutable;
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,8 +12,9 @@ import org.hibernate.SessionFactory;
  * @author Dhanji R. Prasanna <a href="mailto:dhanji@gmail.com">email</a>
  * @since 1.0
  */
+@Immutable
 class SessionFactoryProvider implements Provider<SessionFactory> {
-    private SessionFactoryHolder sessionFactoryHolder;
+    private final SessionFactoryHolder sessionFactoryHolder;
 
     @Inject
     public SessionFactoryProvider(SessionFactoryHolder sessionFactoryHolder) {

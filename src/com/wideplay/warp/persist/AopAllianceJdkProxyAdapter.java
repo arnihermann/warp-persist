@@ -7,6 +7,8 @@ import org.aopalliance.intercept.MethodInvocation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 
+import net.jcip.annotations.Immutable;
+
 /**
  * Created by IntelliJ IDEA.
  * User: dprasanna
@@ -21,6 +23,7 @@ import java.lang.reflect.Method;
  * @author dprasanna
  * @since 1.0
  */
+@Immutable
 class AopAllianceJdkProxyAdapter implements InvocationHandler {
     private final MethodInterceptor interceptor;
 
