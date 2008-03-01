@@ -67,7 +67,7 @@
     <target name="assemble.jar" depends="make"
             description="builds and assembles a library jar for drop in persistence support in guice injectors">
         <!-- build distro first -->
-        <jar basedir="${build}" destfile="${dist}/warp-persist.jar"
+        <jar basedir="${build}" destfile="${dist}/warp-persist-${version}.jar"
              description="Persistence support for Warp, or any guice-based project using hibernate or JPA (www.wideplay.com)">
         </jar>
     </target>
@@ -87,7 +87,7 @@
                 <path refid="persist.classpath"/>
 
                 <pathelement location="${test}"/>
-                <pathelement location="${dist}/warp-persist.jar"/>
+                <pathelement location="${dist}/warp-persist-${version}.jar"/>
             </classpath>
 
             <classfileset dir="${test}" includes="**/*Test.class"/>
