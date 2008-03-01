@@ -32,7 +32,8 @@ public final class Db4oBindingSupport {
 
 	public static void setUnitOfWork(UnitOfWork unitOfWork) {
 		Db4oLocalTxnInterceptor.setUnitOfWork(unitOfWork);
-	}
+        SessionPerRequestFilter.setUnitOfWork(unitOfWork);
+    }
 
 	public static MethodInterceptor getInterceptor(TransactionStrategy transactionStrategy) {
 		switch (transactionStrategy) {

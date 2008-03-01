@@ -62,6 +62,11 @@
           </containerElement>
           <containerElement type="library" level="module">
             <attribute name="method" value="1" />
+            <attribute name="URI" value="/WEB-INF/lib/db4o-6.4.14.8131-java5.jar" />
+            <url>jar://$MODULE_DIR$/lib/db4o-6.4.14.8131-java5.jar!/</url>
+          </containerElement>
+          <containerElement type="library" level="module">
+            <attribute name="method" value="1" />
             <attribute name="URI" value="/WEB-INF/lib/dom4j-1.6.1.jar" />
             <url>jar://$MODULE_DIR$/lib/dom4j-1.6.1.jar!/</url>
           </containerElement>
@@ -160,11 +165,16 @@
             <attribute name="URI" value="/WEB-INF/lib/warp-core.jar" />
             <url>jar://$MODULE_DIR$/lib/warp-core.jar!/</url>
           </containerElement>
-          <containerElement type="library" name="Groovy from GroovyJ 0.1.8 (Demetra)" level="application">
+          <containerElement type="library" level="module">
+            <attribute name="method" value="0" />
+            <attribute name="URI" value="/WEB-INF/lib" />
+            <url>jar://$MODULE_DIR$/lib/warp-jcip-annotations.jar!/</url>
+          </containerElement>
+          <containerElement type="library" name="Groovy from GroovyJ 0.1.9 (Demetra)" level="application">
             <attribute name="method" value="0" />
             <attribute name="URI" value="/WEB-INF/lib" />
           </containerElement>
-          <containerElement type="library" name="Groovy from GroovyJ 0.1.9 (Demetra)" level="application">
+          <containerElement type="library" name="Groovy from GroovyJ 0.1.8 (Demetra)" level="application">
             <attribute name="method" value="0" />
             <attribute name="URI" value="/WEB-INF/lib" />
           </containerElement>

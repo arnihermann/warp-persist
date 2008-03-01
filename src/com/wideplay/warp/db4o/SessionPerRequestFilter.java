@@ -24,7 +24,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 public class SessionPerRequestFilter implements Filter {
-    private static volatile UnitOfWork unitOfWork;
+    private static volatile UnitOfWork unitOfWork = UnitOfWork.TRANSACTION;
 
 	public void destroy() {}
 
