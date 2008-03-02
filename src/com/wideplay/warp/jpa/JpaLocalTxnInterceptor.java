@@ -153,6 +153,9 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
         return UnitOfWork.TRANSACTION.equals(unitOfWork);
     }
 
+    static UnitOfWork getUnitOfWork() {
+        return unitOfWork;
+    }
 
     static void setUnitOfWork(UnitOfWork unitOfWork) {
         JpaLocalTxnInterceptor.unitOfWork = unitOfWork;

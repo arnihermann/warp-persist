@@ -23,6 +23,7 @@ import javax.servlet.*;
 import java.io.IOException;
 
 import net.jcip.annotations.ThreadSafe;
+import net.jcip.annotations.Immutable;
 
 /**
  * Created with IntelliJ IDEA.
@@ -36,14 +37,12 @@ import net.jcip.annotations.ThreadSafe;
  * @since 1.0
  * @see com.wideplay.warp.persist.UnitOfWork
  */
-@ThreadSafe
+@Immutable
 public class SessionPerRequestFilter implements Filter {
-    private static volatile UnitOfWork unitOfWork;
-
     public void destroy() {}
 
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        if (!UnitOfWork.REQUEST.equals(unitOfWork))
+        if (!UnitOfWork.REQUEST.equals(HibernateLocalTxnInterceptor.getUnitOfWork()))
             throw new ServletException("UnitOfWork *must* be REQUEST to use this filter (did you mean to use jpa instead)?");
 
         //open session;
@@ -59,13 +58,4 @@ public class SessionPerRequestFilter implements Filter {
     }
 
     public void init(FilterConfig filterConfig) throws ServletException {}
-
-
-    static void setUnitOfWork(UnitOfWork unitOfWork) {
-        SessionPerRequestFilter.unitOfWork = unitOfWork;
-    }
-
-    static UnitOfWork getUnitOfWork() {
-        return unitOfWork;
-    }
 }

@@ -35,7 +35,7 @@ class HibernateWorkManager implements WorkManager {
 
 
     public void beginWork() {
-        if (UnitOfWork.TRANSACTION.equals(SessionPerRequestFilter.getUnitOfWork()))
+        if (UnitOfWork.TRANSACTION.equals(HibernateLocalTxnInterceptor.getUnitOfWork()))
             throw new IllegalStateException("Cannot use WorkManager with UnitOfWork.TRANSACTION");
 
         //do nothing if a session is already open
@@ -47,7 +47,7 @@ class HibernateWorkManager implements WorkManager {
     }
 
     public void endWork() {
-        if (UnitOfWork.TRANSACTION.equals(SessionPerRequestFilter.getUnitOfWork()))
+        if (UnitOfWork.TRANSACTION.equals(HibernateLocalTxnInterceptor.getUnitOfWork()))
             throw new IllegalStateException("Cannot use WorkManager with UnitOfWork.TRANSACTION");
 
         //do nothing if there is no session open

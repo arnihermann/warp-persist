@@ -48,7 +48,7 @@ public class JpaSPRFilterTest {
     public final void testDoFilter() throws IOException, ServletException {
 //        //create our spr filter and set it up
         SessionPerRequestFilter filter = new SessionPerRequestFilter();
-        SessionPerRequestFilter.setUnitOfWork(UnitOfWork.REQUEST);
+        JpaLocalTxnInterceptor.setUnitOfWork(UnitOfWork.REQUEST);
 
         EntityManagerFactory emfMock = createStrictMock(EntityManagerFactory.class);
         EntityManager emMock = createStrictMock(EntityManager.class);
@@ -80,7 +80,7 @@ public class JpaSPRFilterTest {
 
 //        //create our spr filter and set it up
         SessionPerRequestFilter filter = new SessionPerRequestFilter();
-        SessionPerRequestFilter.setUnitOfWork(UnitOfWork.REQUEST);
+        JpaLocalTxnInterceptor.setUnitOfWork(UnitOfWork.REQUEST);
 
         EntityManagerFactory emfMock = createStrictMock(EntityManagerFactory.class);
         EntityManager emMock = createStrictMock(EntityManager.class);

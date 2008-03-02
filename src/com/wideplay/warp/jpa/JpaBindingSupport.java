@@ -57,7 +57,6 @@ public final class JpaBindingSupport {
     public static void setUnitOfWork(UnitOfWork unitOfWork) {
         //set the default unit-of-work strategy
         JpaLocalTxnInterceptor.setUnitOfWork(unitOfWork);
-        SessionPerRequestFilter.setUnitOfWork(unitOfWork);
     }
 
     public static MethodInterceptor getInterceptor(TransactionStrategy transactionStrategy) {

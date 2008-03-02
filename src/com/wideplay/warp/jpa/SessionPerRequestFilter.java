@@ -38,12 +38,10 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 public class SessionPerRequestFilter implements Filter {
-    private static volatile UnitOfWork unitOfWork;
-
     public void destroy() {}
 
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        if (!UnitOfWork.REQUEST.equals(unitOfWork))
+        if (!UnitOfWork.REQUEST.equals(JpaLocalTxnInterceptor.getUnitOfWork()))
             throw new ServletException("UnitOfWork *must* be REQUEST to use this filter (did you mean to use hibernate instead)?");
 
         //open a new EM
@@ -59,8 +57,4 @@ public class SessionPerRequestFilter implements Filter {
     }
 
     public void init(FilterConfig filterConfig) throws ServletException {}
-
-    static void setUnitOfWork(UnitOfWork unitOfWork) {
-        SessionPerRequestFilter.unitOfWork = unitOfWork;
-    }
 }

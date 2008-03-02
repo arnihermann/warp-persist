@@ -125,7 +125,11 @@ class Db4oLocalTxnInterceptor implements MethodInterceptor {
 		return UnitOfWork.TRANSACTION.equals(unitOfWork);
 	}
 
-	static void setUnitOfWork(UnitOfWork unitOfWork) {
+    static UnitOfWork getUnitOfWork() {
+        return unitOfWork;
+    }
+
+    static void setUnitOfWork(UnitOfWork unitOfWork) {
 		Db4oLocalTxnInterceptor.unitOfWork = unitOfWork;
 	}
 }

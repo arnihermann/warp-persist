@@ -40,7 +40,7 @@ public class Db4oSPRFilterTest {
 	@Test
 	public final void testDoFilter() throws IOException, ServletException {
 		SessionPerRequestFilter filter = new SessionPerRequestFilter();
-		SessionPerRequestFilter.setUnitOfWork(UnitOfWork.REQUEST);
+		Db4oLocalTxnInterceptor.setUnitOfWork(UnitOfWork.REQUEST);
 
 		ObjectServer osMock = createMock(ObjectServer.class);
 		ObjectContainer ocMock = createMock(ObjectContainer.class);
@@ -67,7 +67,7 @@ public class Db4oSPRFilterTest {
 	@Test
 	public final void testDoFilterWithException() throws IOException, ServletException {
 		SessionPerRequestFilter filter = new SessionPerRequestFilter();
-		SessionPerRequestFilter.setUnitOfWork(UnitOfWork.REQUEST);
+		Db4oLocalTxnInterceptor.setUnitOfWork(UnitOfWork.REQUEST);
 
 		ObjectServer osMock = createMock(ObjectServer.class);
 		ObjectContainer ocMock = createMock(ObjectContainer.class);

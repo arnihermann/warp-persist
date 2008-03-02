@@ -66,6 +66,6 @@ public final class HibernateBindingSupport {
     }
 
     public static void setUnitOfWork(UnitOfWork unitOfWork) {
-        SessionPerRequestFilter.setUnitOfWork(unitOfWork);
+        HibernateLocalTxnInterceptor.setUnitOfWork(unitOfWork);
     }
 }

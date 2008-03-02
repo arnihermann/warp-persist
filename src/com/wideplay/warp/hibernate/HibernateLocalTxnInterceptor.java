@@ -18,6 +18,7 @@ package com.wideplay.warp.hibernate;
 
 import com.wideplay.warp.persist.TransactionType;
 import com.wideplay.warp.persist.Transactional;
+import com.wideplay.warp.persist.UnitOfWork;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.hibernate.FlushMode;
@@ -27,6 +28,7 @@ import org.hibernate.classic.Session;
 import java.lang.reflect.Method;
 
 import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Created with IntelliJ IDEA.
@@ -34,8 +36,9 @@ import net.jcip.annotations.Immutable;
  *
  * @author Dhanji R. Prasanna (dhanji@gmail.com)
  */
-@Immutable
+@ThreadSafe
 class HibernateLocalTxnInterceptor implements MethodInterceptor {
+    private static volatile UnitOfWork unitOfWork = UnitOfWork.TRANSACTION;
 
     //make this customizable if there is a demand for it?
     @Transactional
@@ -155,5 +158,13 @@ class HibernateLocalTxnInterceptor implements MethodInterceptor {
         }
 
         return commit;
+    }
+
+    static UnitOfWork getUnitOfWork() {
+        return unitOfWork;
+    }
+
+    static void setUnitOfWork(UnitOfWork unitOfWork) {
+        HibernateLocalTxnInterceptor.unitOfWork = unitOfWork;
     }
 }

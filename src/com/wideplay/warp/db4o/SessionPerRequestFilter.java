@@ -40,14 +40,13 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 public class SessionPerRequestFilter implements Filter {
-    private static volatile UnitOfWork unitOfWork = UnitOfWork.TRANSACTION;
 
 	public void destroy() {}
 
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
 			FilterChain filterChain) throws IOException, ServletException {
 
-		if (!unitOfWork.equals(UnitOfWork.REQUEST)) {
+		if (!UnitOfWork.REQUEST.equals(Db4oLocalTxnInterceptor.getUnitOfWork())) {
 			throw new ServletException("UnitOfWork must be REQUEST to use this filter. Did you mean to use Hibernate or JPA instead?");
 		}
 
@@ -62,7 +61,4 @@ public class SessionPerRequestFilter implements Filter {
 
 	public void init(FilterConfig filterConfig) throws ServletException {}
 
-	public static void setUnitOfWork(UnitOfWork unitOfWork) {
-		SessionPerRequestFilter.unitOfWork = unitOfWork;
-	}
 }
