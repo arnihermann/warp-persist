@@ -144,6 +144,22 @@ public class JpaDynamicFindersTest {
         assert result.getId().equals(id) : "attribs not persisted correctly";
     }
 
+    @Test
+    public void testSingleResultFetchWithIndexedParameter() {
+
+        //set up some test data
+        Long id = injector.getInstance(FinderDao.class).store().getId();
+
+        //now attempt to query it out
+        JpaTestAccessor accessor = injector.getInstance(JpaTestAccessor.class);
+
+        JpaTestEntity result = accessor.fetchById(id);
+
+        assert null != result : "result not returned!";
+
+        assert result.getId().equals(id) : "attribs not persisted correctly";
+    }
+
     public static class FinderDao {
         private final EntityManager em;
 

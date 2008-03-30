@@ -40,4 +40,7 @@ public interface JpaTestAccessor {
 
     @Finder(query = "from JpaTestEntity where id = :id")
     JpaTestEntity fetch(@Named("id")Long id);
+
+    @Finder(query = "from JpaTestEntity where id = ?")
+    JpaTestEntity fetchById(Long id);
 }

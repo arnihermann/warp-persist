@@ -115,19 +115,19 @@ class JpaFinderInterceptor implements MethodInterceptor {
         }
     }
 
-    private void bindQueryRawParameters(Query hibernateQuery, JpaFinderInterceptor.FinderDescriptor descriptor, Object[] arguments) {
-        for (int i = 0, index = 0; i < arguments.length; i++) {
+    private void bindQueryRawParameters(Query jpaQuery, JpaFinderInterceptor.FinderDescriptor descriptor, Object[] arguments) {
+        for (int i = 0, index = 1; i < arguments.length; i++) {
             Object argument = arguments[i];
             Object annotation = descriptor.parameterAnnotations[i];
 
             if (null == annotation) {
-                //bind it as a raw param (0-based index, yes I know its different from JDBC, blargh)
-                hibernateQuery.setParameter(index, argument);
+                //bind it as a raw param (1-based index, yes I know its different from Hibernate, blargh)
+                jpaQuery.setParameter(index, argument);
                 index++;
             } else if (annotation instanceof FirstResult)
-                hibernateQuery.setFirstResult((Integer)argument);
+                jpaQuery.setFirstResult((Integer)argument);
             else if (annotation instanceof MaxResults)
-                hibernateQuery.setMaxResults((Integer)argument);
+                jpaQuery.setMaxResults((Integer)argument);
         }
     }
 
