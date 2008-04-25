@@ -32,7 +32,7 @@ import com.wideplay.warp.persist.UnitOfWork;
 
 /**
  * 
- * @author Jeffrey Chung (lwbruce@gmail.com)
+ * @author Jeffrey Chung (jeffreymchung@gmail.com)
  */
 @Test(suiteName = "db4o")
 public class ObjectServerProvisionTest {

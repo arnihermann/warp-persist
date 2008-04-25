@@ -30,7 +30,7 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * TODO Rolled-back objects need to be refreshed?
  * 
- * @author Jeffrey Chung (lwbruce@gmail.com)
+ * @author Jeffrey Chung (jeffreymchung@gmail.com)
  */
 @ThreadSafe
 class Db4oLocalTxnInterceptor implements MethodInterceptor {

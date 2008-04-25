@@ -30,7 +30,7 @@ import net.jcip.annotations.Immutable;
 
 /**
  * 
- * @author Jeffrey Chung (lwbruce@gmail.com)
+ * @author Jeffrey Chung (jeffreymchung@gmail.com)
  */
 @Immutable
 public final class Db4oBindingSupport {

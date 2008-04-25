@@ -18,7 +18,7 @@ package com.wideplay.warp.db4o;
 
 /**
  * 
- * @author Jeffrey Chung (lwbruce@gmail.com)
+ * @author Jeffrey Chung (jeffreymchung@gmail.com)
  */
 public class Db4oTestObject {
 	private String text;

@@ -21,7 +21,7 @@ import com.wideplay.warp.persist.WorkManager;
 
 /**
  * 
- * @author Jeffrey Chung (lwbruce@gmail.com)
+ * @author Jeffrey Chung (jeffreymchung@gmail.com)
  */
 class Db4oWorkManager implements WorkManager {
 

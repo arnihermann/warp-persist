@@ -10,10 +10,6 @@
           <root url="file://$MODULE_DIR$/resources" relative="/" />
           <root url="file://$MODULE_DIR$/WEB-INF" relative="/WEB-INF" />
         </webroots>
-        <sourceRoots>
-          <root url="file://$MODULE_DIR$/src" />
-          <root url="file://$MODULE_DIR$/test" />
-        </sourceRoots>
         <building>
           <setting name="EXPLODED_URL" value="file://$MODULE_DIR$/exploded" />
           <setting name="EXPLODED_ENABLED" value="true" />
@@ -184,6 +180,7 @@
     <facet type="jpa" name="code-monkey">
       <configuration>
         <setting name="validation-enabled" value="false" />
+        <setting name="provider-name" value="" />
         <datasource-mapping />
         <deploymentDescriptor name="persistence.xml" url="file://$MODULE_DIR$/src/META-INF/persistence.xml" optional="false" version="1.0" />
       </configuration>

@@ -35,7 +35,7 @@ import net.jcip.annotations.ThreadSafe;
  * Apply this filter in web.xml to enable the HTTP Request unit of work.
  * </p>
  * 
- * @author Jeffrey Chung (lwbruce@gmail.com)
+ * @author Jeffrey Chung (jeffreymchung@gmail.com)
  * @see com.wideplay.warp.persist.UnitOfWork
  */
 @ThreadSafe

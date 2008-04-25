@@ -22,7 +22,7 @@ import com.google.inject.Provider;
 
 /**
  * 
- * @author Jeffrey Chung (lwbruce@gmail.com)
+ * @author Jeffrey Chung (jeffreymchung@gmail.com)
  */
 class ObjectContainerProvider implements Provider<ObjectContainer> {
 

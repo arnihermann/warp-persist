@@ -51,7 +51,7 @@ import com.google.inject.BindingAnnotation;
  *   bindConstant().annotatedWith(Db4Objects.class).to("TestDatabase.data");
  * </code>
  * 
- * @author Jeffrey Chung (lwbruce@gmail.com)
+ * @author Jeffrey Chung (jeffreymchung@gmail.com)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @BindingAnnotation

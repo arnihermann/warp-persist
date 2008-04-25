@@ -23,7 +23,7 @@ import net.jcip.annotations.Immutable;
 
 /**
  * 
- * @author Jeffrey Chung (lwbruce@gmail.com)
+ * @author Jeffrey Chung (jeffreymchung@gmail.com)
  */
 @Immutable
 class ObjectServerProvider implements Provider<ObjectServer> {

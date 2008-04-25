@@ -28,7 +28,7 @@ import net.jcip.annotations.GuardedBy;
 
 /**
  * 
- * @author Jeffrey Chung (lwbruce@gmail.com), Dhanji R. Prasanna (dhanji@gmail.com)
+ * @author Jeffrey Chung (jeffreymchung@gmail.com), Dhanji R. Prasanna (dhanji@gmail.com)
  */
 @ThreadSafe
 class ObjectServerHolder {
