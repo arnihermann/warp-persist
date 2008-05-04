@@ -27,6 +27,9 @@ import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.testng.annotations.Test;
 
+import java.util.List;
+import java.util.ArrayList;
+
 /**
  * Created with IntelliJ IDEA.
  * On: 2/06/2007
@@ -73,7 +76,6 @@ public class EdslBuilderTest {
 
     static class TransactionalObject {
         @Transactional public void txnMethod() {
-            
         }
     }
 }
