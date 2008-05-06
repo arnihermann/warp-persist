@@ -107,9 +107,9 @@ public class EntityManagerPerRequestProvisionTest {
         dao.persist(te);
 
         //im not sure this hack works...
-        assert !JpaDao.em.equals(injector.getInstance(EntityManager.class))
+        assert JpaDao.em.equals(injector.getInstance(EntityManager.class))
                  : "Duplicate entity managers crossing-scope";
-        assert !JpaDao.em.equals(injector.getInstance(EntityManager.class))
+        assert JpaDao.em.equals(injector.getInstance(EntityManager.class))
                  : "Duplicate entity managers crossing-scope";
 
         //some fuzz to test no open/close is happening
@@ -122,7 +122,7 @@ public class EntityManagerPerRequestProvisionTest {
         //try to start a new em in a new txn
         dao = injector.getInstance(JpaDao.class);
 
-        assert !dao.contains(te) : "EntityManager wasnt closed and reopened properly around txn (persistent object persists)";
+        assert dao.contains(te) : "EntityManager was closed and reopened around txn (persistent object doesnt persist)";
     }
 
     public static class JpaDao {
