@@ -428,7 +428,6 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="Groovy from GroovyJ 0.1.9 (Demetra)" level="application" />
-    <orderEntry type="library" name="Groovy from GroovyJ 0.1.9 (Demetra)" level="application" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -451,6 +450,15 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/warp-jcip-annotations.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/xwork-2.0.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

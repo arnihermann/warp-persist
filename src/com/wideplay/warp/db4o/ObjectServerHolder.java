@@ -63,7 +63,14 @@ class ObjectServerHolder {
 	}
 
 	static ObjectServer getCurrentObjectServer() {
-		return singletonObjectServerHolder.getObjectServer();
+        final ObjectServer server = singletonObjectServerHolder.getObjectServer();
+
+        if (null == server) {
+            throw new RuntimeException("No ObjectServer was found. Did you remember to call " +
+                    "PersistenceService.start() *before* using the EntityManager? In servlet environments, this is typically " +
+                    "done in the init() lifecycle method of a servlet (or equivalent webapp initialization scheme).");
+        }
+        return server;
 	}
 
     //@ThreadLocal

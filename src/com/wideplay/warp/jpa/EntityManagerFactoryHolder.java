@@ -64,7 +64,14 @@ class EntityManagerFactoryHolder {
     }
 
     static EntityManagerFactory getCurrentEntityManagerFactory() {
-        return singletonEmFactoryHolder.getEntityManagerFactory();
+        final EntityManagerFactory emFactory = singletonEmFactoryHolder.getEntityManagerFactory();
+
+        if (null == emFactory)
+            throw new RuntimeException("No EntityManagerFactory was found. Did you remember to call " +
+                    "PersistenceService.start() *before* using the EntityManager? In servlet environments, this is typically " +
+                    "done in the init() lifecycle method of a servlet (or equivalent webapp initialization scheme).");
+
+        return emFactory;
     }
 
 

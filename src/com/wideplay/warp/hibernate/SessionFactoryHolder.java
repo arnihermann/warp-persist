@@ -59,7 +59,14 @@ class SessionFactoryHolder {
     }
 
     static SessionFactory getCurrentSessionFactory() {
-        return singletonSessionFactoryHolder.getSessionFactory();
+        final SessionFactory sessionFactory = singletonSessionFactoryHolder.getSessionFactory();
+
+        if (null == sessionFactory) {
+            throw new RuntimeException("No SessionFactory was found. Did you remember to call " +
+                    "PersistenceService.start() *before* using the EntityManager? In servlet environments, this is typically " +
+                    "done in the init() lifecycle method of a servlet (or equivalent webapp initialization scheme).");
+        }
+        return sessionFactory;
     }
 
     @Override
