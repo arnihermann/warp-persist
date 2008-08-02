@@ -19,6 +19,7 @@ package com.wideplay.warp.jpa;
 import javax.persistence.EntityManagerFactory;
 
 import net.jcip.annotations.ThreadSafe;
+import net.jcip.annotations.Immutable;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -78,6 +79,7 @@ import com.wideplay.warp.persist.UnitOfWork;
  * @see com.wideplay.warp.jpa.SessionPerRequestFilter
  * @author Robbie Vanbrabant
  */
+@Immutable
 @ThreadSafe
 public class SessionPerRequestInterceptor implements Interceptor {
     // transient because we provide readResolve; providers are not serializable
