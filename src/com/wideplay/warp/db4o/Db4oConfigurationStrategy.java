@@ -38,7 +38,7 @@ public class Db4oConfigurationStrategy implements ConfigurationStrategy {
 
                 // Set up transactions. Only local transactions are supported.
                 if (TransactionStrategy.LOCAL != config.getTransactionStrategy())
-                    throw new IllegalArgumentException("Unsupported Hibernate transaction strategy: " + config.getTransactionStrategy());
+                    throw new IllegalArgumentException("Unsupported Db40 transaction strategy: " + config.getTransactionStrategy());
                 Db4oLocalTxnInterceptor.setUnitOfWork(config.getUnitOfWork());
                 bindInterceptor(config.getTransactionClassMatcher(),
                                 config.getTransactionMethodMatcher(),
