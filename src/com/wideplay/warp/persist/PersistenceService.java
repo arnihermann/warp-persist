@@ -49,7 +49,7 @@ public abstract class PersistenceService {
      * @return Returns the next step in the configuration chain.
      */
     public static SessionStrategyBuilder usingHibernate() {
-        return new PersistenceServiceBuilderImpl(new PersistenceModule(PersistenceModule.PersistenceFlavor.HIBERNATE));
+        return new PersistenceServiceBuilderImpl(Configuration.PersistenceFlavor.HIBERNATE);
     }
 
 
@@ -61,19 +61,8 @@ public abstract class PersistenceService {
      * @return Returns the next step in the configuration chain.
      */
     public static SessionStrategyBuilder usingJpa() {
-        return new PersistenceServiceBuilderImpl(new PersistenceModule(PersistenceModule.PersistenceFlavor.JPA));
+        return new PersistenceServiceBuilderImpl(Configuration.PersistenceFlavor.JPA);
     }
-
-    /**
-     * A utility for testing if a given method is a dynamic finder.
-     *
-     * @param method A method you suspect is a Dynamic Finder.
-     * @return Returns true if the method is annotated {@code @Finder}
-     */
-    public static boolean isDynamicFinder(Method method) {
-        return method.isAnnotationPresent(Finder.class);
-    }
-
 
     /**
      * A factory for warp-persist using Db4o in your Guice module. See http://www.wideplay.com
@@ -83,6 +72,16 @@ public abstract class PersistenceService {
      * @return Returns the next step in the configuration chain.
      */
     public static SessionStrategyBuilder usingDb4o() {
-        return new PersistenceServiceBuilderImpl(new PersistenceModule(PersistenceModule.PersistenceFlavor.DB4O));
+        return new PersistenceServiceBuilderImpl(Configuration.PersistenceFlavor.DB4O);
+    }
+    
+    /**
+     * A utility for testing if a given method is a dynamic finder.
+     *
+     * @param method A method you suspect is a Dynamic Finder.
+     * @return Returns true if the method is annotated {@code @Finder}
+     */
+    public static boolean isDynamicFinder(Method method) {
+        return method.isAnnotationPresent(Finder.class);
     }
 }

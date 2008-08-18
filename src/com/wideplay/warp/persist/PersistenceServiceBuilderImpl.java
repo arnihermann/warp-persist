@@ -19,10 +19,10 @@ package com.wideplay.warp.persist;
 import com.google.inject.Module;
 import com.google.inject.matcher.Matcher;
 import com.google.inject.matcher.Matchers;
+import com.wideplay.warp.persist.Configuration.PersistenceFlavor;
+import net.jcip.annotations.NotThreadSafe;
 
 import java.lang.reflect.Method;
-
-import net.jcip.annotations.NotThreadSafe;
 
 /**
  * Created by IntelliJ IDEA.
@@ -40,47 +40,48 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, PersistenceModuleBuilder, TransactionStrategyBuilder {
-    private final PersistenceModule persistenceModule;
+    private final Configuration.ConfigurationBuilder persistenceConfiguration = Configuration.builder();
+    private final PersistenceFlavor flavor;
 
-    PersistenceServiceBuilderImpl(PersistenceModule persistenceModule) {
-        this.persistenceModule = persistenceModule;
+    PersistenceServiceBuilderImpl(PersistenceFlavor flavor) {
+        this.flavor = flavor;
     }
 
     public TransactionStrategyBuilder across(UnitOfWork unitOfWork) {
-        persistenceModule.setUnitOfWork(unitOfWork);
+        persistenceConfiguration.unitOfWork(unitOfWork);
 
         return this;
     }
 
     public Module buildModule() {
-        return persistenceModule;
+        return new PersistenceModule(flavor, persistenceConfiguration.build());
     }
 
 
     public TransactionStrategyBuilder transactedWith(TransactionStrategy transactionStrategy) {
-        persistenceModule.setTransactionStrategy(transactionStrategy);
+        persistenceConfiguration.transactionStrategy(transactionStrategy);
 
         return this;
     }
 
 
     public TransactionStrategyBuilder addAccessor(Class<?> daoInterface) {
-        persistenceModule.addAccessor(daoInterface);
+        persistenceConfiguration.accessor(daoInterface);
 
         return this;
     }
 
     public PersistenceModuleBuilder forAll(Matcher<? super Class<?>> classMatcher) {
-        persistenceModule.setClassMatcher(classMatcher);
-        persistenceModule.setMethodMatcher(Matchers.annotatedWith(Transactional.class));
+        persistenceConfiguration.transactionClassMatcher(classMatcher);
+        persistenceConfiguration.transactionMethodMatcher(Matchers.annotatedWith(Transactional.class));
 
         return this;
     }
 
 
     public PersistenceModuleBuilder forAll(Matcher<? super Class<?>> classMatcher, Matcher<? super Method> methodMatcher) {
-        persistenceModule.setClassMatcher(classMatcher);
-        persistenceModule.setMethodMatcher(methodMatcher);
+        persistenceConfiguration.transactionClassMatcher(classMatcher);
+        persistenceConfiguration.transactionMethodMatcher(methodMatcher);
 
         return this;
     }
