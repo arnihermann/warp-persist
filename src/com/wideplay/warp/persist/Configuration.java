@@ -17,6 +17,9 @@ package com.wideplay.warp.persist;
 
 import com.google.inject.matcher.Matcher;
 import com.google.inject.matcher.Matchers;
+import com.wideplay.warp.db4o.Db4oConfigurationStrategy;
+import com.wideplay.warp.hibernate.HibernateConfigurationStrategy;
+import com.wideplay.warp.jpa.JpaConfigurationStrategy;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
@@ -104,5 +107,24 @@ public class Configuration {
         }
     }
 
-    static enum PersistenceFlavor { HIBERNATE, JPA, DB4O }
+    static enum PersistenceFlavor implements HasConfigurationStrategy {
+        HIBERNATE {
+            public ConfigurationStrategy getConfigurationStrategy() {
+                return new HibernateConfigurationStrategy();
+            }
+        },
+        JPA {
+            public ConfigurationStrategy getConfigurationStrategy() {
+                return new JpaConfigurationStrategy();
+            }
+        },
+        DB4O {
+            public ConfigurationStrategy getConfigurationStrategy() {
+                return new Db4oConfigurationStrategy();
+            }
+        }
+    }
+    static interface HasConfigurationStrategy {
+        ConfigurationStrategy getConfigurationStrategy();
+    }
 }

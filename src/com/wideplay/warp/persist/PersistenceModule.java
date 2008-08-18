@@ -17,9 +17,6 @@
 package com.wideplay.warp.persist;
 
 import com.google.inject.AbstractModule;
-import com.wideplay.warp.db4o.Db4oConfigurationStrategy;
-import com.wideplay.warp.hibernate.HibernateConfigurationStrategy;
-import com.wideplay.warp.jpa.JpaConfigurationStrategy;
 import com.wideplay.warp.persist.Configuration.PersistenceFlavor;
 import net.jcip.annotations.ThreadSafe;
 
@@ -47,18 +44,6 @@ class PersistenceModule extends AbstractModule {
     }
 
     protected void configure() {
-        ConfigurationStrategy configStrategy = null;
-        switch (flavor) {
-            case HIBERNATE:
-                configStrategy = new HibernateConfigurationStrategy();
-                break;
-            case JPA:
-                configStrategy = new JpaConfigurationStrategy();
-                break;
-            case DB4O:
-                configStrategy = new Db4oConfigurationStrategy();
-                break;
-        }
-        install(configStrategy.getBindings(config));
+        install(flavor.getConfigurationStrategy().getBindings(config));
     }
 }
