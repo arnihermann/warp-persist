@@ -54,7 +54,7 @@ class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, Persisten
     }
 
     public Module buildModule() {
-        return new PersistenceModule(flavor, persistenceConfiguration.build());
+        return flavor.getConfigurationStrategy().getBindings(persistenceConfiguration.build());
     }
 
 
