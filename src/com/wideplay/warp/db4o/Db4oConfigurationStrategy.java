@@ -29,7 +29,7 @@ public class Db4oConfigurationStrategy implements ConfigurationStrategy {
     public Module getBindings(final Configuration config) {
         return new AbstractModule() {
             protected void configure() {
-                // Set up Db40.
+                // Set up Db4o.
                 bind(ObjectServerHolder.class).in(Singleton.class);
 		        bind(ObjectServer.class).toProvider(ObjectServerProvider.class);
 		        bind(ObjectContainer.class).toProvider(ObjectContainerProvider.class);
@@ -38,7 +38,7 @@ public class Db4oConfigurationStrategy implements ConfigurationStrategy {
 
                 // Set up transactions. Only local transactions are supported.
                 if (TransactionStrategy.LOCAL != config.getTransactionStrategy())
-                    throw new IllegalArgumentException("Unsupported Db40 transaction strategy: " + config.getTransactionStrategy());
+                    throw new IllegalArgumentException("Unsupported Db4o transaction strategy: " + config.getTransactionStrategy());
                 Db4oLocalTxnInterceptor.setUnitOfWork(config.getUnitOfWork());
                 bindInterceptor(config.getTransactionClassMatcher(),
                                 config.getTransactionMethodMatcher(),
