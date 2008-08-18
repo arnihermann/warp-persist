@@ -24,6 +24,7 @@ import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -48,7 +49,7 @@ public class Configuration {
         this.txStrategy = builder.txStrategy;
         this.txClassMatcher = builder.txClassMatcher;
         this.txMethodMatcher = builder.txMethodMatcher;
-        this.accessors = builder.accessors;
+        this.accessors = Collections.unmodifiableSet(builder.accessors);
     }
 
     public UnitOfWork getUnitOfWork() {
