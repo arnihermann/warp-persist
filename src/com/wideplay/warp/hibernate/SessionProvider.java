@@ -16,7 +16,6 @@
 
 package com.wideplay.warp.hibernate;
 
-import com.google.inject.Inject;
 import com.google.inject.Provider;
 import net.jcip.annotations.Immutable;
 import org.hibernate.Session;
@@ -31,8 +30,11 @@ import org.hibernate.SessionFactory;
 @Immutable
 class SessionProvider implements Provider<Session> {
     //factory is thread safe (presumably!)
-    @Inject
-    private final Provider<SessionFactory> factory = null;
+    private final Provider<SessionFactory> factory ;
+
+    public SessionProvider(Provider<SessionFactory> factory) {
+        this.factory = factory;
+    }
 
     public Session get() {
         return factory.get().getCurrentSession();

@@ -18,7 +18,6 @@ package com.wideplay.warp.hibernate;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.Provider;
-import com.google.inject.Singleton;
 import com.wideplay.warp.persist.*;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.hibernate.Session;
@@ -34,17 +33,19 @@ public class HibernateConfigurationStrategy implements ConfigurationStrategy {
                 // Need instance here for the work manager.
                 SessionFactoryProvider sfProvider = new SessionFactoryProvider();
                 // Need instance here for the interceptors.
-                Provider<Session> sessionProvider = new SessionProvider();
+                Provider<Session> sessionProvider = new SessionProvider(sfProvider);
                 // Need WorkManager here so we can register it on the SPR filter if the UnitOfWork is REQUEST
                 WorkManager workManager = new HibernateWorkManager(sfProvider, config.getUnitOfWork());
+                // Needs to be able to initialize Provider<SessionFactory>
+                PersistenceService pService = new HibernatePersistenceService(sfProvider);
+
                 if (UnitOfWork.REQUEST == config.getUnitOfWork())
                     SessionPerRequestFilter.registerWorkManager(workManager);
 
                 bindSpecial(SessionFactory.class).toProvider(sfProvider);
                 bindSpecial(Session.class).toProvider(sessionProvider);
                 bindSpecial(WorkManager.class).toInstance(workManager);
-
-                bindSpecial(PersistenceService.class).to(HibernatePersistenceService.class).in(Singleton.class);
+                bindSpecial(PersistenceService.class).toInstance(pService);
 
                 // Set up transactions. Only local transactions are supported.
                 if (TransactionStrategy.LOCAL != config.getTransactionStrategy())
