@@ -16,12 +16,14 @@
 
 package com.wideplay.warp.persist;
 
+import com.google.inject.BindingAnnotation;
 import com.google.inject.Module;
 import com.google.inject.matcher.Matcher;
 import com.google.inject.matcher.Matchers;
 import com.wideplay.warp.persist.Configuration.PersistenceFlavor;
 import net.jcip.annotations.NotThreadSafe;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 /**
@@ -57,6 +59,19 @@ class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, Persisten
         return flavor.getConfigurationStrategy().getBindings(persistenceConfiguration.build());
     }
 
+    /** Builds a peristence module that has all persistence artefacts bound to the specified binding annotation. */
+    public <A extends Annotation> Module buildModuleBoundTo(A bindingAnnotation) {
+        if (bindingAnnotation.getClass().getAnnotation(BindingAnnotation.class) == null)
+            throw new IllegalArgumentException(String.format("Annotation '%s' is not a binding annotation.", bindingAnnotation));
+        return flavor.getConfigurationStrategy().getBindings(persistenceConfiguration.build());
+    }
+
+    /** Builds a peristence module that has all persistence artefacts bound to the specified binding annotation type. */
+    public <A extends Annotation> Module buildModuleBoundTo(Class<A> bindingAnnotationClass) {
+        if (bindingAnnotationClass.getAnnotation(BindingAnnotation.class) == null)
+            throw new IllegalArgumentException(String.format("Annotation '%s' is not a binding annotation.", bindingAnnotationClass));
+        return flavor.getConfigurationStrategy().getBindings(persistenceConfiguration.build());
+    }
 
     public TransactionStrategyBuilder transactedWith(TransactionStrategy transactionStrategy) {
         persistenceConfiguration.transactionStrategy(transactionStrategy);

@@ -16,14 +16,13 @@
 
 package com.wideplay.warp.hibernate;
 
-import com.wideplay.warp.persist.UnitOfWork;
-import org.hibernate.context.ManagedSessionContext;
+import com.wideplay.warp.persist.WorkManager;
+import net.jcip.annotations.Immutable;
 
 import javax.servlet.*;
 import java.io.IOException;
-
-import net.jcip.annotations.ThreadSafe;
-import net.jcip.annotations.Immutable;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -39,23 +38,27 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 public class SessionPerRequestFilter implements Filter {
+    private static final List<WorkManager> workManagers = new CopyOnWriteArrayList<WorkManager>();
+
     public void destroy() {}
 
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        if (!UnitOfWork.REQUEST.equals(HibernateLocalTxnInterceptor.getUnitOfWork()))
-            throw new ServletException("UnitOfWork *must* be REQUEST to use this filter (did you mean to use jpa instead)?");
-
         //open session;
-        ManagedSessionContext.bind(SessionFactoryHolder.getCurrentSessionFactory().openSession());
-
+        for (WorkManager wm : workManagers)
+            wm.beginWork();
         try {
             //continue operations
             filterChain.doFilter(servletRequest, servletResponse);
         } finally {
-            //close up session when done
-            SessionFactoryHolder.getCurrentSessionFactory().getCurrentSession().close();
+            // FIFO
+            for (WorkManager wm : workManagers)
+                wm.endWork();
         }
     }
 
     public void init(FilterConfig filterConfig) throws ServletException {}
+
+    static void registerWorkManager(WorkManager wm) {
+        workManagers.add(wm);
+    }
 }

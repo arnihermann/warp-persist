@@ -23,6 +23,7 @@ import com.wideplay.warp.jpa.JpaConfigurationStrategy;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -43,13 +44,18 @@ public class Configuration {
     private final Matcher<? super Class<?>> txClassMatcher;
     private final Matcher<? super Method> txMethodMatcher;
     private final Set<Class<?>> accessors;
-    
+
+    private final Class<? extends Annotation> bindingAnnotationClass;
+    private final Annotation bindingAnnotation;
+
     private Configuration(ConfigurationBuilder builder) {
         this.unitOfWork = builder.unitOfWork;
         this.txStrategy = builder.txStrategy;
         this.txClassMatcher = builder.txClassMatcher;
         this.txMethodMatcher = builder.txMethodMatcher;
         this.accessors = Collections.unmodifiableSet(builder.accessors);
+        this.bindingAnnotationClass = builder.bindingAnnotationClass;
+        this.bindingAnnotation = builder.bindingAnnotation;
     }
 
     public UnitOfWork getUnitOfWork() {
@@ -67,7 +73,16 @@ public class Configuration {
     public Set<Class<?>> getAccessors() {
         return this.accessors;
     }
-
+    public Class<? extends Annotation> getBindingAnnotationClass() {
+        return this.bindingAnnotationClass;
+    }
+    public Annotation getBindingAnnotation() {
+        return this.bindingAnnotation;
+    }
+    public boolean hasBindingAnnotation() {
+        return this.bindingAnnotation != null || this.bindingAnnotationClass != null;
+    }
+    
     public static ConfigurationBuilder builder() {
         return new ConfigurationBuilder();
     }
@@ -78,9 +93,20 @@ public class Configuration {
         private TransactionStrategy txStrategy = TransactionStrategy.LOCAL;
         private Matcher<? super Class<?>> txClassMatcher = Matchers.any();
         private Matcher<? super Method> txMethodMatcher = Matchers.annotatedWith(Transactional.class);
-        
+
+        private Class<? extends Annotation> bindingAnnotationClass;
+        private Annotation bindingAnnotation;
+
         private final Set<Class<?>> accessors = new LinkedHashSet<Class<?>>();
 
+        public <A extends Annotation> ConfigurationBuilder boundTo(A annotation) {
+            this.bindingAnnotation = annotation;
+            return this;
+        }
+        public <A extends Annotation> ConfigurationBuilder boundTo(Class<A> annotationClass) {
+            this.bindingAnnotationClass = annotationClass;
+            return this;
+        }
         public ConfigurationBuilder unitOfWork(UnitOfWork unitOfWork) {
             this.unitOfWork = unitOfWork;
             return this;
@@ -103,7 +129,10 @@ public class Configuration {
         }
 
         public Configuration build() {
-            // TODO validate state
+            // TODO validate more state
+            if (this.bindingAnnotation != null && this.bindingAnnotationClass != null)
+                throw new IllegalStateException("Ambiguous binding annotation configuration. " +
+                                                "Specify either a type or an instance; not both.");
             return new Configuration(this);
         }
     }

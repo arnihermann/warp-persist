@@ -17,9 +17,10 @@
 package com.wideplay.warp.hibernate;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.wideplay.warp.persist.PersistenceService;
 import net.jcip.annotations.Immutable;
-import org.hibernate.cfg.Configuration;
+import org.hibernate.SessionFactory;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,31 +31,15 @@ import org.hibernate.cfg.Configuration;
  */
 @Immutable
 class HibernatePersistenceService extends PersistenceService {
-    private final SessionFactoryHolder sessionFactoryHolder;
-    private final Configuration configuration;
-
-    private static final String JTA_USER_TRANSACTION = "jta.UserTransaction";
+    private final Provider<SessionFactory> sessionFactoryProvider;
 
     @Inject
-    public HibernatePersistenceService(SessionFactoryHolder sessionFactoryHolder, Configuration configuration) {
-        this.sessionFactoryHolder = sessionFactoryHolder;
-        this.configuration = configuration;
+    public HibernatePersistenceService(Provider<SessionFactory> sessionFactoryProvider) {
+        this.sessionFactoryProvider = sessionFactoryProvider;
     }
 
     public void start() {
-        sessionFactoryHolder.setSessionFactory(configuration.buildSessionFactory());
-
-        //if necessary, set the JNDI lookup name of the JTA txn
-        HibernateJtaTxnInterceptor.setUserTransactionJndiName(configuration.getProperty(JTA_USER_TRANSACTION));
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return sessionFactoryHolder.equals( ((HibernatePersistenceService) obj).sessionFactoryHolder);
-    }
-
-    @Override
-    public int hashCode() {
-        return (sessionFactoryHolder != null ? sessionFactoryHolder.hashCode() : 0);
+        // the provider lazily loads, force start.
+        sessionFactoryProvider.get();
     }
 }

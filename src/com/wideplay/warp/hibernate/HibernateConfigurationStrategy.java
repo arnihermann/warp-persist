@@ -17,6 +17,7 @@ package com.wideplay.warp.hibernate;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.wideplay.warp.persist.*;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -30,25 +31,53 @@ public class HibernateConfigurationStrategy implements ConfigurationStrategy {
     public Module getBindings(final Configuration config) {
         return new AbstractModule() {
             protected void configure() {
-                // Set up Hibernate.
-                bind(SessionFactoryHolder.class).in(Singleton.class);
-                bind(SessionFactory.class).toProvider(SessionFactoryProvider.class);
-                bind(Session.class).toProvider(SessionProvider.class);
-                bind(PersistenceService.class).to(HibernatePersistenceService.class).in(Singleton.class);
-                bind(WorkManager.class).to(HibernateWorkManager.class);
+                // Need instance here for the work manager.
+                SessionFactoryProvider sfProvider = new SessionFactoryProvider();
+                // Need instance here for the interceptors.
+                Provider<Session> sessionProvider = new SessionProvider();
+                // Need WorkManager here so we can register it on the SPR filter if the UnitOfWork is REQUEST
+                WorkManager workManager = new HibernateWorkManager(sfProvider, config.getUnitOfWork());
+                if (UnitOfWork.REQUEST == config.getUnitOfWork())
+                    SessionPerRequestFilter.registerWorkManager(workManager);
+
+                bindSpecial(SessionFactory.class).toProvider(sfProvider);
+                bindSpecial(Session.class).toProvider(sessionProvider);
+                bindSpecial(WorkManager.class).toInstance(workManager);
+
+                bindSpecial(PersistenceService.class).to(HibernatePersistenceService.class).in(Singleton.class);
 
                 // Set up transactions. Only local transactions are supported.
                 if (TransactionStrategy.LOCAL != config.getTransactionStrategy())
                     throw new IllegalArgumentException("Unsupported Hibernate transaction strategy: " + config.getTransactionStrategy());
-                HibernateLocalTxnInterceptor.setUnitOfWork(config.getUnitOfWork());
+                // IMPORTANT: the user should configure transactions manually when using multiple Hibernate modules.
+                MethodInterceptor txInterceptor = new HibernateLocalTxnInterceptor(sessionProvider);
                 bindInterceptor(config.getTransactionClassMatcher(),
                                 config.getTransactionMethodMatcher(), 
-                                new HibernateLocalTxnInterceptor());
+                                txInterceptor);
 
+                // TODO Review Dynamic Finders to fit multiple module config.
                 // Set up Dynamic Finders.
-                MethodInterceptor finderInterceptor = new HibernateFinderInterceptor();
+                MethodInterceptor finderInterceptor = new HibernateFinderInterceptor(sessionProvider);
                 DynamicFinders.bindInterceptor(binder(), finderInterceptor);
                 DynamicFinders.bindDynamicAccessors(binder(), config.getAccessors(), finderInterceptor);
+            }
+
+            /**
+             * Bind with an optional binding annotation instance or type, depending on the configuration.
+             * A binding annotation needs to be specified when using two Hibernate configuration within the
+             * same Injector. Only use this method for bindings exposed to users. Useless otherwise.
+             */
+            protected <T> com.google.inject.binder.LinkedBindingBuilder<T> bindSpecial(java.lang.Class<T> tClass) {
+                if (config.hasBindingAnnotation()) {
+                    if (config.getBindingAnnotationClass() != null) {
+                        return super.bind(tClass).annotatedWith(config.getBindingAnnotationClass());
+                    } else {
+                        // we know it's not null because of hasBindingAnnotation
+                        return super.bind(tClass).annotatedWith(config.getBindingAnnotation());
+                    }
+                } else {
+                    return super.bind(tClass);
+                }
             }
         };
     }

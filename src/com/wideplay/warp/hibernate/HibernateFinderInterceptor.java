@@ -16,10 +16,12 @@
 
 package com.wideplay.warp.hibernate;
 
+import com.google.inject.Provider;
 import com.google.inject.name.Named;
 import com.wideplay.warp.persist.dao.Finder;
 import com.wideplay.warp.persist.dao.FirstResult;
 import com.wideplay.warp.persist.dao.MaxResults;
+import net.jcip.annotations.ThreadSafe;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.hibernate.Query;
@@ -29,10 +31,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import net.jcip.annotations.ThreadSafe;
 
 /**
  * Created by IntelliJ IDEA.
@@ -48,8 +50,14 @@ import net.jcip.annotations.ThreadSafe;
 class HibernateFinderInterceptor implements MethodInterceptor {
     private final Map<Method, FinderDescriptor> finderCache = new ConcurrentHashMap<Method, FinderDescriptor>();
 
+    private final Provider<Session> sessionProvider;
+
+    public HibernateFinderInterceptor(Provider<Session> sessionProvider) {
+        this.sessionProvider = sessionProvider;
+    }
+
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-        Session session = SessionFactoryHolder.getCurrentSessionFactory().getCurrentSession();
+        Session session = this.sessionProvider.get();
 
         //obtain a cached finder descriptor (or create a new one)
         FinderDescriptor finderDescriptor = getFinderDescriptor(methodInvocation);

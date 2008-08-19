@@ -16,11 +16,12 @@
 
 package com.wideplay.warp.hibernate;
 
-import com.wideplay.warp.persist.WorkManager;
+import com.google.inject.Provider;
 import com.wideplay.warp.persist.UnitOfWork;
-import org.hibernate.context.ManagedSessionContext;
-import org.hibernate.SessionFactory;
+import com.wideplay.warp.persist.WorkManager;
 import net.jcip.annotations.Immutable;
+import org.hibernate.SessionFactory;
+import org.hibernate.context.ManagedSessionContext;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,26 +33,32 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 class HibernateWorkManager implements WorkManager {
+    private final Provider<SessionFactory> sessionFactoryProvider;
+    private final UnitOfWork unitOfWork;
 
+    public HibernateWorkManager(Provider<SessionFactory> sessionFactoryProvider, UnitOfWork unitOfWork) {
+        this.sessionFactoryProvider = sessionFactoryProvider;
+        this.unitOfWork = unitOfWork;
+    }
 
     public void beginWork() {
-        if (UnitOfWork.TRANSACTION.equals(HibernateLocalTxnInterceptor.getUnitOfWork()))
+        if (UnitOfWork.TRANSACTION.equals(unitOfWork))
             throw new IllegalStateException("Cannot use WorkManager with UnitOfWork.TRANSACTION");
 
         //do nothing if a session is already open
-        if (ManagedSessionContext.hasBind(SessionFactoryHolder.getCurrentSessionFactory()))
+        if (ManagedSessionContext.hasBind(sessionFactoryProvider.get()))
             return;
 
         //open session;
-        ManagedSessionContext.bind(SessionFactoryHolder.getCurrentSessionFactory().openSession());
+        ManagedSessionContext.bind(sessionFactoryProvider.get().openSession());
     }
 
     public void endWork() {
-        if (UnitOfWork.TRANSACTION.equals(HibernateLocalTxnInterceptor.getUnitOfWork()))
+        if (UnitOfWork.TRANSACTION.equals(unitOfWork))
             throw new IllegalStateException("Cannot use WorkManager with UnitOfWork.TRANSACTION");
 
         //do nothing if there is no session open
-        SessionFactory sessionFactory = SessionFactoryHolder.getCurrentSessionFactory();
+        SessionFactory sessionFactory = sessionFactoryProvider.get();
         if (!ManagedSessionContext.hasBind(sessionFactory))
             return;
 

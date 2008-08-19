@@ -18,8 +18,9 @@ package com.wideplay.warp.hibernate;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import org.hibernate.SessionFactory;
 import net.jcip.annotations.Immutable;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,14 +31,28 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 class SessionFactoryProvider implements Provider<SessionFactory> {
-    private final SessionFactoryHolder sessionFactoryHolder;
+    private static final String JTA_USER_TRANSACTION = "jta.UserTransaction";
+    private static final Object LOCK = new Object();
 
-    @Inject
-    public SessionFactoryProvider(SessionFactoryHolder sessionFactoryHolder) {
-        this.sessionFactoryHolder = sessionFactoryHolder;
-    }
+    @Inject // injecting finals works and has the same thread safety guarantees as constructors.
+    private final Configuration configuration = null;
+
+    // DCL on a volatile
+    private volatile SessionFactory sessionFactory = null;
 
     public SessionFactory get() {
-        return this.sessionFactoryHolder.getSessionFactory();
+        if (sessionFactory == null) {
+            synchronized (LOCK) {
+                if (sessionFactory == null) {
+                    sessionFactory = configuration.buildSessionFactory();
+                }
+            }
+        }
+
+        // TODO (Robbie) Dhanji, do we really need this legacy stuff?
+        //if necessary, set the JNDI lookup name of the JTA txn
+        HibernateJtaTxnInterceptor.setUserTransactionJndiName(configuration.getProperty(JTA_USER_TRANSACTION));
+
+        return sessionFactory;
     }    
 }

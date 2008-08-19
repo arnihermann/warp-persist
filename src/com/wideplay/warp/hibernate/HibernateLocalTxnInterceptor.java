@@ -16,19 +16,17 @@
 
 package com.wideplay.warp.hibernate;
 
+import com.google.inject.Provider;
 import com.wideplay.warp.persist.TransactionType;
 import com.wideplay.warp.persist.Transactional;
-import com.wideplay.warp.persist.UnitOfWork;
+import net.jcip.annotations.ThreadSafe;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.hibernate.FlushMode;
+import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.classic.Session;
 
 import java.lang.reflect.Method;
-
-import net.jcip.annotations.Immutable;
-import net.jcip.annotations.ThreadSafe;
 
 /**
  * Created with IntelliJ IDEA.
@@ -38,14 +36,18 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 class HibernateLocalTxnInterceptor implements MethodInterceptor {
-    private static volatile UnitOfWork unitOfWork = UnitOfWork.TRANSACTION;
+    private final Provider<Session> sessionProvider;
 
     //make this customizable if there is a demand for it?
     @Transactional
     private static class Internal { }
 
+    public HibernateLocalTxnInterceptor(Provider<Session> sessionProvider) {
+        this.sessionProvider = sessionProvider;
+    }
+
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-        Session session = SessionFactoryHolder.getCurrentSessionFactory().getCurrentSession();
+        Session session = sessionProvider.get();
 
         //allow silent joining of enclosing transactional methods (NOTE: this ignores the current method's txn-al settings)
         if (session.getTransaction().isActive())
@@ -68,8 +70,6 @@ class HibernateLocalTxnInterceptor implements MethodInterceptor {
                 result = methodInvocation.proceed();
 
             } catch(Exception e) {
-
-
 
                 //commit transaction only if rollback didnt occur
                 if (rollbackIfNecessary(transactional, e, txn))
@@ -158,13 +158,5 @@ class HibernateLocalTxnInterceptor implements MethodInterceptor {
         }
 
         return commit;
-    }
-
-    static UnitOfWork getUnitOfWork() {
-        return unitOfWork;
-    }
-
-    static void setUnitOfWork(UnitOfWork unitOfWork) {
-        HibernateLocalTxnInterceptor.unitOfWork = unitOfWork;
     }
 }
