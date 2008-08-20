@@ -49,7 +49,7 @@ public abstract class PersistenceService {
      * @return Returns the next step in the configuration chain.
      */
     public static SessionStrategyBuilder usingHibernate() {
-        return new PersistenceServiceBuilderImpl(Configuration.PersistenceFlavor.HIBERNATE);
+        return new PersistenceServiceBuilderImpl(PersistenceConfiguration.PersistenceFlavor.HIBERNATE);
     }
 
 
@@ -61,7 +61,7 @@ public abstract class PersistenceService {
      * @return Returns the next step in the configuration chain.
      */
     public static SessionStrategyBuilder usingJpa() {
-        return new PersistenceServiceBuilderImpl(Configuration.PersistenceFlavor.JPA);
+        return new PersistenceServiceBuilderImpl(PersistenceConfiguration.PersistenceFlavor.JPA);
     }
 
     /**
@@ -72,7 +72,7 @@ public abstract class PersistenceService {
      * @return Returns the next step in the configuration chain.
      */
     public static SessionStrategyBuilder usingDb4o() {
-        return new PersistenceServiceBuilderImpl(Configuration.PersistenceFlavor.DB4O);
+        return new PersistenceServiceBuilderImpl(PersistenceConfiguration.PersistenceFlavor.DB4O);
     }
     
     /**

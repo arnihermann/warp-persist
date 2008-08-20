@@ -27,7 +27,7 @@ import org.hibernate.SessionFactory;
  * @author Robbie Vanbrabant
  */
 public class HibernatePersistenceStrategy implements PersistenceStrategy {
-    public Module getBindings(final Configuration config) {
+    public Module getBindings(final PersistenceConfiguration config) {
         return new AbstractModule() {
 
             @Override

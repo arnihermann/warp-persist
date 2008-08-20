@@ -20,7 +20,7 @@ import com.google.inject.BindingAnnotation;
 import com.google.inject.Module;
 import com.google.inject.matcher.Matcher;
 import com.google.inject.matcher.Matchers;
-import com.wideplay.warp.persist.Configuration.PersistenceFlavor;
+import com.wideplay.warp.persist.PersistenceConfiguration.PersistenceFlavor;
 import net.jcip.annotations.NotThreadSafe;
 
 import java.lang.annotation.Annotation;
@@ -35,7 +35,7 @@ import java.lang.reflect.Method;
  */
 @NotThreadSafe
 class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, PersistenceModuleBuilder, TransactionStrategyBuilder {
-    private final Configuration.ConfigurationBuilder persistenceConfiguration = Configuration.builder();
+    private final PersistenceConfiguration.PersistenceConfigurationBuilder persistenceConfiguration = PersistenceConfiguration.builder();
     private final PersistenceFlavor flavor;
 
     PersistenceServiceBuilderImpl(PersistenceFlavor flavor) {

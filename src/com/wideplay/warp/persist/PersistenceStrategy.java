@@ -22,5 +22,5 @@ import com.google.inject.Module;
  * @author Robbie Vanbrabant
  */
 public interface PersistenceStrategy {
-    Module getBindings(Configuration config);
+    Module getBindings(PersistenceConfiguration config);
 }

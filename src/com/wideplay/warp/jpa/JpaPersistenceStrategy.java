@@ -28,7 +28,7 @@ import javax.persistence.EntityManagerFactory;
  * @author Robbie Vanbrabant
  */
 public class JpaPersistenceStrategy implements PersistenceStrategy {
-    public Module getBindings(final Configuration config) {
+    public Module getBindings(final PersistenceConfiguration config) {
         return new AbstractModule() {
             protected void configure() {
                 // Set up JPA.
