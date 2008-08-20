@@ -60,7 +60,7 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
 
                 // Set up Dynamic Finders.
                 MethodInterceptor finderInterceptor = new HibernateFinderInterceptor(sessionProvider);
-                DynamicFinders.bindInterceptor(binder(), finderInterceptor);
+                bindFinderInterceptor(config, finderInterceptor);
                 bindDynamicAccessors(config, finderInterceptor);
             }
         };

@@ -47,7 +47,7 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
 
                 // Set up Dynamic Finders.
                 MethodInterceptor finderInterceptor = new JpaFinderInterceptor();
-                DynamicFinders.bindInterceptor(binder(), finderInterceptor);
+                bindFinderInterceptor(config, finderInterceptor);
                 bindDynamicAccessors(config, finderInterceptor);
             }
         };
