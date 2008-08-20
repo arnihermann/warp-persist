@@ -16,14 +16,6 @@
 
 package com.wideplay.warp.db4o;
 
-import java.io.IOException;
-import java.util.Date;
-
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectServer;
 import com.db4o.ObjectSet;
@@ -36,6 +28,13 @@ import com.wideplay.warp.persist.PersistenceService;
 import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.Transactional;
 import com.wideplay.warp.persist.UnitOfWork;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.Date;
 
 /**
  * 
@@ -87,7 +86,7 @@ public class JoiningLocalTransactionsTest {
 	    	});
     	ObjectServerHolder.closeCurrentObjectContainer();
     	
-    	assert objSet.get(0) instanceof Db4oTestObject: "Odd result returned fatal";
+    	assert objSet.get(0) != null : "Nothing returned from predicate query: fatal";
     	assert objSet.get(0).getText().equals(UNIQUE_TEXT) : "Queried object did not match";
     }
     

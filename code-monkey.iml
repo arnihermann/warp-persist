@@ -442,7 +442,9 @@
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/db4o-6.4.14.8131-java5.jar!/" />
         </CLASSES>
-        <JAVADOC />
+        <JAVADOC>
+          <root url="http://developer.db4o.com/resources/api/db4o-java/" />
+        </JAVADOC>
         <SOURCES />
       </library>
     </orderEntry>

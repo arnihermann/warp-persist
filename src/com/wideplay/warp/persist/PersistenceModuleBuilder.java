@@ -19,8 +19,6 @@ package com.wideplay.warp.persist;
 import com.google.inject.Module;
 
 /**
- * Created with IntelliJ IDEA.
- * On: 2/06/2007
  *
  * @author Dhanji R. Prasanna (dhanji@gmail.com)
  * @since 1.0

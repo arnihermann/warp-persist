@@ -17,10 +17,6 @@
 package com.wideplay.warp.persist;
 
 /**
- * Created with IntelliJ IDEA.
- * User: dhanji
- * Date: Oct 7, 2007
- * Time: 8:48:33 PM
  *
  * <p>
  * This interface is used to gain manual control over the unit of work. This

@@ -31,7 +31,6 @@ import org.hibernate.cfg.Configuration;
  */
 @Immutable
 class SessionFactoryProvider implements Provider<SessionFactory> {
-    private static final String JTA_USER_TRANSACTION = "jta.UserTransaction";
     private static final Object LOCK = new Object();
 
     @Inject // injecting finals works and has the same thread safety guarantees as constructors.
@@ -48,10 +47,6 @@ class SessionFactoryProvider implements Provider<SessionFactory> {
                 }
             }
         }
-
-        // TODO (Robbie) Dhanji, do we really need this legacy stuff?
-        //if necessary, set the JNDI lookup name of the JTA txn
-        HibernateJtaTxnInterceptor.setUserTransactionJndiName(configuration.getProperty(JTA_USER_TRANSACTION));
 
         return sessionFactory;
     }    

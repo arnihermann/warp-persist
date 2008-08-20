@@ -29,6 +29,8 @@ import org.hibernate.SessionFactory;
 public class HibernateConfigurationStrategy implements ConfigurationStrategy {
     public Module getBindings(final Configuration config) {
         return new AbstractModule() {
+
+            @Override
             protected void configure() {
                 // Need instance here for the work manager.
                 SessionFactoryProvider sfProvider = new SessionFactoryProvider();
@@ -68,7 +70,7 @@ public class HibernateConfigurationStrategy implements ConfigurationStrategy {
              * A binding annotation needs to be specified when using two Hibernate configuration within the
              * same Injector. Only use this method for bindings exposed to users. Useless otherwise.
              */
-            protected <T> com.google.inject.binder.LinkedBindingBuilder<T> bindSpecial(java.lang.Class<T> tClass) {
+            private <T> com.google.inject.binder.LinkedBindingBuilder<T> bindSpecial(java.lang.Class<T> tClass) {
                 if (config.hasBindingAnnotation()) {
                     if (config.getBindingAnnotationClass() != null) {
                         return super.bind(tClass).annotatedWith(config.getBindingAnnotationClass());

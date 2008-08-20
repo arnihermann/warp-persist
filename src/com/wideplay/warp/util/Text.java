@@ -17,13 +17,9 @@
 package com.wideplay.warp.util;
 
 /**
- * Created with IntelliJ IDEA.
- * User: dhanji
- * Date: Mar 1, 2008
- * Time: 10:21:41 AM
  *
  * <p>
- * A utility analogous to com.google.inject.util.Strings 
+ * A Strings utility.
  * </p>
  *
  * @author Dhanji R. Prasanna (dhanji gmail com)
@@ -39,7 +35,7 @@ public class Text {
      * @throws IllegalArgumentException Thrown with the message if this string is empty
      */
     public static void nonEmpty(String str, String message) {
-        if (isNotEmpty(str))
+        if (empty(str))
             throw new IllegalArgumentException(message);
     }
 
@@ -47,9 +43,9 @@ public class Text {
      *
      * @param str A string to test for emptiness (i.e. non null and not the empty string
      * when trimmed)
-     * @return Returns true if the string is not empty.
+     * @return Returns true if the string is empty.
      */
-    public static boolean isNotEmpty(String str) {
+    public static boolean empty(String str) {
         return null == str || "".equals(str.trim());
     }
 }

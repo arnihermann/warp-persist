@@ -18,7 +18,7 @@ package com.wideplay.warp.persist;
 import com.google.inject.Module;
 
 /**
- * Strategy for hooking persistence strategies into Guice.
+ * Strategy for hooking persistence strategies into warp-persist.
  * @author Robbie Vanbrabant
  */
 public interface ConfigurationStrategy {

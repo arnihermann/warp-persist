@@ -17,9 +17,6 @@
 package com.wideplay.warp.persist;
 
 /**
- * Created with IntelliJ IDEA.
- * On: 2/06/2007
- *
  * @author Dhanji R. Prasanna (dhanji@gmail.com)
  * @since 1.0
  */

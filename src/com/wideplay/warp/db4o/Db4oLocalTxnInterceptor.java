@@ -16,16 +16,14 @@
 
 package com.wideplay.warp.db4o;
 
-import java.lang.reflect.Method;
-
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
-
 import com.db4o.ObjectContainer;
 import com.wideplay.warp.persist.Transactional;
 import com.wideplay.warp.persist.UnitOfWork;
-import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
+
+import java.lang.reflect.Method;
 
 /**
  * TODO Rolled-back objects need to be refreshed?
@@ -42,18 +40,20 @@ class Db4oLocalTxnInterceptor implements MethodInterceptor {
 	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
 		ObjectContainer oc = ObjectServerHolder.getCurrentObjectContainer();
 		
-		Object result = null;
+		Object result;
 		try {
 			result = methodInvocation.proceed();
 		} catch (Exception e) {
 			Transactional transactional = readTransactionMetadata(methodInvocation);
 
-			if (rollbackIfNecessary(transactional, e, oc)) {
-				oc.commit();
+            try {
+                if (rollbackIfNecessary(transactional, e, oc))
+                    oc.commit();
 
+            } finally {
                 if (isUnitOfWorkTransaction())
                     oc.close();
-			}
+            }
 
 			throw e;
 		}

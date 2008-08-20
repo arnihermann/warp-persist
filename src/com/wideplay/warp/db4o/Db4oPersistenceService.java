@@ -21,9 +21,10 @@ import com.db4o.ObjectServer;
 import com.db4o.config.Configuration;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import static com.wideplay.warp.db4o.ObjectServerHolder.HostKind;
 import com.wideplay.warp.persist.PersistenceService;
 import com.wideplay.warp.util.Text;
-import static com.wideplay.warp.util.Text.isNotEmpty;
+import static com.wideplay.warp.util.Text.empty;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -34,10 +35,9 @@ import net.jcip.annotations.ThreadSafe;
 class Db4oPersistenceService extends PersistenceService {
 
 	private final ObjectServerHolder objectServerHolder;
-	private final String databaseFileName;
-
 
     //temporary config placeholders (injected)
+    private volatile String databaseFileName;
     private volatile String host;
 	private volatile String user;
 	private volatile String password;
@@ -45,44 +45,75 @@ class Db4oPersistenceService extends PersistenceService {
 	private volatile Configuration configuration;
 
 	@Inject
-	public Db4oPersistenceService(ObjectServerHolder objectServerHolder, @Db4Objects String databaseFileName) {
+	public Db4oPersistenceService(ObjectServerHolder objectServerHolder) {
 		this.objectServerHolder = objectServerHolder;
-		this.databaseFileName = databaseFileName;
-
-        Text.nonEmpty(databaseFileName, "Db4o database file name was not set; please bindConstant()" +
-                ".annotatedWith(Db4Objects.class) to a string containing the name of a Db4o database file.");
 	}
 
 	public synchronized void start() {
-		if (configuration != null) {
-			ObjectServer objectServer = Db4o.openServer(configuration, databaseFileName, port);
+        HostKind hostKind;
+        if (databaseFileName == null) {
+            if (!empty(host))
+                hostKind = HostKind.REMOTE;
+            else
+                throw new IllegalStateException("Must specify either database file name: " +
+                        "bindConstant().annotatedWith(Db4Objects); or a remote server host: bindConstant()" +
+                        ".annotatedWith(Names.named(Db4Objects.HOST)).to(\"localhost\")");
+        } else if (!empty(host)) {
+            hostKind = HostKind.LOCAL;
+        } else
+            hostKind = HostKind.FILE;
+        
 
-            //use host or local?
-            if (isNotEmpty(host) &&
-					isNotEmpty(user) &&
-					isNotEmpty(password)) {
+        //validate configuration object
+        if ( (!HostKind.FILE.equals(hostKind)) && null == configuration)
+            throw new IllegalStateException("Must specify a Configuration when using " + hostKind + " server mode." +
+                    " For starters, try: bind(Configuration.class).toInstance(Db4o.newConfiguration());");
 
-                objectServerHolder.set(user, password, host, port);
-				objectServer.grantAccess(user, password);
-			}
-			
-			objectServerHolder.setObjectServer(objectServer);
-		} else {
-			objectServerHolder.setObjectServer(Db4o.openServer(databaseFileName, port));
-		}
+
+        //pass on configuration TODO (ugh) need better design pattern here...
+        objectServerHolder.set(user, password, host, port, configuration, hostKind);
+
+
+        //use local (i.e. open our own) object server?
+        if (HostKind.LOCAL.equals(hostKind)) {
+            ObjectServer objectServer = Db4o.openServer(configuration, databaseFileName, port);
+
+            //auth if credentials are available
+            if (!empty(user))
+                objectServer.grantAccess(user, password);
+
+            objectServerHolder.setObjectServer(objectServer);
+
+
+            //otherwise it's a simple local-file database
+        } else if (HostKind.FILE.equals(hostKind)) {
+            objectServerHolder.setObjectServer(Db4o.openServer(databaseFileName, port));
+        }
+
+
 	}
 
 
     //DO NOT Collapse these into a single setter (each is optional individually...)
     @Inject(optional = true)
+    public void setDatabaseFileName(@Db4Objects String databaseFileName) {
+        this.databaseFileName = databaseFileName;
+
+        Text.nonEmpty(databaseFileName, "Db4o database file name was not set; please bindConstant()" +
+                ".annotatedWith(Db4Objects.class) to a string containing the name of a Db4o database file.");
+    }
+
+    @Inject(optional = true)
 	private void setConfiguration(Configuration configuration) {
-		this.configuration = configuration;
+        this.configuration = configuration;
 	}
 
 	@Inject(optional = true)
 	private void setHost(@Named(Db4Objects.HOST) String host) {
 		this.host = host;
-	}
+
+        Text.nonEmpty(host, "Please specify a valid host name.");
+    }
 
 	@Inject(optional = true)
 	private void setPassword(@Named(Db4Objects.PASSWORD) String password) {
@@ -91,7 +122,11 @@ class Db4oPersistenceService extends PersistenceService {
 
 	@Inject(optional = true)
 	private void setPort(@Named(Db4Objects.PORT) int port) {
-		this.port = port;
+        if (port < 0 || port > 65535)
+            throw new IllegalArgumentException("Port number was invalid (must be in range 0-65535). Was: "
+                    + port);
+
+        this.port = port;
 	}
 
 	@Inject(optional = true)

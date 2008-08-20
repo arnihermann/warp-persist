@@ -20,11 +20,10 @@ import com.db4o.Db4o;
 import com.db4o.Db4oIOException;
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectServer;
-import com.wideplay.warp.util.Text;
-import static com.wideplay.warp.util.Text.isNotEmpty;
-import net.jcip.annotations.ThreadSafe;
-import net.jcip.annotations.Immutable;
+import com.db4o.config.Configuration;
 import net.jcip.annotations.GuardedBy;
+import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * 
@@ -65,11 +64,13 @@ class ObjectServerHolder {
 	static ObjectServer getCurrentObjectServer() {
         final ObjectServer server = singletonObjectServerHolder.getObjectServer();
 
-        if (null == server) {
+        if (null == server)
             throw new RuntimeException("No ObjectServer was found. Did you remember to call " +
-                    "PersistenceService.start() *before* using the EntityManager? In servlet environments, this is typically " +
-                    "done in the init() lifecycle method of a servlet (or equivalent webapp initialization scheme).");
-        }
+                    "PersistenceService.start() *before* using the ObjectServer? In servlet environments, this is typically " +
+                    "done in the init() lifecycle method of a servlet (or equivalent webapp initialization scheme)." +
+                    " If you are connecting to a remote ObjectServer, then do not try to inject ObjectServer " +
+                    "(use ObjectContainer instead).");
+
         return server;
 	}
 
@@ -99,16 +100,30 @@ class ObjectServerHolder {
 
         //if the current container is dead, open a new one
         if (oc == null || oc.ext().isClosed()) {
-			if (settings.useHost()) {
+
+            //open local server client
+            if (settings.isLocal()) {
 				oc = Db4o.openClient(getCurrentObjectServer().ext().configure(),
                         settings.host,
                         settings.port,
                         settings.user,
                         settings.password);
-			} else {
-				oc = getCurrentObjectServer().openClient();
+
+                //open remote client
+            } else if (settings.isRemote()) {
+                oc = Db4o.openClient(settings.configuration,
+                        settings.host,
+                        settings.port,
+                        settings.user,
+                        settings.password);
+
+                //open file based client
+            } else {
+                oc = getCurrentObjectServer().openClient();
 			}
-			singletonObjectServerHolder.objectContainer.set(oc);
+
+            //ugh.  TODO refactor!
+            singletonObjectServerHolder.objectContainer.set(oc);
 		}
 
 		return oc;
@@ -133,8 +148,8 @@ class ObjectServerHolder {
 		return getCurrentObjectContainer();
 	}
 
-	public void set(String user, String password, String host, int port) {
-        settings = new Db4oSettings(user, password, host, port);
+	public void set(String user, String password, String host, int port, Configuration configuration, HostKind hostKind) {
+        settings = new Db4oSettings(user, password, host, port, configuration, hostKind);
     }
 
 
@@ -145,33 +160,47 @@ class ObjectServerHolder {
         private final String password;
         private final String host;
         private final int port;
+        private final Configuration configuration;
+        private final HostKind hostKind;
 
-        private final boolean useHost;
 
-        private Db4oSettings(String user, String password, String host, int port) {
+        private Db4oSettings(String user, String password, String host, int port,
+                             Configuration configuration, HostKind hostKind) {
+
             this.user = user;
             this.password = password;
             this.host = host;
             this.port = port;
+            this.configuration = configuration;
 
-            this.useHost = isNotEmpty(host) && isNotEmpty(user) && isNotEmpty(password);
+            this.hostKind = hostKind;
         }
 
+
+        //default settings
         private Db4oSettings() {
             user = null;
             password = null;
             host = null;
             port = 0;
+            configuration = null;
 
-            useHost = false;
-        }
-
-        public boolean useHost() {
-            return this.useHost;
+            hostKind = HostKind.FILE;
         }
 
         private static Db4oSettings defaultSettings() {
             return new Db4oSettings();
         }
+
+        public boolean isLocal() {
+            return HostKind.LOCAL.equals(hostKind);
+        }
+
+        public boolean isRemote() {
+            return HostKind.REMOTE.equals(hostKind);
+        }
     }
+
+    static enum HostKind {
+        REMOTE, LOCAL, FILE }
 }
