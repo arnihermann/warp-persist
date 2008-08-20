@@ -103,7 +103,7 @@ public class Configuration {
             this.bindingAnnotation = annotation;
             return this;
         }
-        public <A extends Annotation> ConfigurationBuilder boundTo(Class<A> annotationClass) {
+        public <A extends Annotation> ConfigurationBuilder boundToType(Class<A> annotationClass) {
             this.bindingAnnotationClass = annotationClass;
             return this;
         }

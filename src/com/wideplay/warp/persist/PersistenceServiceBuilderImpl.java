@@ -27,15 +27,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Dhanji R. Prasanna (dhanji@gmail.com)
- * Date: 31/05/2007
- * Time: 11:54:45
- * <p>
- *
  * Configures and builds a Module for use in a Guice injector to enable the PersistenceService.
  * see the website for the EDSL binder language.
- * </p>
  *
  * @author Dhanji R. Prasanna (dhanji@gmail.com)
  * @since 1.0
@@ -61,15 +54,15 @@ class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, Persisten
 
     /** Builds a peristence module that has all persistence artefacts bound to the specified binding annotation. */
     public <A extends Annotation> Module buildModuleBoundTo(A bindingAnnotation) {
-        if (bindingAnnotation.getClass().getAnnotation(BindingAnnotation.class) == null)
-            throw new IllegalArgumentException(String.format("Annotation '%s' is not a binding annotation.", bindingAnnotation));
+        bindingAnnotationPrecondition(bindingAnnotation.getClass());
+        persistenceConfiguration.boundTo(bindingAnnotation);
         return flavor.getConfigurationStrategy().getBindings(persistenceConfiguration.build());
     }
 
     /** Builds a peristence module that has all persistence artefacts bound to the specified binding annotation type. */
     public <A extends Annotation> Module buildModuleBoundTo(Class<A> bindingAnnotationClass) {
-        if (bindingAnnotationClass.getAnnotation(BindingAnnotation.class) == null)
-            throw new IllegalArgumentException(String.format("Annotation '%s' is not a binding annotation.", bindingAnnotationClass));
+        bindingAnnotationPrecondition(bindingAnnotationClass);
+        persistenceConfiguration.boundToType(bindingAnnotationClass);
         return flavor.getConfigurationStrategy().getBindings(persistenceConfiguration.build());
     }
 
@@ -99,5 +92,11 @@ class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, Persisten
         persistenceConfiguration.transactionMethodMatcher(methodMatcher);
 
         return this;
+    }
+
+    /** Asserts that the given annotation is a Guice binding annotation. */
+    private void bindingAnnotationPrecondition(Class<? extends Annotation> annotationType) {
+        if (annotationType.getAnnotation(BindingAnnotation.class) == null)
+            throw new IllegalArgumentException(String.format("Annotation '%s' is not a binding annotation.", annotationType));
     }
 }
