@@ -39,6 +39,13 @@ class SessionFactoryProvider implements Provider<SessionFactory> {
     // DCL on a volatile
     private volatile SessionFactory sessionFactory = null;
 
+    /** Debugging to include in toString. */
+    private final String annotationDebug;
+
+    SessionFactoryProvider(String annotationDebug) {
+        this.annotationDebug = annotationDebug;
+    }
+
     public SessionFactory get() {
         if (sessionFactory == null) {
             synchronized (LOCK) {
@@ -49,5 +56,9 @@ class SessionFactoryProvider implements Provider<SessionFactory> {
         }
 
         return sessionFactory;
-    }    
+    }
+
+    public String toString() {
+        return String.format("%s[boundTo: %s]", super.toString(), this.annotationDebug);
+    }
 }

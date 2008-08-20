@@ -32,12 +32,14 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
 
             @Override
             protected void configure() {
+                String annotationDebugString = config.getAnnotationDebugStringOrNull();
                 // Need instance here for the work manager.
-                SessionFactoryProvider sfProvider = new SessionFactoryProvider();
+                SessionFactoryProvider sfProvider = new SessionFactoryProvider(annotationDebugString);
                 // Need instance here for the interceptors.
                 Provider<Session> sessionProvider = new SessionProvider(sfProvider);
                 // Need WorkManager here so we can register it on the SPR filter if the UnitOfWork is REQUEST
-                WorkManager workManager = new HibernateWorkManager(sfProvider, config.getUnitOfWork());
+                WorkManager workManager = new HibernateWorkManager(sfProvider, config.getUnitOfWork(),
+                                                                   annotationDebugString);
                 // Needs to be able to initialize Provider<SessionFactory>
                 PersistenceService pService = new HibernatePersistenceService(sfProvider);
 

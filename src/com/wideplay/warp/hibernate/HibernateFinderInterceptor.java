@@ -257,5 +257,9 @@ class HibernateFinderInterceptor implements MethodInterceptor {
         }
     }
 
+    public String toString() {
+        return String.format("%s[session: %s]",super.toString(), this.sessionProvider);
+    }
+
     private static enum ReturnType { PLAIN, COLLECTION, ARRAY }
 }

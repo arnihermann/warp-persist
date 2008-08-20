@@ -42,4 +42,8 @@ class HibernatePersistenceService extends PersistenceService {
         // the provider lazily loads, force start.
         sessionFactoryProvider.get();
     }
+
+    public String toString() {
+        return String.format("%s[sessionFactory: %s]",super.toString(), this.sessionFactoryProvider);
+    }
 }

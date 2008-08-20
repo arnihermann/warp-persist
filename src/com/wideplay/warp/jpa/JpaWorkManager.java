@@ -17,7 +17,6 @@
 package com.wideplay.warp.jpa;
 
 import com.wideplay.warp.persist.WorkManager;
-
 import net.jcip.annotations.Immutable;
 
 /**
@@ -51,5 +50,9 @@ class JpaWorkManager implements WorkManager {
 //
 //        //close up session when done
 //        currentEntityManager.close();
+    }
+
+    public String toString() {
+        return super.toString();
     }
 }

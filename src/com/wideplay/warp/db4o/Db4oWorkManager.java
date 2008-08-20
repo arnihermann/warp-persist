@@ -16,7 +16,6 @@
 
 package com.wideplay.warp.db4o;
 
-import com.db4o.ObjectContainer;
 import com.wideplay.warp.persist.WorkManager;
 
 /**
@@ -32,4 +31,8 @@ class Db4oWorkManager implements WorkManager {
 	public void endWork() {
 		ObjectServerHolder.closeCurrentObjectContainer();
 	}
+
+    public String toString() {
+        return super.toString();
+    }
 }

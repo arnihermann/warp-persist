@@ -66,4 +66,7 @@ public interface WorkManager {
      *
      */
     void endWork();
+
+    /** Returns a short description that uniquely identifies the WorkManager. */
+    String toString();
 }

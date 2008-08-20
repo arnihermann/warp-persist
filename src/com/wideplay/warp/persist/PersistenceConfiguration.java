@@ -82,6 +82,18 @@ public class PersistenceConfiguration {
     public boolean hasBindingAnnotation() {
         return this.bindingAnnotation != null || this.bindingAnnotationClass != null;
     }
+
+    /** Useful for debugging. We should emit this String in as much persistence types as possible. */
+    public String getAnnotationDebugStringOrNull() {
+        if (hasBindingAnnotation()) {
+            if (getBindingAnnotationClass() != null) {
+                return getBindingAnnotationClass().getSimpleName();
+            } else {
+                return getBindingAnnotation().toString();
+            }
+        }
+        return null;
+    }
     
     public static PersistenceConfigurationBuilder builder() {
         return new PersistenceConfigurationBuilder();

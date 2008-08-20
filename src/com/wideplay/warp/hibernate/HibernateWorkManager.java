@@ -35,10 +35,13 @@ import org.hibernate.context.ManagedSessionContext;
 class HibernateWorkManager implements WorkManager {
     private final Provider<SessionFactory> sessionFactoryProvider;
     private final UnitOfWork unitOfWork;
+    private String annotationDebugString;
 
-    public HibernateWorkManager(Provider<SessionFactory> sessionFactoryProvider, UnitOfWork unitOfWork) {
+    public HibernateWorkManager(Provider<SessionFactory> sessionFactoryProvider, UnitOfWork unitOfWork,
+                                String annotationDebugString) {
         this.sessionFactoryProvider = sessionFactoryProvider;
         this.unitOfWork = unitOfWork;
+        this.annotationDebugString = annotationDebugString;
     }
 
     public void beginWork() {
@@ -70,5 +73,10 @@ class HibernateWorkManager implements WorkManager {
             //discard session;
             ManagedSessionContext.unbind(sessionFactory);
         }
+    }
+
+    public String toString() {
+        return String.format("%s[boundTo: %s, unitOfWork: %s]",super.toString(),
+                             this.annotationDebugString, this.unitOfWork);
     }
 }
