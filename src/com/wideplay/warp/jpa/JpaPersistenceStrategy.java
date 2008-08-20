@@ -15,7 +15,6 @@
  */
 package com.wideplay.warp.jpa;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.Singleton;
 import com.wideplay.warp.persist.*;
@@ -29,7 +28,7 @@ import javax.persistence.EntityManagerFactory;
  */
 public class JpaPersistenceStrategy implements PersistenceStrategy {
     public Module getBindings(final PersistenceConfiguration config) {
-        return new AbstractModule() {
+        return new AbstractPersistenceModule() {
             protected void configure() {
                 // Set up JPA.
                 bind(EntityManagerFactoryHolder.class).in(Singleton.class);
@@ -49,7 +48,7 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
                 // Set up Dynamic Finders.
                 MethodInterceptor finderInterceptor = new JpaFinderInterceptor();
                 DynamicFinders.bindInterceptor(binder(), finderInterceptor);
-                DynamicFinders.bindDynamicAccessors(binder(), config.getAccessors(), finderInterceptor);
+                bindDynamicAccessors(config, finderInterceptor);
             }
         };
     }

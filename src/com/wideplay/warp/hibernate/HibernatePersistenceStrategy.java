@@ -15,7 +15,6 @@
  */
 package com.wideplay.warp.hibernate;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.Provider;
 import com.wideplay.warp.persist.*;
@@ -28,8 +27,7 @@ import org.hibernate.SessionFactory;
  */
 public class HibernatePersistenceStrategy implements PersistenceStrategy {
     public Module getBindings(final PersistenceConfiguration config) {
-        return new AbstractModule() {
-
+        return new AbstractPersistenceModule() {
             @Override
             protected void configure() {
                 String annotationDebugString = config.getAnnotationDebugStringOrNull();
@@ -46,10 +44,10 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
                 if (UnitOfWork.REQUEST == config.getUnitOfWork())
                     SessionPerRequestFilter.registerWorkManager(workManager);
 
-                bindSpecial(SessionFactory.class).toProvider(sfProvider);
-                bindSpecial(Session.class).toProvider(sessionProvider);
-                bindSpecial(WorkManager.class).toInstance(workManager);
-                bindSpecial(PersistenceService.class).toInstance(pService);
+                bindSpecial(config, SessionFactory.class).toProvider(sfProvider);
+                bindSpecial(config, Session.class).toProvider(sessionProvider);
+                bindSpecial(config, WorkManager.class).toInstance(workManager);
+                bindSpecial(config, PersistenceService.class).toInstance(pService);
 
                 // Set up transactions. Only local transactions are supported.
                 if (TransactionStrategy.LOCAL != config.getTransactionStrategy())
@@ -60,29 +58,10 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
                                 config.getTransactionMethodMatcher(), 
                                 txInterceptor);
 
-                // TODO Review Dynamic Finders to fit multiple module config.
                 // Set up Dynamic Finders.
                 MethodInterceptor finderInterceptor = new HibernateFinderInterceptor(sessionProvider);
                 DynamicFinders.bindInterceptor(binder(), finderInterceptor);
-                DynamicFinders.bindDynamicAccessors(binder(), config.getAccessors(), finderInterceptor);
-            }
-
-            /**
-             * Bind with an optional binding annotation instance or type, depending on the configuration.
-             * A binding annotation needs to be specified when using two Hibernate configuration within the
-             * same Injector. Only use this method for bindings exposed to users. Useless otherwise.
-             */
-            private <T> com.google.inject.binder.LinkedBindingBuilder<T> bindSpecial(java.lang.Class<T> tClass) {
-                if (config.hasBindingAnnotation()) {
-                    if (config.getBindingAnnotationClass() != null) {
-                        return super.bind(tClass).annotatedWith(config.getBindingAnnotationClass());
-                    } else {
-                        // we know it's not null because of hasBindingAnnotation
-                        return super.bind(tClass).annotatedWith(config.getBindingAnnotation());
-                    }
-                } else {
-                    return super.bind(tClass);
-                }
+                bindDynamicAccessors(config, finderInterceptor);
             }
         };
     }

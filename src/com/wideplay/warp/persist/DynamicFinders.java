@@ -16,12 +16,9 @@
 package com.wideplay.warp.persist;
 
 import com.google.inject.Binder;
-import com.google.inject.cglib.proxy.Proxy;
 import com.google.inject.matcher.Matchers;
 import com.wideplay.warp.persist.dao.Finder;
 import org.aopalliance.intercept.MethodInterceptor;
-
-import java.util.Set;
 
 /**
  * Utilities for configuring Dynamic Finders.
@@ -30,20 +27,8 @@ import java.util.Set;
 public class DynamicFinders {
     private DynamicFinders() {}
 
+    // TODO This doesn't work properly with multiple persistence modules.
     public static void bindInterceptor(Binder binder, MethodInterceptor finderInterceptor) {
         binder.bindInterceptor(Matchers.any(), Matchers.annotatedWith(Finder.class), finderInterceptor);
-    }
-    
-    public static void bindDynamicAccessors(Binder binder, Set<Class<?>> accessors, MethodInterceptor finderInterceptor) {
-        for (Class accessor : accessors) {
-            if (accessor.isInterface()) {
-                binder.bind(accessor).toInstance(Proxy.newProxyInstance(accessor.getClassLoader(),
-                        new Class<?>[] { accessor }, new AopAllianceJdkProxyAdapter(finderInterceptor)));
-            } else {
-                //use cglib adapter to subclass the accessor (this lets us intercept abstract classes)
-                binder.bind(accessor).toInstance(com.google.inject.cglib.proxy.Enhancer.create(accessor,
-                        new AopAllianceCglibAdapter(finderInterceptor)));
-            }
-        }
     }
 }
