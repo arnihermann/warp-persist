@@ -52,7 +52,17 @@ public class SessionPerRequestFilter implements Filter {
                 localWorkManagers.get(i).beginWork();
             } catch (RuntimeException e) {
                 // clean up what we did so far and end this madness.
-                endAsMuchWorkAsPossible(localWorkManagers.subList(0, i-1));
+                try {
+                    endAsMuchWorkAsPossible(localWorkManagers.subList(0, i-1));
+                } catch (final RuntimeException closeErrors) {
+                    // Better than nothing.
+                    throw new RuntimeException(e) {
+                        @Override public String getMessage() {
+                            return String.format("Unable to start work: %s%nUnable to clean up after failing:%n%s",
+                                                 super.getMessage(), closeErrors.getMessage());
+                        }
+                    };
+                }
                 throw e;
             }
         }
