@@ -24,7 +24,7 @@ import org.aopalliance.intercept.MethodInterceptor;
 import java.util.Set;
 
 /**
- * Utilities for configuration Dynamic Finders.
+ * Utilities for configuring Dynamic Finders.
  * @author Robbie Vanbrabant
  */
 public class DynamicFinders {

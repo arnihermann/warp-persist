@@ -26,7 +26,7 @@ import org.hibernate.SessionFactory;
 /**
  * @author Robbie Vanbrabant
  */
-public class HibernateConfigurationStrategy implements ConfigurationStrategy {
+public class HibernatePersistenceStrategy implements PersistenceStrategy {
     public Module getBindings(final Configuration config) {
         return new AbstractModule() {
 

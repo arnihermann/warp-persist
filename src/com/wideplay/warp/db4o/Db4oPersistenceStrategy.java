@@ -25,7 +25,7 @@ import com.wideplay.warp.persist.*;
 /**
  * @author Robbie Vanbrabant
  */
-public class Db4oConfigurationStrategy implements ConfigurationStrategy {
+public class Db4oPersistenceStrategy implements PersistenceStrategy {
     public Module getBindings(final Configuration config) {
         return new AbstractModule() {
             protected void configure() {

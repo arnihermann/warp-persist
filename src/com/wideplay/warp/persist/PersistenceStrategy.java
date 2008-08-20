@@ -21,6 +21,6 @@ import com.google.inject.Module;
  * Strategy for hooking persistence strategies into warp-persist.
  * @author Robbie Vanbrabant
  */
-public interface ConfigurationStrategy {
+public interface PersistenceStrategy {
     Module getBindings(Configuration config);
 }

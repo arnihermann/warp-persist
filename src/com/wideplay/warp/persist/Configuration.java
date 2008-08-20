@@ -17,9 +17,9 @@ package com.wideplay.warp.persist;
 
 import com.google.inject.matcher.Matcher;
 import com.google.inject.matcher.Matchers;
-import com.wideplay.warp.db4o.Db4oConfigurationStrategy;
-import com.wideplay.warp.hibernate.HibernateConfigurationStrategy;
-import com.wideplay.warp.jpa.JpaConfigurationStrategy;
+import com.wideplay.warp.db4o.Db4oPersistenceStrategy;
+import com.wideplay.warp.hibernate.HibernatePersistenceStrategy;
+import com.wideplay.warp.jpa.JpaPersistenceStrategy;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
@@ -137,24 +137,24 @@ public class Configuration {
         }
     }
 
-    static enum PersistenceFlavor implements HasConfigurationStrategy {
+    static enum PersistenceFlavor implements HasPersistenceStrategy {
         HIBERNATE {
-            public ConfigurationStrategy getConfigurationStrategy() {
-                return new HibernateConfigurationStrategy();
+            public PersistenceStrategy getPersistenceStrategy() {
+                return new HibernatePersistenceStrategy();
             }
         },
         JPA {
-            public ConfigurationStrategy getConfigurationStrategy() {
-                return new JpaConfigurationStrategy();
+            public PersistenceStrategy getPersistenceStrategy() {
+                return new JpaPersistenceStrategy();
             }
         },
         DB4O {
-            public ConfigurationStrategy getConfigurationStrategy() {
-                return new Db4oConfigurationStrategy();
+            public PersistenceStrategy getPersistenceStrategy() {
+                return new Db4oPersistenceStrategy();
             }
         }
     }
-    static interface HasConfigurationStrategy {
-        ConfigurationStrategy getConfigurationStrategy();
+    static interface HasPersistenceStrategy {
+        PersistenceStrategy getPersistenceStrategy();
     }
 }
