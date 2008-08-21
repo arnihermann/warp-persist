@@ -115,7 +115,7 @@ public class SessionPerRequestFilter implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {}
 
     /**
-     * The difference persistence strategies should add their WorkManager here
+     * The different persistence strategies should add their WorkManager here
      * at configuration time if they support {@link com.wideplay.warp.persist.UnitOfWork#REQUEST}.
      */
     static void registerWorkManager(WorkManager wm) {
