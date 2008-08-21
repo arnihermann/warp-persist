@@ -17,7 +17,7 @@
 package com.wideplay.warp.hibernate;
 
 import com.wideplay.warp.persist.WorkManager;
-import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 
 import javax.servlet.*;
 import java.io.IOException;
@@ -35,7 +35,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @since 1.0
  * @see com.wideplay.warp.persist.UnitOfWork
  */
-@Immutable
+@ThreadSafe
 public class SessionPerRequestFilter implements Filter {
     private static final List<WorkManager> workManagers = new CopyOnWriteArrayList<WorkManager>();
 

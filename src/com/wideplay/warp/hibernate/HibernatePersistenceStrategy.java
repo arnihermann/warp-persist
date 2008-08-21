@@ -15,12 +15,14 @@
  */
 package com.wideplay.warp.hibernate;
 
+import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.Provider;
 import com.wideplay.warp.persist.*;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 
 /**
  * @author Robbie Vanbrabant
@@ -32,7 +34,8 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
             protected void configure() {
                 String annotationDebugString = config.getAnnotationDebugStringOrNull();
                 // Need instance here for the work manager.
-                SessionFactoryProvider sfProvider = new SessionFactoryProvider(annotationDebugString);
+                SessionFactoryProvider sfProvider =
+                        new SessionFactoryProvider(getConfigurationKey(), annotationDebugString);
                 // Need instance here for the interceptors.
                 Provider<Session> sessionProvider = new SessionProvider(sfProvider);
                 // Need WorkManager here so we can register it on the SPR filter if the UnitOfWork is REQUEST
@@ -62,6 +65,22 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
                 MethodInterceptor finderInterceptor = new HibernateFinderInterceptor(sessionProvider);
                 bindFinderInterceptor(config, finderInterceptor);
                 bindDynamicAccessors(config, finderInterceptor);
+            }
+
+            /**
+             * Gets the Key to which the Hibernate Configuration has been bound.
+             */
+            private Key<Configuration> getConfigurationKey() {
+                if (config.hasBindingAnnotation()) {
+                    if (config.getBindingAnnotationClass() != null) {
+                        return Key.get(Configuration.class, config.getBindingAnnotationClass());
+                    } else {
+                        // we know it's not null because of hasBindingAnnotation
+                        return Key.get(Configuration.class, config.getBindingAnnotation());
+                    }
+                } else {
+                    return Key.get(Configuration.class);
+                }
             }
         };
     }

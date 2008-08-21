@@ -17,6 +17,8 @@
 package com.wideplay.warp.hibernate;
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Provider;
 import net.jcip.annotations.Immutable;
 import org.hibernate.SessionFactory;
@@ -31,18 +33,31 @@ import org.hibernate.cfg.Configuration;
  */
 @Immutable
 class SessionFactoryProvider implements Provider<SessionFactory> {
-    private static final Object LOCK = new Object();
+    // private lock for DCL
+    private final Object LOCK = new Object();
 
+    // Injecting the Injector because we can't inject a Hibernate Configuration
+    // directly. When using multiple Hibernate modules the user has to bind at least
+    // one Configuration using a binding annotation, and we don't know it up front.
     @Inject // injecting finals works and has the same thread safety guarantees as constructors.
-    private final Configuration configuration = null;
+    private final Injector injector = null;
 
-    // DCL on a volatile
+    /**
+     * Lazily loaded SessionFactory. Double-checked locking is safe on a volatile.
+     */
     private volatile SessionFactory sessionFactory = null;
 
+    /**
+     * Key to which the user has bound the Hibernate Configuration.
+     * Simply points to the Configuration class if the user did not specify an annotation.
+     */
+    private final Key<Configuration> configurationKey;
+    
     /** Debugging to include in toString. */
     private final String annotationDebug;
 
-    SessionFactoryProvider(String annotationDebug) {
+    SessionFactoryProvider(Key<Configuration> configurationKey, String annotationDebug) {
+        this.configurationKey = configurationKey;
         this.annotationDebug = annotationDebug;
     }
 
@@ -50,7 +65,7 @@ class SessionFactoryProvider implements Provider<SessionFactory> {
         if (sessionFactory == null) {
             synchronized (LOCK) {
                 if (sessionFactory == null) {
-                    sessionFactory = configuration.buildSessionFactory();
+                    sessionFactory = injector.getInstance(configurationKey).buildSessionFactory();
                 }
             }
         }
