@@ -17,7 +17,6 @@
 package com.wideplay.warp.hibernate;
 
 import com.wideplay.warp.persist.SessionFilter;
-import net.jcip.annotations.ThreadSafe;
 
 /**
  * Apply this filter in web.xml to enable the HTTP Request unit of work.
@@ -26,6 +25,7 @@ import net.jcip.annotations.ThreadSafe;
  * @author Robbie Vanbrabant
  * @since 1.0
  * @see com.wideplay.warp.persist.UnitOfWork
+ * @deprecated use {@link com.wideplay.warp.persist.SessionFilter}
  */
-@ThreadSafe
+@Deprecated
 public class SessionPerRequestFilter extends SessionFilter {}
