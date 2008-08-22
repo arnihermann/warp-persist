@@ -9,7 +9,6 @@ import static com.google.inject.matcher.Matchers.any;
 import com.wideplay.warp.persist.dao.Finder;
 import org.aopalliance.intercept.MethodInterceptor;
 
-import java.io.Serializable;
 import java.lang.reflect.AnnotatedElement;
 
 /**
@@ -37,7 +36,7 @@ public abstract class AbstractPersistenceModule extends AbstractModule {
             return super.bind(tClass);
         }
     }
-
+    
     protected void bindDynamicAccessors(PersistenceConfiguration config, MethodInterceptor finderInterceptor) {
         for (Class accessor : config.getAccessors()) {
             if (accessor.isInterface()) {
@@ -69,40 +68,19 @@ public abstract class AbstractPersistenceModule extends AbstractModule {
         }
     }
 
-    /**
-     * Matches on exclusive AND for the given matchers.
-     */
-    protected <T> Matcher<T> and(final Matcher<? super T> one, final Matcher<? super T> two) {
-      return new And<T>(one, two);
+    // TODO use
+    private <T extends AnnotatedElement> Matcher<T> finderWithUnitIdenticalTo(final Class<T> annotation) {
+        return new AbstractMatcher<T>() {
+            public boolean matches(T t) {
+                return annotatedWith(Finder.class).matches(t) && ((Finder)t).unit() == annotation;
+            }
+        };
     }
 
-    static class And<T> extends AbstractMatcher<T> implements Serializable {
-        private final Matcher<? super T> one;
-        private final Matcher<? super T> two;
-
-        public And(Matcher<? super T> one, Matcher<? super T> two) {
-            this.one = one;
-            this.two = two;
-        }
-        public boolean matches(T t) {
-            return one.matches(t) && two.matches(t);
-        }
-
-        @Override public boolean equals(Object other) {
-          return other instanceof And
-              && ((And) other).one.equals(one)
-              && ((And) other).two.equals(two);
-        }
-
-        @Override public int hashCode() {
-          int result = 17;
-          result = 37*result + one.hashCode();
-          result = 37*result + two.hashCode();
-          return result;
-        }
-
-        @Override public String toString() {
-          return "and(" + one + ", " + two + ")";
-        }
+    /**
+     * Matches on AND for the given matchers.
+     */
+    protected <T> Matcher<T> and(final Matcher<T> one, final Matcher<T> two) {
+        return one.and(two);
     }
 }
