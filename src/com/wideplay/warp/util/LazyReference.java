@@ -1,11 +1,17 @@
 package com.wideplay.warp.util;
 
 import com.google.inject.Provider;
+import net.jcip.annotations.ThreadSafe;
 
 /**
- * Utility to implement double-checked locking.
+ * Utility to lazily load an object reference.
+ * It uses Double-Checked Locking under the covers
+ * and thus can safely be accessed from multiple threads
+ * concurrently.
+ * 
  * @author Robbie Vanbrabant
  */
+@ThreadSafe
 public class LazyReference<T> {
     private final Object LOCK = new Object();
     // This field has to be volatile. Do not change!
@@ -17,8 +23,8 @@ public class LazyReference<T> {
     }
 
     /**
-     * Get the existing T instance, of lazily initialize T using the
-     * internal instance provider.
+     * Get the existing T instance, or lazily initialize T using
+     * {@link #instanceProvider}.
      * @return the T instance unique to this LazyReference
      */
     public T get() {
