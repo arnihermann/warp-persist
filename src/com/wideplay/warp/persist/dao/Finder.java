@@ -16,6 +16,8 @@
 
 package com.wideplay.warp.persist.dao;
 
+import com.wideplay.warp.persist.Defaults;
+
 import java.lang.annotation.*;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,7 +37,7 @@ import java.util.Collection;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Finder {
-    Class<? extends Annotation> unit() default DefaultUnit.class;
+    Class<? extends Annotation> unit() default Defaults.DefaultUnit.class;
 
     /**
      * Specify a named query's name here, typically using the {@code @NamedQuery} annotation.

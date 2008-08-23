@@ -30,7 +30,8 @@ public abstract class AbstractPersistenceModule extends AbstractModule {
             return super.bind(tClass);
         }
     }
-    
+
+    @SuppressWarnings("unchecked") // Proxies are not generic.
     protected void bindDynamicAccessors(PersistenceConfiguration config, MethodInterceptor finderInterceptor) {
         for (Class accessor : config.getAccessors()) {
             if (accessor.isInterface()) {
@@ -41,6 +42,24 @@ public abstract class AbstractPersistenceModule extends AbstractModule {
                 bindSpecial(config, accessor).toInstance(com.google.inject.cglib.proxy.Enhancer.create(accessor,
                         new AopAllianceCglibAdapter(finderInterceptor)));
             }
+        }
+    }
+
+    protected void bindTransactionInterceptor(PersistenceConfiguration config, MethodInterceptor txInterceptor) {
+        if (config.hasBindingAnnotation()) {
+            // We support forAll, and assume the user knows what he/she is doing.
+            // TODO make our custom method matcher public?
+            if (config.getTransactionMethodMatcher() != Defaults.TX_METHOD_MATCHER) {
+                bindInterceptor(config.getTransactionClassMatcher(),
+                                config.getTransactionMethodMatcher(),
+                                txInterceptor);
+            } else {
+                bindInterceptor(config.getTransactionClassMatcher(),
+                                transactionalWithUnitIdenticalTo(config.getBindingAnnotationClass()),
+                                txInterceptor);
+            }
+        } else {
+            bindInterceptor(config.getTransactionClassMatcher(), config.getTransactionMethodMatcher(), txInterceptor);
         }
     }
 
@@ -61,6 +80,15 @@ public abstract class AbstractPersistenceModule extends AbstractModule {
             public boolean matches(Method method) {
                 return annotatedWith(Finder.class).matches(method) &&
                        method.getAnnotation(Finder.class).unit() == annotation;
+            }
+        };
+    }
+
+    private Matcher<? super Method> transactionalWithUnitIdenticalTo(final Class<?> annotation) {
+        return new AbstractMatcher<Method>() {
+            public boolean matches(Method method) {
+                return annotatedWith(Transactional.class).matches(method) &&
+                       method.getAnnotation(Transactional.class).unit() == annotation;
             }
         };
     }

@@ -19,7 +19,6 @@ package com.wideplay.warp.persist;
 import com.google.inject.BindingAnnotation;
 import com.google.inject.Module;
 import com.google.inject.matcher.Matcher;
-import com.google.inject.matcher.Matchers;
 import net.jcip.annotations.NotThreadSafe;
 
 import java.lang.annotation.Annotation;
@@ -82,7 +81,6 @@ class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, Persisten
 
     public PersistenceModuleBuilder forAll(Matcher<? super Class<?>> classMatcher) {
         persistenceConfiguration.transactionClassMatcher(classMatcher);
-        persistenceConfiguration.transactionMethodMatcher(Matchers.annotatedWith(Transactional.class));
 
         return this;
     }

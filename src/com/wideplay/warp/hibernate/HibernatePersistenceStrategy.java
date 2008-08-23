@@ -44,9 +44,6 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
                 // Needs to be able to initialize Provider<SessionFactory>
                 PersistenceService pService = new HibernatePersistenceService(sfProvider);
 
-                if (UnitOfWork.REQUEST == config.getUnitOfWork())
-                    SessionFilter.registerWorkManager(workManager);
-
                 bindSpecial(config, SessionFactory.class).toProvider(sfProvider);
                 bindSpecial(config, Session.class).toProvider(sessionProvider);
                 bindSpecial(config, WorkManager.class).toInstance(workManager);
@@ -55,16 +52,16 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
                 // Set up transactions. Only local transactions are supported.
                 if (TransactionStrategy.LOCAL != config.getTransactionStrategy())
                     throw new IllegalArgumentException("Unsupported Hibernate transaction strategy: " + config.getTransactionStrategy());
-                // IMPORTANT: the user should configure transactions manually when using multiple Hibernate modules.
                 MethodInterceptor txInterceptor = new HibernateLocalTxnInterceptor(sessionProvider);
-                bindInterceptor(config.getTransactionClassMatcher(),
-                                config.getTransactionMethodMatcher(), 
-                                txInterceptor);
+                bindTransactionInterceptor(config, txInterceptor);
 
                 // Set up Dynamic Finders.
                 MethodInterceptor finderInterceptor = new HibernateFinderInterceptor(sessionProvider);
                 bindFinderInterceptor(config, finderInterceptor);
                 bindDynamicAccessors(config, finderInterceptor);
+
+                if (UnitOfWork.REQUEST == config.getUnitOfWork())
+                    SessionFilter.registerWorkManager(workManager);
             }
 
             /**

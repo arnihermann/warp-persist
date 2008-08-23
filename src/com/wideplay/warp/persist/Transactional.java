@@ -44,6 +44,7 @@ import java.lang.annotation.*;
 @Target({ ElementType.METHOD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Transactional {
+    Class<? extends Annotation> unit() default Defaults.DefaultUnit.class;
 
     /**
      * This is an experimental feature and is only supported for Hibernate. It
