@@ -43,7 +43,7 @@ class HibernatePersistenceService extends PersistenceService {
         sessionFactoryProvider.get();
     }
 
-    public void stop() {
+    public void shutdown() {
         // We don't try to be smart because we don't know what to synchronize on.
         // Leave it up to the caller to check if it has been closed already.
         sessionFactoryProvider.get().close();

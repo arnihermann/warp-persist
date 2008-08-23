@@ -38,6 +38,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class SessionFilter implements Filter {
     private static final List<WorkManager> workManagers = new CopyOnWriteArrayList<WorkManager>();
 
+    public void init(FilterConfig filterConfig) throws ServletException {}
     public void destroy() {}
 
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -108,8 +109,6 @@ public class SessionFilter implements Filter {
             }
         }
     }
-
-    public void init(FilterConfig filterConfig) throws ServletException {}
 
     /**
      * The different persistence strategies should add their WorkManager here

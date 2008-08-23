@@ -60,8 +60,11 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
                 bindFinderInterceptor(config, finderInterceptor);
                 bindDynamicAccessors(config, finderInterceptor);
 
-                if (UnitOfWork.REQUEST == config.getUnitOfWork())
+                if (UnitOfWork.REQUEST == config.getUnitOfWork()) {
+                    // statics -- we don't have a choice.
                     SessionFilter.registerWorkManager(workManager);
+                    LifecycleSessionFilter.registerPersistenceService(pService);
+                }
             }
 
             /**

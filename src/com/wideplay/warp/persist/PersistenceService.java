@@ -43,6 +43,12 @@ public abstract class PersistenceService {
     public abstract void start();
 
     /**
+     * Stops the underlying persistence engine.
+     * For instance, with Hibernate, it closes the SessionFactory.
+     */
+    public abstract void shutdown();
+
+    /**
      * A factory for warp-persist using Hibernate in your Guice module. See http://www.wideplay.com
      * for proper documentation on the EDSL.
      *

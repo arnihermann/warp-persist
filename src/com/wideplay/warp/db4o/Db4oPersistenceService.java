@@ -93,6 +93,11 @@ class Db4oPersistenceService extends PersistenceService {
 
 	}
 
+    public void shutdown() {
+        // TODO (Robbie) Dhanji, is this enough? I'm not familiar with DB4O.
+        objectServerHolder.getObjectServer().close();
+    }
+
 
     //DO NOT Collapse these into a single setter (each is optional individually...)
     @Inject(optional = true)

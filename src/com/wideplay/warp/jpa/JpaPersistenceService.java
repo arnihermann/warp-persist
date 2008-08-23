@@ -18,11 +18,11 @@ package com.wideplay.warp.jpa;
 
 import com.google.inject.Inject;
 import com.wideplay.warp.persist.PersistenceService;
+import net.jcip.annotations.ThreadSafe;
 
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import java.util.Properties;
-
-import net.jcip.annotations.ThreadSafe;
 
 /**
  * Created with IntelliJ IDEA.
@@ -57,6 +57,14 @@ class JpaPersistenceService extends PersistenceService {
             emFactoryHolder.setEntityManagerFactory(Persistence.createEntityManagerFactory(persistenceUnitName));
 
         //if necessary, set the JNDI lookup name of the JTA txn
+    }
+
+    public void shutdown() {
+        // SPRInterceptor syncs on the same instance.
+        synchronized(emFactoryHolder.getEntityManagerFactory()) {
+            EntityManagerFactory emf = emFactoryHolder.getEntityManagerFactory();
+            if (emf.isOpen()) emf.close();
+        }
     }
 
 

@@ -35,6 +35,8 @@ public abstract class AbstractPersistenceModule extends AbstractModule {
     protected void bindDynamicAccessors(PersistenceConfiguration config, MethodInterceptor finderInterceptor) {
         for (Class accessor : config.getAccessors()) {
             if (accessor.isInterface()) {
+                // TODO we should validate that all methods have @Finder on them at startup
+                //      and use Guice's addError.
                 bindSpecial(config, accessor).toInstance(Proxy.newProxyInstance(accessor.getClassLoader(),
                         new Class<?>[] { accessor }, new AopAllianceJdkProxyAdapter(finderInterceptor)));
             } else {
