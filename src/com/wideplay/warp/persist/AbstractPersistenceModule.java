@@ -20,9 +20,8 @@ public abstract class AbstractPersistenceModule extends AbstractModule {
     protected abstract void configure();
 
     /**
-     * Bind with an optional binding annotation instance or type, depending on the configuration.
-     * A binding annotation needs to be specified when using two Hibernate configurations within the
-     * same Injector.
+     * Bind with an optional binding annotation type. A binding annotation needs
+     * to be specified when using two Hibernate configurations within the same Injector.
      */
     protected <T> com.google.inject.binder.LinkedBindingBuilder<T> bindSpecial(PersistenceConfiguration config, java.lang.Class<T> tClass) {
         if (config.hasBindingAnnotation()) {
