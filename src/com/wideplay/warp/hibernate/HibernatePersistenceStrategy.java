@@ -45,7 +45,7 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
                 PersistenceService pService = new HibernatePersistenceService(sfProvider);
 
                 if (UnitOfWork.REQUEST == config.getUnitOfWork())
-                    SessionPerRequestFilter.registerWorkManager(workManager);
+                    SessionFilter.registerWorkManager(workManager);
 
                 bindSpecial(config, SessionFactory.class).toProvider(sfProvider);
                 bindSpecial(config, Session.class).toProvider(sessionProvider);
