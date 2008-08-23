@@ -47,7 +47,7 @@ public abstract class AbstractPersistenceModule extends AbstractModule {
 
     /**
      * Binds a finder interceptor with support for multiple modules. When the user specifies
-     * an annotation to bind the module to, we match on the combination {@code @UserAnnotation @Finder}.
+     * an annotation to bind the module to, we match on {@code @Finder(unit=UserAnnotation.class)}.
      */
     protected void bindFinderInterceptor(PersistenceConfiguration config, MethodInterceptor finderInterceptor) {
         if (config.hasBindingAnnotation()) {
