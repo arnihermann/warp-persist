@@ -72,12 +72,7 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
              */
             private Key<Configuration> getConfigurationKey() {
                 if (config.hasBindingAnnotation()) {
-                    if (config.getBindingAnnotationClass() != null) {
-                        return Key.get(Configuration.class, config.getBindingAnnotationClass());
-                    } else {
-                        // we know it's not null because of hasBindingAnnotation
-                        return Key.get(Configuration.class, config.getBindingAnnotation());
-                    }
+                    return Key.get(Configuration.class, config.getBindingAnnotationClass());
                 } else {
                     return Key.get(Configuration.class);
                 }

@@ -43,7 +43,6 @@ public class PersistenceConfigurationImpl implements PersistenceConfiguration {
     private final Set<Class<?>> accessors;
 
     private final Class<? extends Annotation> bindingAnnotationClass;
-    private final Annotation bindingAnnotation;
 
     private PersistenceConfigurationImpl(PersistenceConfigurationBuilder builder) {
         this.unitOfWork = builder.unitOfWork;
@@ -52,7 +51,6 @@ public class PersistenceConfigurationImpl implements PersistenceConfiguration {
         this.txMethodMatcher = builder.txMethodMatcher;
         this.accessors = Collections.unmodifiableSet(builder.accessors);
         this.bindingAnnotationClass = builder.bindingAnnotationClass;
-        this.bindingAnnotation = builder.bindingAnnotation;
     }
 
     public UnitOfWork getUnitOfWork() {
@@ -73,21 +71,14 @@ public class PersistenceConfigurationImpl implements PersistenceConfiguration {
     public Class<? extends Annotation> getBindingAnnotationClass() {
         return this.bindingAnnotationClass;
     }
-    public Annotation getBindingAnnotation() {
-        return this.bindingAnnotation;
-    }
     public boolean hasBindingAnnotation() {
-        return this.bindingAnnotation != null || this.bindingAnnotationClass != null;
+        return this.bindingAnnotationClass != null;
     }
 
     /** Useful for debugging. We should emit this String in as much persistence types as possible. */
     public String getAnnotationDebugStringOrNull() {
         if (hasBindingAnnotation()) {
-            if (getBindingAnnotationClass() != null) {
-                return getBindingAnnotationClass().getSimpleName();
-            } else {
-                return getBindingAnnotation().toString();
-            }
+            return getBindingAnnotationClass().getSimpleName();
         }
         return null;
     }
@@ -104,14 +95,9 @@ public class PersistenceConfigurationImpl implements PersistenceConfiguration {
         private Matcher<? super Method> txMethodMatcher = Matchers.annotatedWith(Transactional.class);
 
         private Class<? extends Annotation> bindingAnnotationClass;
-        private Annotation bindingAnnotation;
 
         private final Set<Class<?>> accessors = new LinkedHashSet<Class<?>>();
 
-        public <A extends Annotation> PersistenceConfigurationBuilder boundTo(A annotation) {
-            this.bindingAnnotation = annotation;
-            return this;
-        }
         public <A extends Annotation> PersistenceConfigurationBuilder boundToType(Class<A> annotationClass) {
             this.bindingAnnotationClass = annotationClass;
             return this;
@@ -138,10 +124,7 @@ public class PersistenceConfigurationImpl implements PersistenceConfiguration {
         }
 
         public PersistenceConfiguration build() {
-            // TODO validate more state
-            if (this.bindingAnnotation != null && this.bindingAnnotationClass != null)
-                throw new IllegalStateException("Ambiguous binding annotation configuration. " +
-                                                "Specify either a type or an instance; not both.");
+            // TODO validate state
             return new PersistenceConfigurationImpl(this);
         }
     }

@@ -51,14 +51,16 @@ class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, Persisten
         return flavor.getPersistenceStrategy().getBindings(persistenceConfiguration.build());
     }
 
-    /** Builds a peristence module that has all persistence artefacts bound to the specified binding annotation. */
-    public <A extends Annotation> Module buildModuleBoundTo(A bindingAnnotation) {
-        bindingAnnotationPrecondition(bindingAnnotation.getClass());
-        persistenceConfiguration.boundTo(bindingAnnotation);
-        return flavor.getPersistenceStrategy().getBindings(persistenceConfiguration.build());
-    }
-
-    /** Builds a peristence module that has all persistence artefacts bound to the specified binding annotation type. */
+    /**
+     * Builds a peristence module that has all persistence artefacts bound
+     * to the specified binding annotation type.
+     * <p>
+     * We do not support bindings to annotation instances because we use the type in
+     * {@link com.wideplay.warp.persist.dao.Finder} annotations, for example:
+     * {@code @Finder(unit=BoundToAnnotation.class)}.
+     * Restrictions in JLS prevent us from specifying annotation instances.
+     * </p>
+     */
     public <A extends Annotation> Module buildModuleBoundTo(Class<A> bindingAnnotationClass) {
         bindingAnnotationPrecondition(bindingAnnotationClass);
         persistenceConfiguration.boundToType(bindingAnnotationClass);

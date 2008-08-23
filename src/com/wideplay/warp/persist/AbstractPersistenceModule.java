@@ -26,12 +26,7 @@ public abstract class AbstractPersistenceModule extends AbstractModule {
      */
     protected <T> com.google.inject.binder.LinkedBindingBuilder<T> bindSpecial(PersistenceConfiguration config, java.lang.Class<T> tClass) {
         if (config.hasBindingAnnotation()) {
-            if (config.getBindingAnnotationClass() != null) {
-                return super.bind(tClass).annotatedWith(config.getBindingAnnotationClass());
-            } else {
-                // we know it's not null because of hasBindingAnnotation
-                return super.bind(tClass).annotatedWith(config.getBindingAnnotation());
-            }
+            return super.bind(tClass).annotatedWith(config.getBindingAnnotationClass());
         } else {
             return super.bind(tClass);
         }
@@ -57,12 +52,7 @@ public abstract class AbstractPersistenceModule extends AbstractModule {
     protected void bindFinderInterceptor(PersistenceConfiguration config, MethodInterceptor finderInterceptor) {
         Matcher<AnnotatedElement> annotatedWithFinder = annotatedWith(Finder.class);
         if (config.hasBindingAnnotation()) {
-            if (config.getBindingAnnotationClass() != null) {
-                bindInterceptor(any(), and(annotatedWithFinder, annotatedWith(config.getBindingAnnotationClass())), finderInterceptor);
-            } else {
-                // we know it's not null because of hasBindingAnnotation
-                bindInterceptor(any(), and(annotatedWithFinder, annotatedWith(config.getBindingAnnotation())), finderInterceptor);
-            }
+            bindInterceptor(any(), and(annotatedWithFinder, annotatedWith(config.getBindingAnnotationClass())), finderInterceptor);
         } else {
             bindInterceptor(any(), annotatedWithFinder, finderInterceptor);
         }

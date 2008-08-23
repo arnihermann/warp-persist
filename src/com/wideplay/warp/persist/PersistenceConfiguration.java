@@ -22,8 +22,6 @@ public interface PersistenceConfiguration {
 
     Class<? extends Annotation> getBindingAnnotationClass();
 
-    Annotation getBindingAnnotation();
-
     boolean hasBindingAnnotation();
 
     String getAnnotationDebugStringOrNull();
