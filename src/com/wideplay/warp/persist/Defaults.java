@@ -14,10 +14,10 @@ import java.lang.reflect.Method;
 public class Defaults {
     private Defaults() {}
 
-    public static UnitOfWork UNIT_OF_WORK = UnitOfWork.TRANSACTION;
-    public static TransactionStrategy TX_STRATEGY = TransactionStrategy.LOCAL;
-    public static Matcher<? super Class<?>> TX_CLASS_MATCHER = Matchers.any();
-    public static Matcher<? super Method> TX_METHOD_MATCHER = Matchers.annotatedWith(Transactional.class);    
+    public static final UnitOfWork UNIT_OF_WORK = UnitOfWork.TRANSACTION;
+    public static final TransactionStrategy TX_STRATEGY = TransactionStrategy.LOCAL;
+    public static final Matcher<? super Class<?>> TX_CLASS_MATCHER = Matchers.any();
+    public static final Matcher<? super Method> TX_METHOD_MATCHER = Matchers.annotatedWith(Transactional.class);    
 
     /**
      * Default persistence unit annotation.
