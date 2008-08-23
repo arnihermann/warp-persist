@@ -49,7 +49,7 @@ class SessionFactoryProvider implements Provider<SessionFactory> {
                 public SessionFactory get() {
                     return injector.getInstance(configurationKey).buildSessionFactory();
                 }
-    });
+            });
 
     /**
      * Key to which the user has bound the Hibernate Configuration.
