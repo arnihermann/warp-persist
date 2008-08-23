@@ -20,6 +20,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provider;
+import com.wideplay.warp.util.LazyReference;
 import net.jcip.annotations.Immutable;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -33,8 +34,6 @@ import org.hibernate.cfg.Configuration;
  */
 @Immutable
 class SessionFactoryProvider implements Provider<SessionFactory> {
-    // private lock for DCL
-    private final Object LOCK = new Object();
 
     // Injecting the Injector because we can't inject a Hibernate Configuration
     // directly. When using multiple Hibernate modules the user has to bind at least
@@ -43,9 +42,14 @@ class SessionFactoryProvider implements Provider<SessionFactory> {
     private final Injector injector = null;
 
     /**
-     * Lazily loaded SessionFactory. Double-checked locking is safe on a volatile.
+     * Lazily loaded SessionFactory.
      */
-    private volatile SessionFactory sessionFactory = null;
+    private LazyReference<SessionFactory> sessionFactory =
+            LazyReference.of(new Provider<SessionFactory>() {
+                public SessionFactory get() {
+                    return injector.getInstance(configurationKey).buildSessionFactory();
+                }
+    });
 
     /**
      * Key to which the user has bound the Hibernate Configuration.
@@ -62,15 +66,7 @@ class SessionFactoryProvider implements Provider<SessionFactory> {
     }
 
     public SessionFactory get() {
-        if (sessionFactory == null) {
-            synchronized (LOCK) {
-                if (sessionFactory == null) {
-                    sessionFactory = injector.getInstance(configurationKey).buildSessionFactory();
-                }
-            }
-        }
-
-        return sessionFactory;
+        return sessionFactory.get();
     }
 
     public String toString() {
