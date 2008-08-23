@@ -9,7 +9,7 @@ import static com.google.inject.matcher.Matchers.any;
 import com.wideplay.warp.persist.dao.Finder;
 import org.aopalliance.intercept.MethodInterceptor;
 
-import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Method;
 
 /**
  * Base module for persistence strategies that holds a bunch
@@ -50,27 +50,19 @@ public abstract class AbstractPersistenceModule extends AbstractModule {
      * an annotation to bind the module to, we match on the combination {@code @UserAnnotation @Finder}.
      */
     protected void bindFinderInterceptor(PersistenceConfiguration config, MethodInterceptor finderInterceptor) {
-        Matcher<AnnotatedElement> annotatedWithFinder = annotatedWith(Finder.class);
         if (config.hasBindingAnnotation()) {
-            bindInterceptor(any(), and(annotatedWithFinder, annotatedWith(config.getBindingAnnotationClass())), finderInterceptor);
+            bindInterceptor(any(), finderWithUnitIdenticalTo(config.getBindingAnnotationClass()), finderInterceptor);
         } else {
-            bindInterceptor(any(), annotatedWithFinder, finderInterceptor);
+            bindInterceptor(any(), annotatedWith(Finder.class), finderInterceptor);
         }
     }
 
-    // TODO use
-    private <T extends AnnotatedElement> Matcher<T> finderWithUnitIdenticalTo(final Class<T> annotation) {
-        return new AbstractMatcher<T>() {
-            public boolean matches(T t) {
-                return annotatedWith(Finder.class).matches(t) && ((Finder)t).unit() == annotation;
+    private Matcher<Method> finderWithUnitIdenticalTo(final Class<?> annotation) {
+        return new AbstractMatcher<Method>() {
+            public boolean matches(Method method) {
+                return annotatedWith(Finder.class).matches(method) &&
+                       method.getAnnotation(Finder.class).unit() == annotation;
             }
         };
-    }
-
-    /**
-     * Matches on AND for the given matchers.
-     */
-    protected <T> Matcher<T> and(final Matcher<T> one, final Matcher<T> two) {
-        return one.and(two);
     }
 }
