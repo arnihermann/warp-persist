@@ -16,12 +16,11 @@
 
 package com.wideplay.warp.jpa;
 
-import com.google.inject.Inject;
 import com.google.inject.Provider;
+import net.jcip.annotations.Immutable;
 
 import javax.persistence.EntityManager;
-
-import net.jcip.annotations.Immutable;
+import javax.persistence.EntityManagerFactory;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,14 +30,31 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 class EntityManagerProvider implements Provider<EntityManager> {
-    private final EntityManagerFactoryHolder holder;
+    // TODO only in UnitOfWork.REQUEST?
+    private final ThreadLocal<EntityManager> entityManager =
+            new ThreadLocal<EntityManager>();
+    private final Provider<EntityManagerFactory> emfProvider;
 
-    @Inject
-    public EntityManagerProvider(EntityManagerFactoryHolder holder) {
-        this.holder = holder;
+    public EntityManagerProvider(Provider<EntityManagerFactory> emfProvider) {
+        this.emfProvider = emfProvider;
     }
 
     public EntityManager get() {
-        return holder.getEntityManager();
+        if (!isEntityManagerSet()) {
+            setEntityManager(emfProvider.get().createEntityManager());
+        }
+        return entityManager.get();
+    }
+
+    boolean isEntityManagerSet() {
+        return entityManager.get() != null;
+    }
+
+    void setEntityManager(EntityManager em) {
+        entityManager.set(em);
+    }
+
+    void clearEntityManager() {
+        entityManager.remove();
     }
 }

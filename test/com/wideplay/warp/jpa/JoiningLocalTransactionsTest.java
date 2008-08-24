@@ -16,25 +16,22 @@
 
 package com.wideplay.warp.jpa;
 
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.AfterClass;
-import com.google.inject.Injector;
-import com.google.inject.Guice;
 import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.matcher.Matchers;
-import com.wideplay.warp.persist.PersistenceService;
-import com.wideplay.warp.persist.UnitOfWork;
-import com.wideplay.warp.persist.TransactionStrategy;
-import com.wideplay.warp.persist.Transactional;
+import com.wideplay.warp.persist.*;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
-import java.util.Date;
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
@@ -72,7 +69,7 @@ public class JoiningLocalTransactionsTest {
     @AfterTest
     //cleanup entitymanager in case some of the rollback tests left it in an open state
     public final void post() {
-        EntityManagerFactoryHolder.closeCurrentEntityManager();
+        injector.getInstance(WorkManager.class).endWork();
     }
 
     @AfterClass
@@ -89,7 +86,7 @@ public class JoiningLocalTransactionsTest {
 
         //test that the data has been stored
         Object result = em.createQuery("from JpaTestEntity where text = :text").setParameter("text", UNIQUE_TEXT).getSingleResult();
-        EntityManagerFactoryHolder.closeCurrentEntityManager();
+        injector.getInstance(WorkManager.class).endWork();
 
         assert result instanceof JpaTestEntity : "odd result returned fatal";
 
@@ -104,16 +101,16 @@ public class JoiningLocalTransactionsTest {
             //ignore
             System.out.println("caught (expecting rollback) " + e);
 
-            EntityManagerFactoryHolder.closeCurrentEntityManager();
+            injector.getInstance(WorkManager.class).endWork();
         }
 
-        EntityManager em = EntityManagerFactoryHolder.getCurrentEntityManager();
+        EntityManager em = injector.getInstance(EntityManager.class);
 
         assert !em.getTransaction().isActive() : "EM was not closed by transactional service (rollback didnt happen?)";
 
         //test that the data has been stored
         Object result = em.createQuery("from JpaTestEntity where text = :text").setParameter("text", TRANSIENT_UNIQUE_TEXT).getSingleResult();
-        EntityManagerFactoryHolder.closeCurrentEntityManager();
+        injector.getInstance(WorkManager.class).endWork();
 
         assert null == result : "a result was returned! rollback sure didnt happen!!!";
     }
@@ -125,7 +122,7 @@ public class JoiningLocalTransactionsTest {
         } catch(RuntimeException re) {
             //ignore
             System.out.println("caught (expecting rollback) " + re);
-            EntityManagerFactoryHolder.closeCurrentEntityManager();
+            injector.getInstance(WorkManager.class).endWork();
         }
 
         EntityManager em = injector.getInstance(EntityManager.class);
@@ -133,7 +130,7 @@ public class JoiningLocalTransactionsTest {
 
         //test that the data has been stored
         Object result = em.createQuery("from JpaTestEntity where text = :text").setParameter("text", TRANSIENT_UNIQUE_TEXT).getSingleResult();
-        EntityManagerFactoryHolder.closeCurrentEntityManager();
+        injector.getInstance(WorkManager.class).endWork();
 
         assert null == result : "a result was returned! rollback sure didnt happen!!!";
     }

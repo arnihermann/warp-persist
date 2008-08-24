@@ -15,8 +15,8 @@
  */
 package com.wideplay.warp.jpa;
 
+import com.google.inject.Key;
 import com.google.inject.Module;
-import com.google.inject.Singleton;
 import com.wideplay.warp.persist.*;
 import org.aopalliance.intercept.MethodInterceptor;
 
@@ -30,25 +30,36 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
     public Module getBindings(final PersistenceConfiguration config) {
         return new AbstractPersistenceModule() {
             protected void configure() {
+                // TODO (Robbie) key for multiple modules, and optional properties key
+                EntityManagerFactoryProvider emfProvider = new EntityManagerFactoryProvider(Key.get(String.class, JpaUnit.class), null);
+                EntityManagerProvider emProvider = new EntityManagerProvider(emfProvider);
+                WorkManager workManager = new JpaWorkManager(emfProvider, emProvider);
+
+                JpaPersistenceService pService = new JpaPersistenceService(emfProvider);
+
                 // Set up JPA.
-                bind(EntityManagerFactoryHolder.class).in(Singleton.class);
-                bind(EntityManagerFactory.class).toProvider(EntityManagerFactoryProvider.class);
-                bind(EntityManager.class).toProvider(EntityManagerProvider.class);
-                bind(PersistenceService.class).to(JpaPersistenceService.class).in(Singleton.class);
-                bind(WorkManager.class).to(JpaWorkManager.class);
+                bindSpecial(config, EntityManagerFactory.class).toProvider(emfProvider);
+                bindSpecial(config, EntityManager.class).toProvider(emProvider);
+                bindSpecial(config, PersistenceService.class).toInstance(pService);
+                bindSpecial(config, JpaPersistenceService.class).toInstance(pService);
+                bindSpecial(config, WorkManager.class).toInstance(workManager);
 
                 // Set up transactions. Only local transactions are supported.
                 if (TransactionStrategy.LOCAL != config.getTransactionStrategy())
                     throw new IllegalArgumentException("Unsupported JPA transaction strategy: " + config.getTransactionStrategy());
-                JpaLocalTxnInterceptor.setUnitOfWork(config.getUnitOfWork());
-                bindInterceptor(config.getTransactionClassMatcher(),
-                                config.getTransactionMethodMatcher(),
-                                new JpaLocalTxnInterceptor());
+
+                bindTransactionInterceptor(config, new JpaLocalTxnInterceptor(emProvider, config.getUnitOfWork()));
 
                 // Set up Dynamic Finders.
-                MethodInterceptor finderInterceptor = new JpaFinderInterceptor();
+                MethodInterceptor finderInterceptor = new JpaFinderInterceptor(emProvider);
                 bindFinderInterceptor(config, finderInterceptor);
                 bindDynamicAccessors(config, finderInterceptor);
+                
+                if (UnitOfWork.REQUEST == config.getUnitOfWork()) {
+                    // statics -- we don't have a choice.
+                    SessionFilter.registerWorkManager(workManager);
+                    LifecycleSessionFilter.registerPersistenceService(pService);
+                }
             }
         };
     }

@@ -16,24 +16,22 @@
 
 package com.wideplay.warp.jpa;
 
-import com.google.inject.Injector;
-import com.google.inject.Guice;
 import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.matcher.Matchers;
 import com.wideplay.warp.persist.PersistenceService;
-import com.wideplay.warp.persist.UnitOfWork;
 import com.wideplay.warp.persist.TransactionStrategy;
-import com.wideplay.warp.persist.Transactional;
-
-import java.util.Date;
-
-import org.testng.annotations.BeforeClass;
+import com.wideplay.warp.persist.UnitOfWork;
+import com.wideplay.warp.persist.WorkManager;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
@@ -88,7 +86,7 @@ public class ManualLocalTransactionsWithCustomMatcherTest {
         assert em.contains(entity) : "EntityManager  appears to have been closed across txns!";
         assert em.isOpen() : "EntityManager appears to have been closed across txns!";
 
-        EntityManagerFactoryHolder.closeCurrentEntityManager();
+        injector.getInstance(WorkManager.class).endWork();
 
         //try to query them back out
         em = injector.getInstance(EntityManager.class);

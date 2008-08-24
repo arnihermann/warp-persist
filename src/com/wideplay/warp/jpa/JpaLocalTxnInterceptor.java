@@ -18,14 +18,13 @@ package com.wideplay.warp.jpa;
 
 import com.wideplay.warp.persist.Transactional;
 import com.wideplay.warp.persist.UnitOfWork;
+import net.jcip.annotations.ThreadSafe;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import java.lang.reflect.Method;
-
-import net.jcip.annotations.ThreadSafe;
 
 /**
  * Created with IntelliJ IDEA.
@@ -35,14 +34,20 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 class JpaLocalTxnInterceptor implements MethodInterceptor {
-    private static volatile UnitOfWork unitOfWork = UnitOfWork.TRANSACTION;
+    private final UnitOfWork unitOfWork;
+    private final EntityManagerProvider emProvider;
 
     //TODO this is a clunky hack, make a TransactionalImpl and make it customizable 
     @Transactional
     private static class Internal { }
 
+    public JpaLocalTxnInterceptor(EntityManagerProvider emProvider, UnitOfWork unitOfWork) {
+        this.emProvider = emProvider;
+        this.unitOfWork = unitOfWork;
+    }
+
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-        EntityManager em = EntityManagerFactoryHolder.getCurrentEntityManager();
+        EntityManager em = emProvider.get();
 
         //allow joining of transactions if there is an enclosing @Transactional method
         if (em.getTransaction().isActive())
@@ -71,7 +76,9 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
         } finally {
             //close the em if necessary (this code doesnt run unless above catch/rethrow fired)
             if (isUnitOfWorkTransaction() && !txn.isActive()) {
-                EntityManagerFactoryHolder.closeCurrentEntityManager();
+                // TODO (Robbie) is this enough?
+                emProvider.get().close();
+                emProvider.clearEntityManager();
             }
         }
 
@@ -82,7 +89,9 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
         } finally {
             //close the em if necessary
             if (isUnitOfWorkTransaction()) {
-                EntityManagerFactoryHolder.closeCurrentEntityManager();
+                // TODO (Robbie) is this enough?
+                emProvider.get().close();
+                emProvider.clearEntityManager();
             }
         }
 
@@ -148,16 +157,7 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
 
         return commit;
     }
-
-    private static boolean isUnitOfWorkTransaction() {
-        return UnitOfWork.TRANSACTION.equals(unitOfWork);
-    }
-
-    static UnitOfWork getUnitOfWork() {
-        return unitOfWork;
-    }
-
-    static void setUnitOfWork(UnitOfWork unitOfWork) {
-        JpaLocalTxnInterceptor.unitOfWork = unitOfWork;
+    private boolean isUnitOfWorkTransaction() {
+        return this.unitOfWork == UnitOfWork.TRANSACTION;
     }
 }

@@ -21,20 +21,15 @@ import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.matcher.Matchers;
-import com.wideplay.codemonkey.web.startup.Initializer;
 import com.wideplay.warp.persist.PersistenceService;
 import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.Transactional;
 import com.wideplay.warp.persist.UnitOfWork;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.AnnotationConfiguration;
-import org.hibernate.cfg.Configuration;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Date;
@@ -83,7 +78,7 @@ public class ClassLevelManagedLocalTransactionsTest {
 
     @AfterMethod
     void post() {
-        injector.getInstance(EntityManagerFactory.class).close();
+        injector.getInstance(PersistenceService.class).shutdown();
         injector = null;
     }
 

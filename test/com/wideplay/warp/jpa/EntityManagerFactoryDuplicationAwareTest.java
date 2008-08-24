@@ -23,9 +23,9 @@ import com.google.inject.matcher.Matchers;
 import com.wideplay.warp.persist.PersistenceService;
 import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.UnitOfWork;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
-import org.testng.annotations.AfterClass;
 
 import javax.persistence.EntityManagerFactory;
 
@@ -62,17 +62,18 @@ public class EntityManagerFactoryDuplicationAwareTest {
         injector.getInstance(EntityManagerFactory.class).close();
     }
 
-    @Test(expectedExceptions = RuntimeException.class)
-    public void testEMFactoryDuplicateAvoidance() {
-        //startup persistence
-        injector.getInstance(PersistenceService.class)
-                .start();
-
-        //startup persistence again (should fail!)
-        injector.getInstance(PersistenceService.class)
-                .start();
-
-        //obtain sessionfactory
-        assert false: "EntityManagerfactory duplication!!!";
-    }
+    // TODO no longer holds because of multiple modules refactoring
+//    @Test(expectedExceptions = RuntimeException.class)
+//    public void testEMFactoryDuplicateAvoidance() {
+//        //startup persistence
+//        injector.getInstance(PersistenceService.class)
+//                .start();
+//
+//        //startup persistence again (should fail!)
+//        injector.getInstance(PersistenceService.class)
+//                .start();
+//
+//        //obtain sessionfactory
+//        assert false: "EntityManagerfactory duplication!!!";
+//    }
 }

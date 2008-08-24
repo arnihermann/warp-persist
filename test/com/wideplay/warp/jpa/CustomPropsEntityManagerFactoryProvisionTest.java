@@ -16,21 +16,22 @@
 
 package com.wideplay.warp.jpa;
 
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.AfterClass;
-import com.google.inject.Injector;
-import com.google.inject.Guice;
 import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.google.inject.matcher.Matchers;
-import com.wideplay.warp.persist.PersistenceService;
-import com.wideplay.warp.persist.UnitOfWork;
-import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.codemonkey.web.startup.Initializer;
+import com.wideplay.warp.persist.PersistenceService;
+import com.wideplay.warp.persist.TransactionStrategy;
+import com.wideplay.warp.persist.UnitOfWork;
+import com.wideplay.warp.persist.WorkManager;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
 
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import java.util.Properties;
 
 /**
@@ -68,7 +69,7 @@ public class CustomPropsEntityManagerFactoryProvisionTest {
 
     @AfterTest
     public final void post() {
-        EntityManagerFactoryHolder.closeCurrentEntityManager();
+        injector.getInstance(WorkManager.class).endWork();
     }
 
     @AfterClass
@@ -78,8 +79,7 @@ public class CustomPropsEntityManagerFactoryProvisionTest {
 
     @Test
     public void testSessionCreateOnInjection() {
-        assert injector.getInstance(EntityManagerFactoryHolder.class).equals(injector.getInstance(EntityManagerFactoryHolder.class));
-
+ 
         assert injector.getInstance(JpaPersistenceService.class)
                 .equals(injector.getInstance(JpaPersistenceService.class)) : "SINGLETON VIOLATION " + JpaPersistenceService.class.getName() ;
 

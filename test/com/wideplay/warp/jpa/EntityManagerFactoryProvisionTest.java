@@ -23,10 +23,11 @@ import com.google.inject.matcher.Matchers;
 import com.wideplay.warp.persist.PersistenceService;
 import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.UnitOfWork;
+import com.wideplay.warp.persist.WorkManager;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
-import org.testng.annotations.AfterClass;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -63,7 +64,7 @@ public class EntityManagerFactoryProvisionTest {
     }
 
     @AfterTest public final void post() {
-        EntityManagerFactoryHolder.closeCurrentEntityManager();
+        injector.getInstance(WorkManager.class).endWork();
     }
 
     @AfterClass
@@ -73,8 +74,7 @@ public class EntityManagerFactoryProvisionTest {
 
     @Test
     public void testSessionCreateOnInjection() {
-        assert injector.getInstance(EntityManagerFactoryHolder.class).equals(injector.getInstance(EntityManagerFactoryHolder.class));
-
+        
         assert injector.getInstance(JpaPersistenceService.class).equals(injector.getInstance(JpaPersistenceService.class)) : "SINGLETON VIOLATION " + JpaPersistenceService.class.getName() ;
 
         //startup persistence

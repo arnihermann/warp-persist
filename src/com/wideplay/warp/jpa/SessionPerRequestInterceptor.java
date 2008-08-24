@@ -16,17 +16,17 @@
 
 package com.wideplay.warp.jpa;
 
-import javax.persistence.EntityManagerFactory;
-
-import net.jcip.annotations.ThreadSafe;
-import net.jcip.annotations.Immutable;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;
-import com.wideplay.warp.persist.PersistenceService;
-import com.wideplay.warp.persist.UnitOfWork;
+import com.wideplay.warp.persist.LifecycleSessionFilter;
+import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import java.io.IOException;
 
 /**
  * Struts 2 equivalent for {@link com.wideplay.warp.jpa.SessionPerRequestFilter}.
@@ -81,65 +81,46 @@ import com.wideplay.warp.persist.UnitOfWork;
  */
 @Immutable
 @ThreadSafe
-public class SessionPerRequestInterceptor implements Interceptor {
-    // transient because we provide readResolve; providers are not serializable
-    private final transient Provider<EntityManagerFactory> emfProvider;
-
-    /**
-     * @throws IllegalArgumentException when empProvider is {@code null}.
-     * @throws IllegalStateException when {@link com.wideplay.warp.persist.UnitOfWork} is not
-     *                               {@link com.wideplay.warp.persist.UnitOfWork#REQUEST}
-     */
-    @Inject SessionPerRequestInterceptor(Provider<EntityManagerFactory> emfProvider) {
-        if (emfProvider == null) throw new IllegalArgumentException();
-        if (!UnitOfWork.REQUEST.equals(JpaLocalTxnInterceptor.getUnitOfWork()))
-            throw new IllegalStateException("UnitOfWork must be REQUEST to use this interceptor (did you mean to use Hibernate?)");
-        
-        this.emfProvider = emfProvider; // only use after the PersistenceService starts
-    }
-
+public class SessionPerRequestInterceptor extends LifecycleSessionFilter implements Interceptor {
     /**
      * Makes sure an {@link javax.persistence.EntityManager} instance is available while
      * the current request is being processed.
      * @see com.opensymphony.xwork2.interceptor.Interceptor#intercept(com.opensymphony.xwork2.ActionInvocation)
      */
-    public String intercept(ActionInvocation ai) throws Exception {
-        EntityManagerFactoryHolder.getCurrentEntityManager();
-        try {
-            return ai.invoke();
-        } finally {
-            EntityManagerFactoryHolder.closeCurrentEntityManager();
-        }
+    public String intercept(final ActionInvocation ai) throws Exception {
+        final String[] result = new String[1];
+        final Exception[] exception = new Exception[1];
+        super.doFilter(null, null, new FilterChain() {
+            public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse) throws IOException, ServletException {
+                try {
+                    result[0] = ai.invoke();
+                } catch (Exception e) {
+                    exception[0] = e;
+                }
+            }
+        });
+        if (exception[0] != null)
+            throw exception[0];
+        return result[0];
     }
 
     /**
      * Does nothing.
      * @see com.opensymphony.xwork2.interceptor.Interceptor#init()
      */
-    public void init() {}
+    public void init() {
+        try {
+            super.init(null);
+        } catch (ServletException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * Tries to close the {@link javax.persistence.EntityManagerFactory}.
      * @see com.opensymphony.xwork2.interceptor.Interceptor#destroy()
      */
     public void destroy() {
-        EntityManagerFactory emf = emfProvider.get();
-        synchronized(emf) {
-            if (emf.isOpen()) emf.close();
-        }
-    }
-
-    @Inject @SuppressWarnings("unused")
-    private void startPersistenceService(PersistenceService persistenceService) {
-        // method injection because this is not a true dependency
-        persistenceService.start();
-    }
-
-    private Object readResolve() {
-        return new SessionPerRequestInterceptor(new Provider<EntityManagerFactory>() {
-            public EntityManagerFactory get() {
-                return EntityManagerFactoryHolder.getCurrentEntityManagerFactory();
-            }
-        });
+        super.destroy();
     }
 }

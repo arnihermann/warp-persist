@@ -17,11 +17,15 @@
 package com.wideplay.warp.jpa;
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Provider;
+import com.wideplay.warp.util.LazyReference;
+import net.jcip.annotations.Immutable;
 
 import javax.persistence.EntityManagerFactory;
-
-import net.jcip.annotations.Immutable;
+import javax.persistence.Persistence;
+import java.util.Properties;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,14 +36,33 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 class EntityManagerFactoryProvider implements Provider<EntityManagerFactory> {
-    private final EntityManagerFactoryHolder emFactoryHolder;
-
+    private final Key<String> persistenceUnitName;
+    private final Key<Properties> persistenceProperties;
+    private volatile Properties customProperties;
+    
     @Inject
-    public EntityManagerFactoryProvider(EntityManagerFactoryHolder sessionFactoryHolder) {
-        this.emFactoryHolder = sessionFactoryHolder;
+    private final Injector injector = null;
+
+    /**
+     * Lazily loaded EntityManagerFactory.
+     */
+    private LazyReference<EntityManagerFactory> emFactory =
+            LazyReference.of(new Provider<EntityManagerFactory>() {
+                public EntityManagerFactory get() {
+                    String psName = injector.getInstance(persistenceUnitName);
+                    return Persistence.createEntityManagerFactory(psName);
+                    // TODO support custom properties. How do we handle optional values?
+                }
+            });
+
+    public EntityManagerFactoryProvider(Key<String> persistenceUnitName, Key<Properties> persistenceProperties) {
+//                assert null != persistenceUnitName && (!"".equals(persistenceUnitName.trim()))
+//                : "Persistence unit name was not set! (please bindConstant().annotatedWith(JpaUnit.class) to the name of a persistence unit";
+        this.persistenceUnitName = persistenceUnitName;
+        this.persistenceProperties = persistenceProperties; // may be null
     }
 
     public EntityManagerFactory get() {
-        return this.emFactoryHolder.getEntityManagerFactory();
+        return emFactory.get();
     }
 }

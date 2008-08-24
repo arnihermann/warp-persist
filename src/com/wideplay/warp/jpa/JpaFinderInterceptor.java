@@ -16,10 +16,12 @@
 
 package com.wideplay.warp.jpa;
 
+import com.google.inject.Provider;
 import com.google.inject.name.Named;
 import com.wideplay.warp.persist.dao.Finder;
 import com.wideplay.warp.persist.dao.FirstResult;
 import com.wideplay.warp.persist.dao.MaxResults;
+import net.jcip.annotations.ThreadSafe;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
@@ -29,10 +31,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import net.jcip.annotations.ThreadSafe;
 
 /**
  * Created by IntelliJ IDEA.
@@ -49,9 +51,14 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 class JpaFinderInterceptor implements MethodInterceptor {
     private final Map<Method, FinderDescriptor> finderCache = new ConcurrentHashMap<Method, FinderDescriptor>();
+    private final Provider<EntityManager> emProvider;
+
+    public JpaFinderInterceptor(Provider<EntityManager> emProvider) {
+        this.emProvider = emProvider;
+    }
 
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-        EntityManager em = EntityManagerFactoryHolder.getCurrentEntityManager();
+        EntityManager em = emProvider.get();
 
         //obtain a cached finder descriptor (or create a new one)
         JpaFinderInterceptor.FinderDescriptor finderDescriptor = getFinderDescriptor(methodInvocation);

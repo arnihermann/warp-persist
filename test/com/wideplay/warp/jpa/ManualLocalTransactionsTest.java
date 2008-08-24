@@ -91,8 +91,8 @@ public class ManualLocalTransactionsTest {
         assert em.contains(entity) : "EntityManager  appears to have been closed across txns!";
         assert em.isOpen() : "EntityManager appears to have been closed across txns!";
 
-        EntityManagerFactoryHolder.closeCurrentEntityManager();
-        EntityManagerFactoryHolder.getCurrentEntityManager();
+        injector.getInstance(WorkManager.class).endWork();
+        injector.getInstance(WorkManager.class).beginWork();
 
         //try to query them back out
         em = injector.getInstance(EntityManager.class);

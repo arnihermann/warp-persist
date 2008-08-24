@@ -16,8 +16,12 @@
 
 package com.wideplay.warp.jpa;
 
+import com.google.inject.Provider;
 import com.wideplay.warp.persist.WorkManager;
 import net.jcip.annotations.Immutable;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,27 +33,32 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 class JpaWorkManager implements WorkManager {
+    private final Provider<EntityManagerFactory> entityManagerFactoryProvider;
+    private final EntityManagerProvider emProvider;
 
+    public JpaWorkManager(Provider<EntityManagerFactory> entityManagerFactoryProvider, EntityManagerProvider emProvider) {
+        this.entityManagerFactoryProvider = entityManagerFactoryProvider;
+        this.emProvider = emProvider;
+    }
 
     public void beginWork() {
-        //triggers an em creation
-        EntityManagerFactoryHolder.getCurrentEntityManager();
+        //create if absent
+        if (!emProvider.isEntityManagerSet()) {
+            emProvider.setEntityManager(
+                    entityManagerFactoryProvider.get().createEntityManager());
+        }
     }
 
     public void endWork() {
-        EntityManagerFactoryHolder.closeCurrentEntityManager();
-
-//        //do nothing if there is no em
-//        if (null == EntityManagerFactoryHolder.checkCurrentEntityManager())
-//            return;
-//
-//        //check if it has been closed yet
-//        final EntityManager currentEntityManager = EntityManagerFactoryHolder.checkCurrentEntityManager();
-//        if (!currentEntityManager.isOpen())
-//            return;
-//
-//        //close up session when done
-//        currentEntityManager.close();
+        if (emProvider.isEntityManagerSet()) {
+            EntityManager em = emProvider.get();
+            try {
+                if (em.isOpen())
+                    em.close();
+            } finally {
+                emProvider.clearEntityManager();
+            }
+        }
     }
 
     public String toString() {
