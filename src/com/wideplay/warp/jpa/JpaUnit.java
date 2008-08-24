@@ -17,7 +17,9 @@
 package com.wideplay.warp.jpa;
 
 import com.google.inject.BindingAnnotation;
+import com.wideplay.warp.persist.Defaults;
 
+import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -34,7 +36,12 @@ import java.lang.annotation.RetentionPolicy;
  * <code>
  * bindConstant().annotatedWith(JpaUnit.class).to("myDb");
  * </code>
- *
+ * If you are using multiple JPA configurations in the same project (multiple modules),
+ * bind to an instance of the JpaUnit annotation instead, specifying the module-level
+ * binding annotation used to create the persistence module:
+ * <code>
+ * bindConstant().annotatedWith(JpaUnitInstance.of(MyDB.class)).to("myDb");
+ * </code>
  * <p>
  *  You <b>must</b> bind a string to this annotation if using JPA. And it must match
  * a jpa unit named in your JPA persistence.xml.
@@ -46,4 +53,5 @@ import java.lang.annotation.RetentionPolicy;
 @BindingAnnotation
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JpaUnit {
+    Class<? extends Annotation> value() default Defaults.DefaultUnit.class;
 }
