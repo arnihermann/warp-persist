@@ -76,9 +76,8 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
         } finally {
             //close the em if necessary (this code doesnt run unless above catch/rethrow fired)
             if (isUnitOfWorkTransaction() && !txn.isActive()) {
-                // TODO (Robbie) is this enough?
-                emProvider.get().close();
-                emProvider.clearEntityManager();
+                closeEntityManager();
+
             }
         }
 
@@ -89,14 +88,21 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
         } finally {
             //close the em if necessary
             if (isUnitOfWorkTransaction()) {
-                // TODO (Robbie) is this enough?
-                emProvider.get().close();
-                emProvider.clearEntityManager();
+                closeEntityManager();
             }
         }
 
         //or return result
         return result;
+    }
+
+    // TODO this looks very similar to JpaWorkManager.endWork()
+    private void closeEntityManager() {
+        try {
+            emProvider.get().close();
+        } finally {
+            emProvider.clearEntityManager();
+        }
     }
 
     private Transactional readTransactionMetadata(MethodInvocation methodInvocation) {
