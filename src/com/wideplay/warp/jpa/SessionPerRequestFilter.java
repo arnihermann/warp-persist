@@ -20,10 +20,6 @@ import com.wideplay.warp.persist.SessionFilter;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Created with IntelliJ IDEA.
- * On: 2/06/2007
- *
- *
  * <p>
  * Apply this filter in web.xml to enable the HTTP Request unit of work.
  * </p>

@@ -23,16 +23,22 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 /**
- * Created with IntelliJ IDEA.
- * On: May 26, 2007 2:26:28 PM
- *
  * @author Dhanji R. Prasanna (dhanji@gmail.com)
+ * @author Robbie Vanbrabant
  */
 @Immutable
 class EntityManagerProvider implements Provider<EntityManager> {
-    // TODO only in UnitOfWork.REQUEST?
+    /**
+     * ThreadLocal we manage manually. Opened automatically
+     * by this class or JpaWorkManager, closed by JpaWorkManager
+     * or JpaLocalTxnInterceptor. It is vital that we unset the
+     * ThreadLocal so we avoid memory leaks!
+     * TODO Logic to handle this ThreadLocal is scattered, 
+     *      it's probably hosted in the wrong class.
+     */
     private final ThreadLocal<EntityManager> entityManager =
             new ThreadLocal<EntityManager>();
+    
     private final Provider<EntityManagerFactory> emfProvider;
 
     public EntityManagerProvider(Provider<EntityManagerFactory> emfProvider) {

@@ -37,14 +37,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Dhanji R. Prasanna (dhanji@gmail.com)
- * Date: 4/06/2007
- * Time: 14:54:52
- * <p/>
- *
- *
- *
  * @author Dhanji R. Prasanna (dhanji@gmail.com)
  * @since 1.0
  */

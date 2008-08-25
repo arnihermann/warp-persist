@@ -28,10 +28,8 @@ import javax.persistence.Persistence;
 import java.util.Properties;
 
 /**
- * Created with IntelliJ IDEA.
- * On: 30/04/2007
- *
  * @author Dhanji R. Prasanna (dhanji@gmail.com)
+ * @author Robbie Vanbrabant
  * @since 1.0
  */
 @Immutable

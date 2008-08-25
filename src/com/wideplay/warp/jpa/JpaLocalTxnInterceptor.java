@@ -27,9 +27,6 @@ import javax.persistence.EntityTransaction;
 import java.lang.reflect.Method;
 
 /**
- * Created with IntelliJ IDEA.
- * On: May 26, 2007 3:07:46 PM
- *
  * @author Dhanji R. Prasanna (dhanji@gmail.com)
  */
 @ThreadSafe
