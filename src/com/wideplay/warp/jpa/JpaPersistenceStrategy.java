@@ -32,11 +32,10 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
         return new AbstractPersistenceModule() {
             protected void configure() {
                 // TODO (Robbie) keys for multiple modules
-                EntityManagerFactoryProvider emfProvider = new EntityManagerFactoryProvider(Key.get(String.class, JpaUnit.class),
-                                                                                            Key.get(Properties.class, JpaUnit.class));
+                EntityManagerFactoryProvider emfProvider = new EntityManagerFactoryProvider(getPersistenceUnitKey(),
+                                                                                            getExtraPersistencePropertiesKey());
                 EntityManagerProvider emProvider = new EntityManagerProvider(emfProvider);
                 WorkManager workManager = new JpaWorkManager(emfProvider);
-
                 JpaPersistenceService pService = new JpaPersistenceService(emfProvider);
 
                 // Set up JPA.
@@ -61,6 +60,22 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
                     // statics -- we don't have a choice.
                     SessionFilter.registerWorkManager(workManager);
                     LifecycleSessionFilter.registerPersistenceService(pService);
+                }
+            }
+
+            private Key<String> getPersistenceUnitKey() {
+                if (config.hasBindingAnnotation()) {
+                    return Key.get(String.class, JpaUnitInstance.of(config.getBindingAnnotationClass()));
+                } else {
+                    return Key.get(String.class, JpaUnit.class);
+                }
+            }
+
+            private Key<Properties> getExtraPersistencePropertiesKey() {
+                if (config.hasBindingAnnotation()) {
+                    return Key.get(Properties.class, JpaUnitInstance.of(config.getBindingAnnotationClass()));
+                } else {
+                    return Key.get(Properties.class, JpaUnit.class);
                 }
             }
         };
