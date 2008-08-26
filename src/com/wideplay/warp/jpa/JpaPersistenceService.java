@@ -18,7 +18,6 @@ package com.wideplay.warp.jpa;
 
 import com.google.inject.Provider;
 import com.wideplay.warp.persist.PersistenceService;
-import net.jcip.annotations.ThreadSafe;
 
 import javax.persistence.EntityManagerFactory;
 
@@ -26,7 +25,6 @@ import javax.persistence.EntityManagerFactory;
  * @author Dhanji R. Prasanna (dhanji@gmail.com)
  * @since 1.0
  */
-@ThreadSafe
 class JpaPersistenceService extends PersistenceService {
     private final Provider<EntityManagerFactory> emfProvider;
 
@@ -34,15 +32,12 @@ class JpaPersistenceService extends PersistenceService {
         this.emfProvider = emfProvider;
     }
 
-    public synchronized void start() {
+    public void start() {
         emfProvider.get();
     }
 
     public void shutdown() {
-        // SPRInterceptor syncs on the same instance.
-        synchronized(emfProvider.get()) {
-            EntityManagerFactory emf = emfProvider.get();
-            if (emf.isOpen()) emf.close();
-        }
+        EntityManagerFactory emf = emfProvider.get();
+        if (emf.isOpen()) emf.close();
     }
 }
