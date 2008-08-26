@@ -22,6 +22,7 @@ import org.aopalliance.intercept.MethodInterceptor;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.util.Properties;
 
 /**
  * @author Robbie Vanbrabant
@@ -30,10 +31,11 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
     public Module getBindings(final PersistenceConfiguration config) {
         return new AbstractPersistenceModule() {
             protected void configure() {
-                // TODO (Robbie) key for multiple modules, and optional properties key
-                EntityManagerFactoryProvider emfProvider = new EntityManagerFactoryProvider(Key.get(String.class, JpaUnit.class), null);
+                // TODO (Robbie) keys for multiple modules
+                EntityManagerFactoryProvider emfProvider = new EntityManagerFactoryProvider(Key.get(String.class, JpaUnit.class),
+                                                                                            Key.get(Properties.class, JpaUnit.class));
                 EntityManagerProvider emProvider = new EntityManagerProvider(emfProvider);
-                WorkManager workManager = new JpaWorkManager(emfProvider, emProvider);
+                WorkManager workManager = new JpaWorkManager(emfProvider);
 
                 JpaPersistenceService pService = new JpaPersistenceService(emfProvider);
 
@@ -48,7 +50,7 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
                 if (TransactionStrategy.LOCAL != config.getTransactionStrategy())
                     throw new IllegalArgumentException("Unsupported JPA transaction strategy: " + config.getTransactionStrategy());
 
-                bindTransactionInterceptor(config, new JpaLocalTxnInterceptor(emProvider, config.getUnitOfWork()));
+                bindTransactionInterceptor(config, new JpaLocalTxnInterceptor(emfProvider, emProvider, config.getUnitOfWork()));
 
                 // Set up Dynamic Finders.
                 MethodInterceptor finderInterceptor = new JpaFinderInterceptor(emProvider);

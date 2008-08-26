@@ -28,39 +28,20 @@ import javax.persistence.EntityManagerFactory;
  */
 @Immutable
 class EntityManagerProvider implements Provider<EntityManager> {
-    /**
-     * ThreadLocal we manage manually. Opened automatically
-     * by this class or JpaWorkManager, closed by JpaWorkManager
-     * or JpaLocalTxnInterceptor. It is vital that we unset the
-     * ThreadLocal so we avoid memory leaks!
-     * TODO Logic to handle this ThreadLocal is scattered, 
-     *      it's probably hosted in the wrong class.
-     */
-    private final ThreadLocal<EntityManager> entityManager =
-            new ThreadLocal<EntityManager>();
-    
     private final Provider<EntityManagerFactory> emfProvider;
 
     public EntityManagerProvider(Provider<EntityManagerFactory> emfProvider) {
         this.emfProvider = emfProvider;
     }
 
+    // TODO this looks very similar to JpaWorkManager.beginWork()
     public EntityManager get() {
-        if (!isEntityManagerSet()) {
-            setEntityManager(emfProvider.get().createEntityManager());
+        EntityManagerFactory emf = this.emfProvider.get();
+        EntityManager em = ManagedEntityManagerContext.getBind(emf);
+        if (em == null) {
+            em = emf.createEntityManager();
+            ManagedEntityManagerContext.bind(emf, em);
         }
-        return entityManager.get();
-    }
-
-    boolean isEntityManagerSet() {
-        return entityManager.get() != null;
-    }
-
-    void setEntityManager(EntityManager em) {
-        entityManager.set(em);
-    }
-
-    void clearEntityManager() {
-        entityManager.remove();
+        return em;
     }
 }

@@ -36,7 +36,6 @@ import java.util.Properties;
 class EntityManagerFactoryProvider implements Provider<EntityManagerFactory> {
     private final Key<String> persistenceUnitName;
     private final Key<Properties> persistenceProperties;
-    private volatile Properties customProperties;
     
     @Inject
     private final Injector injector = null;
@@ -48,16 +47,22 @@ class EntityManagerFactoryProvider implements Provider<EntityManagerFactory> {
             LazyReference.of(new Provider<EntityManagerFactory>() {
                 public EntityManagerFactory get() {
                     String psName = injector.getInstance(persistenceUnitName);
-                    return Persistence.createEntityManagerFactory(psName);
-                    // TODO support custom properties. How do we handle optional values?
+                    if (customPropertiesBound()) {
+                        Properties props = injector.getInstance(persistenceProperties);
+                        return Persistence.createEntityManagerFactory(psName, props);
+                    } else {
+                        return Persistence.createEntityManagerFactory(psName);
+                    }
                 }
             });
 
+    private boolean customPropertiesBound() {
+        return injector.getBinding(persistenceProperties) != null;
+    }
+
     public EntityManagerFactoryProvider(Key<String> persistenceUnitName, Key<Properties> persistenceProperties) {
-//                assert null != persistenceUnitName && (!"".equals(persistenceUnitName.trim()))
-//                : "Persistence unit name was not set! (please bindConstant().annotatedWith(JpaUnit.class) to the name of a persistence unit";
         this.persistenceUnitName = persistenceUnitName;
-        this.persistenceProperties = persistenceProperties; // may be null
+        this.persistenceProperties = persistenceProperties;
     }
 
     public EntityManagerFactory get() {

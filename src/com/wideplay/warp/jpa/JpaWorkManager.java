@@ -29,30 +29,23 @@ import javax.persistence.EntityManagerFactory;
 @Immutable
 class JpaWorkManager implements WorkManager {
     private final Provider<EntityManagerFactory> entityManagerFactoryProvider;
-    private final EntityManagerProvider emProvider;
 
-    public JpaWorkManager(Provider<EntityManagerFactory> entityManagerFactoryProvider, EntityManagerProvider emProvider) {
+    public JpaWorkManager(Provider<EntityManagerFactory> entityManagerFactoryProvider) {
         this.entityManagerFactoryProvider = entityManagerFactoryProvider;
-        this.emProvider = emProvider;
     }
 
     public void beginWork() {
-        //create if absent
-        if (!emProvider.isEntityManagerSet()) {
-            emProvider.setEntityManager(
-                    entityManagerFactoryProvider.get().createEntityManager());
+        EntityManagerFactory emf = this.entityManagerFactoryProvider.get();
+        if (!ManagedEntityManagerContext.hasBind(emf)) {
+            ManagedEntityManagerContext.bind(emf, emf.createEntityManager());
         }
     }
 
     public void endWork() {
-        if (emProvider.isEntityManagerSet()) {
-            EntityManager em = emProvider.get();
-            try {
-                if (em.isOpen())
-                    em.close();
-            } finally {
-                emProvider.clearEntityManager();
-            }
+        EntityManagerFactory emf = this.entityManagerFactoryProvider.get();
+        if (ManagedEntityManagerContext.hasBind(emf)) {
+            EntityManager em = ManagedEntityManagerContext.unbind(emf);
+            if (em != null && em.isOpen()) em.close();
         }
     }
 

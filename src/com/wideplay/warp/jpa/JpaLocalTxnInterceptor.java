@@ -16,6 +16,7 @@
 
 package com.wideplay.warp.jpa;
 
+import com.google.inject.Provider;
 import com.wideplay.warp.persist.Transactional;
 import com.wideplay.warp.persist.UnitOfWork;
 import net.jcip.annotations.ThreadSafe;
@@ -23,6 +24,7 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import java.lang.reflect.Method;
 
@@ -32,13 +34,15 @@ import java.lang.reflect.Method;
 @ThreadSafe
 class JpaLocalTxnInterceptor implements MethodInterceptor {
     private final UnitOfWork unitOfWork;
-    private final EntityManagerProvider emProvider;
+    private final Provider<EntityManagerFactory> emfProvider;
+    private final Provider<EntityManager> emProvider;
 
     //TODO this is a clunky hack, make a TransactionalImpl and make it customizable 
     @Transactional
     private static class Internal { }
 
-    public JpaLocalTxnInterceptor(EntityManagerProvider emProvider, UnitOfWork unitOfWork) {
+    public JpaLocalTxnInterceptor(Provider<EntityManagerFactory> emfProvider, Provider<EntityManager> emProvider, UnitOfWork unitOfWork) {
+        this.emfProvider = emfProvider;
         this.emProvider = emProvider;
         this.unitOfWork = unitOfWork;
     }
@@ -49,7 +53,6 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
         //allow joining of transactions if there is an enclosing @Transactional method
         if (em.getTransaction().isActive())
             return methodInvocation.proceed();
-
 
         //otherwise...
 
@@ -95,10 +98,10 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
 
     // TODO this looks very similar to JpaWorkManager.endWork()
     private void closeEntityManager() {
-        try {
-            emProvider.get().close();
-        } finally {
-            emProvider.clearEntityManager();
+        EntityManagerFactory emf = emfProvider.get();
+        if (ManagedEntityManagerContext.hasBind(emf)) {
+            EntityManager em = ManagedEntityManagerContext.unbind(emf);
+            if (em != null && em.isOpen()) em.close();
         }
     }
 
