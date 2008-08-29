@@ -31,7 +31,6 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
     public Module getBindings(final PersistenceConfiguration config) {
         return new AbstractPersistenceModule() {
             protected void configure() {
-                // TODO (Robbie) keys for multiple modules
                 EntityManagerFactoryProvider emfProvider = new EntityManagerFactoryProvider(getPersistenceUnitKey(),
                                                                                             getExtraPersistencePropertiesKey());
                 EntityManagerProvider emProvider = new EntityManagerProvider(emfProvider);
