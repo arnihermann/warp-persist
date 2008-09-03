@@ -48,7 +48,7 @@ public abstract class AbstractPersistenceModule extends AbstractModule {
      * to be specified when using two Hibernate configurations within the same Injector.
      */
     protected <T> com.google.inject.binder.LinkedBindingBuilder<T> bindSpecial(java.lang.Class<T> tClass) {
-        if (annotation != null) {
+        if (inMultiModulesMode()) {
             return super.bind(tClass).annotatedWith(annotation);
         } else {
             return super.bind(tClass);
@@ -72,7 +72,7 @@ public abstract class AbstractPersistenceModule extends AbstractModule {
     }
 
     protected void bindTransactionInterceptor(PersistenceConfiguration config, MethodInterceptor txInterceptor) {
-        if (annotation != null) {
+        if (inMultiModulesMode()) {
             // We support forAll, and assume the user knows what he/she is doing.
             // TODO make our custom method matcher public?
             if (config.getTransactionMethodMatcher() != Defaults.TX_METHOD_MATCHER) {
@@ -94,7 +94,7 @@ public abstract class AbstractPersistenceModule extends AbstractModule {
      * an annotation to bind the module to, we match on {@code @Finder(unit=UserAnnotation.class)}.
      */
     protected void bindFinderInterceptor(MethodInterceptor finderInterceptor) {
-        if (annotation != null) {
+        if (inMultiModulesMode()) {
             bindInterceptor(any(), finderWithUnitIdenticalTo(annotation), finderInterceptor);
         } else {
             bindInterceptor(any(), annotatedWith(Finder.class), finderInterceptor);
