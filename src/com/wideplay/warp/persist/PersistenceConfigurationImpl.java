@@ -20,7 +20,6 @@ import com.google.inject.matcher.Matchers;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -42,15 +41,12 @@ public class PersistenceConfigurationImpl implements PersistenceConfiguration {
     private final Matcher<? super Method> txMethodMatcher;
     private final Set<Class<?>> accessors;
 
-    private final Class<? extends Annotation> bindingAnnotationClass;
-
     private PersistenceConfigurationImpl(PersistenceConfigurationBuilder builder) {
         this.unitOfWork = builder.unitOfWork;
         this.txStrategy = builder.txStrategy;
         this.txClassMatcher = builder.txClassMatcher;
         this.txMethodMatcher = builder.txMethodMatcher;
         this.accessors = Collections.unmodifiableSet(builder.accessors);
-        this.bindingAnnotationClass = builder.bindingAnnotationClass;
     }
 
     public UnitOfWork getUnitOfWork() {
@@ -68,20 +64,6 @@ public class PersistenceConfigurationImpl implements PersistenceConfiguration {
     public Set<Class<?>> getAccessors() {
         return this.accessors;
     }
-    public Class<? extends Annotation> getBindingAnnotationClass() {
-        return this.bindingAnnotationClass;
-    }
-    public boolean hasBindingAnnotation() {
-        return this.bindingAnnotationClass != null;
-    }
-
-    /** Useful for debugging. We should emit this String in as much persistence types as possible. */
-    public String getAnnotationDebugStringOrNull() {
-        if (hasBindingAnnotation()) {
-            return getBindingAnnotationClass().getSimpleName();
-        }
-        return null;
-    }
     
     public static PersistenceConfigurationBuilder builder() {
         return new PersistenceConfigurationBuilder();
@@ -94,14 +76,8 @@ public class PersistenceConfigurationImpl implements PersistenceConfiguration {
         private Matcher<? super Class<?>> txClassMatcher = Matchers.any();
         private Matcher<? super Method> txMethodMatcher = Matchers.annotatedWith(Transactional.class);
 
-        private Class<? extends Annotation> bindingAnnotationClass;
-
         private final Set<Class<?>> accessors = new LinkedHashSet<Class<?>>();
 
-        public <A extends Annotation> PersistenceConfigurationBuilder boundToType(Class<A> annotationClass) {
-            this.bindingAnnotationClass = annotationClass;
-            return this;
-        }
         public PersistenceConfigurationBuilder unitOfWork(UnitOfWork unitOfWork) {
             this.unitOfWork = unitOfWork;
             return this;

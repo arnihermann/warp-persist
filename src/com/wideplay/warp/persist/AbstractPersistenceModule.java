@@ -16,6 +16,7 @@
 package com.wideplay.warp.persist;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Key;
 import com.google.inject.cglib.proxy.Proxy;
 import com.google.inject.matcher.AbstractMatcher;
 import com.google.inject.matcher.Matcher;
@@ -24,7 +25,9 @@ import static com.google.inject.matcher.Matchers.any;
 import com.wideplay.warp.persist.dao.Finder;
 import org.aopalliance.intercept.MethodInterceptor;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Set;
 
 /**
  * Base module for persistence strategies that holds a bunch
@@ -32,38 +35,44 @@ import java.lang.reflect.Method;
  * @author Robbie Vanbrabant
  */
 public abstract class AbstractPersistenceModule extends AbstractModule {
+    private final Class<? extends Annotation> annotation;
+
+    protected AbstractPersistenceModule(Class<? extends Annotation> annotation) {
+        this.annotation = annotation;
+    }
+
     protected abstract void configure();
 
     /**
      * Bind with an optional binding annotation type. A binding annotation needs
      * to be specified when using two Hibernate configurations within the same Injector.
      */
-    protected <T> com.google.inject.binder.LinkedBindingBuilder<T> bindSpecial(PersistenceConfiguration config, java.lang.Class<T> tClass) {
-        if (config.hasBindingAnnotation()) {
-            return super.bind(tClass).annotatedWith(config.getBindingAnnotationClass());
+    protected <T> com.google.inject.binder.LinkedBindingBuilder<T> bindSpecial(java.lang.Class<T> tClass) {
+        if (annotation != null) {
+            return super.bind(tClass).annotatedWith(annotation);
         } else {
             return super.bind(tClass);
         }
     }
 
     @SuppressWarnings("unchecked") // Proxies are not generic.
-    protected void bindDynamicAccessors(PersistenceConfiguration config, MethodInterceptor finderInterceptor) {
-        for (Class accessor : config.getAccessors()) {
+    protected void bindDynamicAccessors(Set<Class<?>> accessors, MethodInterceptor finderInterceptor) {
+        for (Class accessor : accessors) {
             if (accessor.isInterface()) {
                 // TODO we should validate that all methods have @Finder on them at startup
                 //      and use Guice's addError.
-                bindSpecial(config, accessor).toInstance(Proxy.newProxyInstance(accessor.getClassLoader(),
+                bindSpecial(accessor).toInstance(Proxy.newProxyInstance(accessor.getClassLoader(),
                         new Class<?>[] { accessor }, new AopAllianceJdkProxyAdapter(finderInterceptor)));
             } else {
                 //use cglib adapter to subclass the accessor (this lets us intercept abstract classes)
-                bindSpecial(config, accessor).toInstance(com.google.inject.cglib.proxy.Enhancer.create(accessor,
+                bindSpecial(accessor).toInstance(com.google.inject.cglib.proxy.Enhancer.create(accessor,
                         new AopAllianceCglibAdapter(finderInterceptor)));
             }
         }
     }
 
     protected void bindTransactionInterceptor(PersistenceConfiguration config, MethodInterceptor txInterceptor) {
-        if (config.hasBindingAnnotation()) {
+        if (annotation != null) {
             // We support forAll, and assume the user knows what he/she is doing.
             // TODO make our custom method matcher public?
             if (config.getTransactionMethodMatcher() != Defaults.TX_METHOD_MATCHER) {
@@ -72,7 +81,7 @@ public abstract class AbstractPersistenceModule extends AbstractModule {
                                 txInterceptor);
             } else {
                 bindInterceptor(config.getTransactionClassMatcher(),
-                                transactionalWithUnitIdenticalTo(config.getBindingAnnotationClass()),
+                                transactionalWithUnitIdenticalTo(annotation),
                                 txInterceptor);
             }
         } else {
@@ -84,12 +93,23 @@ public abstract class AbstractPersistenceModule extends AbstractModule {
      * Binds a finder interceptor with support for multiple modules. When the user specifies
      * an annotation to bind the module to, we match on {@code @Finder(unit=UserAnnotation.class)}.
      */
-    protected void bindFinderInterceptor(PersistenceConfiguration config, MethodInterceptor finderInterceptor) {
-        if (config.hasBindingAnnotation()) {
-            bindInterceptor(any(), finderWithUnitIdenticalTo(config.getBindingAnnotationClass()), finderInterceptor);
+    protected void bindFinderInterceptor(MethodInterceptor finderInterceptor) {
+        if (annotation != null) {
+            bindInterceptor(any(), finderWithUnitIdenticalTo(annotation), finderInterceptor);
         } else {
             bindInterceptor(any(), annotatedWith(Finder.class), finderInterceptor);
         }
+    }
+
+    protected boolean inMultiModulesMode() {
+        return this.annotation != null;
+    }
+
+    protected <T> Key<T> key(Class<T> clazz) {
+        if (annotation != null) {
+            return Key.get(clazz, annotation);
+        }
+        return Key.get(clazz);
     }
 
     private Matcher<Method> finderWithUnitIdenticalTo(final Class<?> annotation) {

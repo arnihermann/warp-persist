@@ -83,6 +83,10 @@ public abstract class PersistenceService {
     public static SessionStrategyBuilder usingDb4o() {
         return new PersistenceServiceBuilderImpl(PersistenceFlavor.DB4O);
     }
+
+    public static SessionStrategyBuilder using(PersistenceStrategy ps) {
+        return new PersistenceServiceBuilderImpl(ps);
+    }
     
     /**
      * A utility for testing if a given method is a dynamic finder.

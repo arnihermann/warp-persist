@@ -27,7 +27,9 @@ import net.jcip.annotations.ThreadSafe;
  * @author Dhanji R. Prasanna (dhanji@gmail.com)
  * @since 1.0
  * @see com.wideplay.warp.persist.UnitOfWork
+ * @deprecated use {@link com.wideplay.warp.persist.SessionFilter}
  */
+@Deprecated
 @ThreadSafe
 public class SessionPerRequestFilter extends SessionFilter {
 }

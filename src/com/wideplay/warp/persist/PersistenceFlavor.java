@@ -25,17 +25,18 @@ import com.wideplay.warp.jpa.JpaPersistenceStrategy;
 public enum PersistenceFlavor implements HasPersistenceStrategy {
     HIBERNATE {
         public PersistenceStrategy getPersistenceStrategy() {
-            return new HibernatePersistenceStrategy();
+            return HibernatePersistenceStrategy.builder().build();
         }
     },
     JPA {
         public PersistenceStrategy getPersistenceStrategy() {
-            return new JpaPersistenceStrategy();
+            // 1.0 compatibility mode
+            return JpaPersistenceStrategy.builder().build();
         }
     },
     DB4O {
         public PersistenceStrategy getPersistenceStrategy() {
             return new Db4oPersistenceStrategy();
         }
-    };
+    }
 }

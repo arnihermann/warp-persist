@@ -19,16 +19,17 @@ package com.wideplay.warp.persist;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Module;
 import com.google.inject.matcher.Matchers;
 import com.wideplay.codemonkey.web.startup.Initializer;
 import com.wideplay.warp.hibernate.HibernateTestEntity;
+import com.wideplay.warp.jpa.JpaPersistenceStrategy;
 import com.wideplay.warp.persist.dao.HibernateTestAccessor;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.testng.annotations.Test;
 
-import java.util.List;
-import java.util.ArrayList;
+import java.util.Properties;
 
 /**
  * Created with IntelliJ IDEA.
@@ -72,6 +73,21 @@ public class EdslBuilderTest {
                 .forAll(Matchers.any(), Matchers.annotatedWith(Transactional.class))
                 .buildModule()
         );
+    }
+
+    @Test
+    public final void testMultimodulesConfig() {
+        PersistenceStrategy jpa = JpaPersistenceStrategy.builder()
+                                                        .properties(new Properties())
+                                                        .unit("myUnit")
+                                                        .annotatedWith(Test.class).build();
+        Module m = PersistenceService.using(jpa)
+                                     .across(UnitOfWork.TRANSACTION)
+                                     .transactedWith(TransactionStrategy.LOCAL)
+                                     .forAll(Matchers.any(), Matchers.annotatedWith(Transactional.class))
+                                     .buildModule();
+        
+        //Guice.createInjector(m);
     }
 
     static class TransactionalObject {

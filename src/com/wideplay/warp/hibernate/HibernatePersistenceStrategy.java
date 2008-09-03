@@ -24,15 +24,26 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
+import java.lang.annotation.Annotation;
+
 /**
  * @author Robbie Vanbrabant
  */
 public class HibernatePersistenceStrategy implements PersistenceStrategy {
+    private final Configuration configuration;
+    private final Class<? extends Annotation> annotation;
+
+    private HibernatePersistenceStrategy(HibernatePersistenceStrategyBuilder builder) {
+        this.configuration = builder.configuration;
+        this.annotation = builder.annotation;
+    }
+
     public Module getBindings(final PersistenceConfiguration config) {
-        return new AbstractPersistenceModule() {
+        return new AbstractPersistenceModule(annotation) {
             @Override
             protected void configure() {
-                String annotationDebugString = config.getAnnotationDebugStringOrNull();
+                // TODO move to super class?
+                String annotationDebugString = annotation!=null?annotation.getSimpleName():"";
                 // Need instance here for the work manager.
                 SessionFactoryProvider sfProvider =
                         new SessionFactoryProvider(getConfigurationKey(), annotationDebugString);
@@ -44,10 +55,10 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
                 // Needs to be able to initialize Provider<SessionFactory>
                 PersistenceService pService = new HibernatePersistenceService(sfProvider);
 
-                bindSpecial(config, SessionFactory.class).toProvider(sfProvider);
-                bindSpecial(config, Session.class).toProvider(sessionProvider);
-                bindSpecial(config, WorkManager.class).toInstance(workManager);
-                bindSpecial(config, PersistenceService.class).toInstance(pService);
+                bindSpecial(SessionFactory.class).toProvider(sfProvider);
+                bindSpecial(Session.class).toProvider(sessionProvider);
+                bindSpecial(WorkManager.class).toInstance(workManager);
+                bindSpecial(PersistenceService.class).toInstance(pService);
 
                 // Set up transactions. Only local transactions are supported.
                 if (TransactionStrategy.LOCAL != config.getTransactionStrategy())
@@ -57,8 +68,8 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
 
                 // Set up Dynamic Finders.
                 MethodInterceptor finderInterceptor = new HibernateFinderInterceptor(sessionProvider);
-                bindFinderInterceptor(config, finderInterceptor);
-                bindDynamicAccessors(config, finderInterceptor);
+                bindFinderInterceptor(finderInterceptor);
+                bindDynamicAccessors(config.getAccessors(), finderInterceptor);
 
                 if (UnitOfWork.REQUEST == config.getUnitOfWork()) {
                     // statics -- we don't have a choice.
@@ -71,12 +82,31 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
              * Gets the Key to which the Hibernate Configuration has been bound.
              */
             private Key<Configuration> getConfigurationKey() {
-                if (config.hasBindingAnnotation()) {
-                    return Key.get(Configuration.class, config.getBindingAnnotationClass());
-                } else {
-                    return Key.get(Configuration.class);
-                }
+                Key<Configuration> key = key(Configuration.class);
+                if (inMultiModulesMode()) bind(key).toInstance(configuration);
+                return key;
             }
         };
+    }
+
+    public static HibernatePersistenceStrategyBuilder builder() {
+        return new HibernatePersistenceStrategyBuilder();
+    }
+
+    public static class HibernatePersistenceStrategyBuilder {
+        private Configuration configuration;
+        private Class<? extends Annotation> annotation;
+
+        public HibernatePersistenceStrategyBuilder configuration(Configuration config) {
+            this.configuration = config;
+            return this;
+        }
+        public HibernatePersistenceStrategyBuilder annotatedWith(Class<? extends Annotation> annotation) {
+            this.annotation = annotation;
+            return this;
+        }
+        public HibernatePersistenceStrategy build() {
+            return new HibernatePersistenceStrategy(this);
+        }
     }
 }

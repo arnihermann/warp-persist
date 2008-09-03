@@ -16,12 +16,10 @@
 
 package com.wideplay.warp.persist;
 
-import com.google.inject.BindingAnnotation;
 import com.google.inject.Module;
 import com.google.inject.matcher.Matcher;
 import net.jcip.annotations.NotThreadSafe;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 /**
@@ -40,6 +38,14 @@ class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, Persisten
         this.flavor = flavor;
     }
 
+    PersistenceServiceBuilderImpl(final PersistenceStrategy persistenceStrategy) {
+        this.flavor = new HasPersistenceStrategy() {
+            public PersistenceStrategy getPersistenceStrategy() {
+                return persistenceStrategy;
+            }
+        };
+    }
+
     public TransactionStrategyBuilder across(UnitOfWork unitOfWork) {
         persistenceConfiguration.unitOfWork(unitOfWork);
 
@@ -47,22 +53,6 @@ class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, Persisten
     }
 
     public Module buildModule() {
-        return flavor.getPersistenceStrategy().getBindings(persistenceConfiguration.build());
-    }
-
-    /**
-     * Builds a peristence module that has all persistence artefacts bound
-     * to the specified binding annotation type.
-     * <p>
-     * We do not support bindings to annotation instances because we use the type in
-     * {@link com.wideplay.warp.persist.dao.Finder} annotations, for example:
-     * {@code @Finder(unit=BoundToAnnotation.class)}.
-     * Restrictions in JLS prevent us from specifying annotation instances.
-     * </p>
-     */
-    public <A extends Annotation> Module buildModuleBoundTo(Class<A> bindingAnnotationClass) {
-        bindingAnnotationPrecondition(bindingAnnotationClass);
-        persistenceConfiguration.boundToType(bindingAnnotationClass);
         return flavor.getPersistenceStrategy().getBindings(persistenceConfiguration.build());
     }
 
@@ -91,11 +81,5 @@ class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, Persisten
         persistenceConfiguration.transactionMethodMatcher(methodMatcher);
 
         return this;
-    }
-
-    /** Asserts that the given annotation is a Guice binding annotation. */
-    private void bindingAnnotationPrecondition(Class<? extends Annotation> annotationType) {
-        if (annotationType.getAnnotation(BindingAnnotation.class) == null)
-            throw new IllegalArgumentException(String.format("Annotation '%s' is not a binding annotation.", annotationType));
     }
 }
