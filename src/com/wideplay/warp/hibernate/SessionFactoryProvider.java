@@ -22,6 +22,7 @@ import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.wideplay.warp.util.LazyReference;
 import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
@@ -33,6 +34,7 @@ import org.hibernate.cfg.Configuration;
  * @since 1.0
  */
 @Immutable
+@ThreadSafe
 class SessionFactoryProvider implements Provider<SessionFactory> {
 
     // Injecting the Injector because we can't inject a Hibernate Configuration

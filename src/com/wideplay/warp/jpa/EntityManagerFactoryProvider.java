@@ -22,6 +22,7 @@ import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.wideplay.warp.util.LazyReference;
 import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -33,6 +34,7 @@ import java.util.Properties;
  * @since 1.0
  */
 @Immutable
+@ThreadSafe
 class EntityManagerFactoryProvider implements Provider<EntityManagerFactory> {
     private final Key<String> persistenceUnitName;
     private final Key<Properties> persistenceProperties;
