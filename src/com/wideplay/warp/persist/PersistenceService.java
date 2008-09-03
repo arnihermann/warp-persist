@@ -21,13 +21,14 @@ import com.wideplay.warp.persist.dao.Finder;
 import java.lang.reflect.Method;
 
 /**
- * Created with IntelliJ IDEA.
- * On: 2/06/2007
- *
  * <p>
  * This is the core warp-persist artifact. It providers factories for generating guice
  * modules for your persistence configuration. It also must be injected into your code later
  * as a service abstraction for starting the underlying persistence engine (Hibernate or JPA).
+ * </p>
+ * <p>
+ * Implementations of this type should make sure {@link #start()} and {@link #shutdown()} are
+ * thread safe.
  * </p>
  *
  * @author Dhanji R. Prasanna (dhanji@gmail.com)
@@ -39,12 +40,14 @@ public abstract class PersistenceService {
      * Starts the underlying persistence engine and makes warp-persist ready for use.
      * For instance, with hibernate, it creates a SessionFactory and may open connection pools.
      * This method *must* be called by your code prior to using any warp-persist or hibernate artifacts.
+     * If already started, calling this method does nothing, if already stopped, it also does nothing.
      */
     public abstract void start();
 
     /**
      * Stops the underlying persistence engine.
      * For instance, with Hibernate, it closes the SessionFactory.
+     * If already stopped, calling this method does nothing. If not yet started, it also does nothing.
      */
     public abstract void shutdown();
 

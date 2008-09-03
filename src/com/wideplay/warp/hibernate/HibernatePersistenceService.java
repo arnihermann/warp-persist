@@ -23,10 +23,8 @@ import net.jcip.annotations.Immutable;
 import org.hibernate.SessionFactory;
 
 /**
- * Created with IntelliJ IDEA.
- * On: 30/04/2007
- *
  * @author Dhanji R. Prasanna (dhanji@gmail.com)
+ * @author Robbie Vanbrabant
  * @since 1.0
  */
 @Immutable
@@ -40,12 +38,17 @@ class HibernatePersistenceService extends PersistenceService {
 
     public void start() {
         // the provider lazily loads, force start.
+        // does its own synchronization and simply returns
+        // a closed SessionFactory if it has been closed.
         sessionFactoryProvider.get();
     }
 
-    public void shutdown() {
-        // We don't try to be smart because we don't know what to synchronize on.
-        // Leave it up to the caller to check if it has been closed already.
+    public synchronized void shutdown() {
+        // Hibernate silently lets this call pass
+        // if the SessionFactory has been closed already,
+        // but a SessionFactory is not thread safe,
+        // so we define this method as synchronized.
+        // If users use the SessionFactory directly, they're on their own.
         sessionFactoryProvider.get().close();
     }
 

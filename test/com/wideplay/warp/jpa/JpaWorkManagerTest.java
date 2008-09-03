@@ -16,22 +16,20 @@
 
 package com.wideplay.warp.jpa;
 
-import com.google.inject.Injector;
-import com.google.inject.Guice;
 import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.matcher.Matchers;
 import com.wideplay.warp.persist.*;
-
-import java.util.Date;
-
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import org.testng.annotations.AfterClass;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
+import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
@@ -83,7 +81,7 @@ public class JpaWorkManagerTest {
         injector.getInstance(WorkManager.class).beginWork();
         injector.getInstance(EntityManager.class).getTransaction().begin();
         try {
-            final Query query = injector.getInstance(EntityManager.class).createQuery("from JpaTestEntity where text = :text");
+            final Query query = injector.getInstance(EntityManager.class).createQuery("select e from JpaTestEntity as e where text = :text");
 
             query.setParameter("text", UNIQUE_TEXT_3);
             final Object o = query.getSingleResult();
@@ -101,8 +99,11 @@ public class JpaWorkManagerTest {
         }
     }
 
-
-
+    @Test
+    public void testCloseMoreThanOnce() {
+        injector.getInstance(PersistenceService.class).shutdown();
+        injector.getInstance(PersistenceService.class).shutdown();
+    }
 
     public static class TransactionalObject {
         @Inject

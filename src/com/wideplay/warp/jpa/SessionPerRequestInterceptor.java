@@ -88,6 +88,8 @@ public class SessionPerRequestInterceptor extends LifecycleSessionFilter impleme
      * @see com.opensymphony.xwork2.interceptor.Interceptor#intercept(com.opensymphony.xwork2.ActionInvocation)
      */
     public String intercept(final ActionInvocation ai) throws Exception {
+        // Ugly hack to reuse code. We should probably pull some code out of SessionFilter
+        // into a class that we can reuse.
         final String[] result = new String[1];
         final Exception[] exception = new Exception[1];
         super.doFilter(null, null, new FilterChain() {
