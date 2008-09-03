@@ -20,6 +20,7 @@ import com.google.inject.Provider;
 import com.wideplay.warp.persist.UnitOfWork;
 import com.wideplay.warp.persist.WorkManager;
 import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 import org.hibernate.SessionFactory;
 import org.hibernate.context.ManagedSessionContext;
 
@@ -32,10 +33,11 @@ import org.hibernate.context.ManagedSessionContext;
  * @author Dhanji R. Prasanna (dhanji gmail com)
  */
 @Immutable
+@ThreadSafe // Thread confinement through ThreadLocal
 class HibernateWorkManager implements WorkManager {
     private final Provider<SessionFactory> sessionFactoryProvider;
     private final UnitOfWork unitOfWork;
-    private String annotationDebugString;
+    private final String annotationDebugString;
 
     public HibernateWorkManager(Provider<SessionFactory> sessionFactoryProvider, UnitOfWork unitOfWork,
                                 String annotationDebugString) {

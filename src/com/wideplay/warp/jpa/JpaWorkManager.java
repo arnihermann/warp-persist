@@ -19,6 +19,7 @@ package com.wideplay.warp.jpa;
 import com.google.inject.Provider;
 import com.wideplay.warp.persist.WorkManager;
 import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -27,6 +28,7 @@ import javax.persistence.EntityManagerFactory;
  * @author Dhanji R. Prasanna (dhanji gmail com)
  */
 @Immutable
+@ThreadSafe // Thread confinement through ThreadLocal
 class JpaWorkManager implements WorkManager {
     private final Provider<EntityManagerFactory> entityManagerFactoryProvider;
 
