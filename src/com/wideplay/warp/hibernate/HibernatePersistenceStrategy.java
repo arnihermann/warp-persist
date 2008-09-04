@@ -16,7 +16,6 @@
 package com.wideplay.warp.hibernate;
 
 import com.google.inject.Key;
-import com.google.inject.Module;
 import com.google.inject.Provider;
 import com.wideplay.warp.persist.*;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -38,7 +37,7 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
         this.annotation = builder.annotation;
     }
 
-    public Module getBindings(final PersistenceConfiguration config) {
+    public PersistenceModule getBindings(final PersistenceConfiguration config) {
         return new AbstractPersistenceModule(annotation) {
             @Override
             protected void configure() {
@@ -85,6 +84,14 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
                 Key<Configuration> key = key(Configuration.class);
                 if (inMultiModulesMode()) bind(key).toInstance(configuration);
                 return key;
+            }
+
+            public WorkManager getWorkManager() {
+                return null;
+            }
+
+            public PersistenceService getPersistenceService() {
+                return null;
             }
         };
     }

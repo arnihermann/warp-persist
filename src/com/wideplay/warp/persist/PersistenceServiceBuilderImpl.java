@@ -53,7 +53,14 @@ class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, Persisten
     }
 
     public Module buildModule() {
-        return flavor.getPersistenceStrategy().getBindings(persistenceConfiguration.build());
+        PersistenceModule bindings = flavor.getPersistenceStrategy().getBindings(persistenceConfiguration.build());
+        if (bindings.getWorkManager() != null) {
+            SessionFilter.registerWorkManager(bindings.getWorkManager());     
+        }
+        if (bindings.getPersistenceService() != null) {
+            LifecycleSessionFilter.registerPersistenceService(bindings.getPersistenceService());
+        }
+        return bindings;
     }
 
     public TransactionStrategyBuilder transactedWith(TransactionStrategy transactionStrategy) {

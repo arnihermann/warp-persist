@@ -15,12 +15,10 @@
  */
 package com.wideplay.warp.persist;
 
-import com.google.inject.Module;
-
 /**
  * Strategy for hooking persistence strategies into warp-persist.
  * @author Robbie Vanbrabant
  */
 public interface PersistenceStrategy {
-    Module getBindings(PersistenceConfiguration config);
+    PersistenceModule getBindings(PersistenceConfiguration config);
 }

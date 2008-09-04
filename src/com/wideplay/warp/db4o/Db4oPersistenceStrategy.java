@@ -17,8 +17,6 @@ package com.wideplay.warp.db4o;
 
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectServer;
-import com.google.inject.AbstractModule;
-import com.google.inject.Module;
 import com.google.inject.Singleton;
 import com.wideplay.warp.persist.*;
 
@@ -26,8 +24,8 @@ import com.wideplay.warp.persist.*;
  * @author Robbie Vanbrabant
  */
 public class Db4oPersistenceStrategy implements PersistenceStrategy {
-    public Module getBindings(final PersistenceConfiguration config) {
-        return new AbstractModule() {
+    public PersistenceModule getBindings(final PersistenceConfiguration config) {
+        return new AbstractPersistenceModule(null) {
             protected void configure() {
                 // Set up Db4o.
                 bind(ObjectServerHolder.class).in(Singleton.class);
@@ -45,6 +43,14 @@ public class Db4oPersistenceStrategy implements PersistenceStrategy {
                                 new Db4oLocalTxnInterceptor());
 
                 // No Dynamic Finders yet.
+            }
+
+            public WorkManager getWorkManager() {
+                return null;
+            }
+
+            public PersistenceService getPersistenceService() {
+                return null;
             }
         };
 

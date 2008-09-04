@@ -34,7 +34,7 @@ import java.util.Set;
  * of utility methods for easier configuration.
  * @author Robbie Vanbrabant
  */
-public abstract class AbstractPersistenceModule extends AbstractModule {
+public abstract class AbstractPersistenceModule extends AbstractModule implements PersistenceModule {
     private final Class<? extends Annotation> annotation;
 
     protected AbstractPersistenceModule(Class<? extends Annotation> annotation) {

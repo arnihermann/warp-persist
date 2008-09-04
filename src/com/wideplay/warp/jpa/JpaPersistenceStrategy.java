@@ -15,6 +15,7 @@
  */
 package com.wideplay.warp.jpa;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.wideplay.warp.persist.*;
@@ -23,6 +24,8 @@ import org.aopalliance.intercept.MethodInterceptor;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -39,60 +42,89 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
         this.annotation = builder.annotation;
     }
 
-    public Module getBindings(final PersistenceConfiguration config) {
-        return new AbstractPersistenceModule(annotation) {
-            protected void configure() {
-                EntityManagerFactoryProvider emfProvider = new EntityManagerFactoryProvider(getPersistenceUnitKey(),
-                                                                                            getExtraPersistencePropertiesKey());
-                EntityManagerProvider emProvider = new EntityManagerProvider(emfProvider);
-                WorkManager workManager = new JpaWorkManager(emfProvider);
-                JpaPersistenceService pService = new JpaPersistenceService(emfProvider);
+    public PersistenceModule getBindings(final PersistenceConfiguration config) {
+        return new JpaPersistenceModule(config);
+    }
 
-                // Set up JPA.
-                bindSpecial(EntityManagerFactory.class).toProvider(emfProvider);
-                bindSpecial(EntityManager.class).toProvider(emProvider);
-                bindSpecial(PersistenceService.class).toInstance(pService);
-                bindSpecial(JpaPersistenceService.class).toInstance(pService);
-                bindSpecial(WorkManager.class).toInstance(workManager);
+    class JpaPersistenceModule extends AbstractPersistenceModule {
+        private final PersistenceConfiguration config;
+        private final EntityManagerFactoryProvider emfProvider;
+        private final EntityManagerProvider emProvider;
+        private final WorkManager workManager;
+        private final JpaPersistenceService pService;
+        // needed for bindings created in the constructor.
+        private final List<Module> scheduledBindings = new ArrayList<Module>();
 
-                // Set up transactions. Only local transactions are supported.
-                if (TransactionStrategy.LOCAL != config.getTransactionStrategy())
-                    throw new IllegalArgumentException("Unsupported JPA transaction strategy: " + config.getTransactionStrategy());
+        private JpaPersistenceModule(PersistenceConfiguration configuration) {
+            super(annotation);
+            this.config = configuration;
+            this.emfProvider = new EntityManagerFactoryProvider(getPersistenceUnitKey(),
+                                                                getExtraPersistencePropertiesKey());
+            this.emProvider = new EntityManagerProvider(emfProvider);
+            this.workManager = new JpaWorkManager(emfProvider);
+            this.pService = new JpaPersistenceService(emfProvider);
+        }
+        
+        protected void configure() {
+            for (Module m : scheduledBindings) install(m);
+            // Set up JPA.
+            bindSpecial(EntityManagerFactory.class).toProvider(emfProvider);
+            bindSpecial(EntityManager.class).toProvider(emProvider);
+            bindSpecial(PersistenceService.class).toInstance(pService);
+            bindSpecial(JpaPersistenceService.class).toInstance(pService);
+            bindSpecial(WorkManager.class).toInstance(workManager);
 
-                bindTransactionInterceptor(config, new JpaLocalTxnInterceptor(emfProvider, emProvider, config.getUnitOfWork()));
+            // Set up transactions. Only local transactions are supported.
+            if (TransactionStrategy.LOCAL != config.getTransactionStrategy())
+                throw new IllegalArgumentException("Unsupported JPA transaction strategy: " + config.getTransactionStrategy());
 
-                // Set up Dynamic Finders.
-                MethodInterceptor finderInterceptor = new JpaFinderInterceptor(emProvider);
-                bindFinderInterceptor(finderInterceptor);
-                bindDynamicAccessors(config.getAccessors(), finderInterceptor);
-                
-                if (UnitOfWork.REQUEST == config.getUnitOfWork()) {
-                    // statics -- we don't have a choice.
-                    SessionFilter.registerWorkManager(workManager);
-                    LifecycleSessionFilter.registerPersistenceService(pService);
-                }
+            bindTransactionInterceptor(config, new JpaLocalTxnInterceptor(emfProvider, emProvider, config.getUnitOfWork()));
+
+            // Set up Dynamic Finders.
+            MethodInterceptor finderInterceptor = new JpaFinderInterceptor(emProvider);
+            bindFinderInterceptor(finderInterceptor);
+            bindDynamicAccessors(config.getAccessors(), finderInterceptor);
+        }
+
+        private boolean unitOfWorkRequest() {
+            return UnitOfWork.REQUEST == config.getUnitOfWork();
+        }
+
+        private Key<String> getPersistenceUnitKey() {
+            if (!inMultiModulesMode()) {
+                return Key.get(String.class, JpaUnit.class);
+            } else {
+                final Key<String> key = Key.get(String.class, JpaUnitInstance.of(annotation));
+                scheduledBindings.add(new AbstractModule() {
+                    protected void configure() {
+                        bind(key).toInstance(unit);
+                    }
+                });
+                return key;
             }
+        }
 
-            private Key<String> getPersistenceUnitKey() {
-                if (!inMultiModulesMode()) {
-                    return Key.get(String.class, JpaUnit.class);
-                } else {
-                    Key<String> key = Key.get(String.class, JpaUnitInstance.of(annotation));
-                    bind(key).toInstance(unit);
-                    return key;
-                }
+        private Key<Properties> getExtraPersistencePropertiesKey() {
+            if (!inMultiModulesMode()) {
+                return Key.get(Properties.class, JpaUnit.class);
+            } else {
+                final Key<Properties> key = Key.get(Properties.class, JpaUnitInstance.of(JpaPersistenceStrategy.this.annotation));
+                scheduledBindings.add(new AbstractModule() {
+                    protected void configure() {
+                        bind(key).toInstance(jpaProperties);
+                    }
+                });
+                return key;
             }
+        }
 
-            private Key<Properties> getExtraPersistencePropertiesKey() {
-                if (!inMultiModulesMode()) {
-                    return Key.get(Properties.class, JpaUnit.class);
-                } else {
-                    Key<Properties> key = Key.get(Properties.class, JpaUnitInstance.of(JpaPersistenceStrategy.this.annotation));
-                    bind(key).toInstance(jpaProperties);
-                    return key;
-                }
-            }
-        };
+        public WorkManager getWorkManager() {
+            return unitOfWorkRequest() ? this.workManager : null;
+        }
+
+        public PersistenceService getPersistenceService() {
+            return unitOfWorkRequest() ? this.pService : null;
+        }
     }
 
     public static JpaPersistenceStrategyBuilder builder() {
