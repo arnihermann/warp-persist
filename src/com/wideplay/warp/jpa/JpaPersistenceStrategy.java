@@ -86,10 +86,6 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
             bindDynamicAccessors(config.getAccessors(), finderInterceptor);
         }
 
-        private boolean unitOfWorkRequest() {
-            return UnitOfWork.REQUEST == config.getUnitOfWork();
-        }
-
         private Key<String> getPersistenceUnitKey() {
             if (!inMultiModulesMode()) {
                 return Key.get(String.class, JpaUnit.class);
@@ -119,11 +115,11 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
         }
 
         public WorkManager getWorkManager() {
-            return unitOfWorkRequest() ? this.workManager : null;
+            return unitOfWorkRequest(config) ? this.workManager : null;
         }
 
         public PersistenceService getPersistenceService() {
-            return unitOfWorkRequest() ? this.pService : null;
+            return unitOfWorkRequest(config) ? this.pService : null;
         }
     }
 

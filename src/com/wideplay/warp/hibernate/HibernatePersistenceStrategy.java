@@ -15,7 +15,9 @@
  */
 package com.wideplay.warp.hibernate;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Key;
+import com.google.inject.Module;
 import com.google.inject.Provider;
 import com.wideplay.warp.persist.*;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -24,6 +26,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Robbie Vanbrabant
@@ -38,62 +42,76 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
     }
 
     public PersistenceModule getBindings(final PersistenceConfiguration config) {
-        return new AbstractPersistenceModule(annotation) {
-            @Override
-            protected void configure() {
-                // TODO move to super class?
-                String annotationDebugString = annotation!=null?annotation.getSimpleName():"";
-                // Need instance here for the work manager.
-                SessionFactoryProvider sfProvider =
-                        new SessionFactoryProvider(getConfigurationKey(), annotationDebugString);
-                // Need instance here for the interceptors.
-                Provider<Session> sessionProvider = new SessionProvider(sfProvider);
-                // Need WorkManager here so we can register it on the SPR filter if the UnitOfWork is REQUEST
-                WorkManager workManager = new HibernateWorkManager(sfProvider, config.getUnitOfWork(),
-                                                                   annotationDebugString);
-                // Needs to be able to initialize Provider<SessionFactory>
-                PersistenceService pService = new HibernatePersistenceService(sfProvider);
+        return new HibernatePersistenceModule(config);
+    }
 
-                bindSpecial(SessionFactory.class).toProvider(sfProvider);
-                bindSpecial(Session.class).toProvider(sessionProvider);
-                bindSpecial(WorkManager.class).toInstance(workManager);
-                bindSpecial(PersistenceService.class).toInstance(pService);
+    class HibernatePersistenceModule extends AbstractPersistenceModule {
+        private final PersistenceConfiguration config;
+        private String annotationDebugString;
+        private WorkManager workManager;
+        private Provider<SessionFactory> sfProvider;
+        private Provider<Session> sessionProvider;
+        private PersistenceService pService;
+        // needed for bindings created in the constructor.
+        private final List<Module> scheduledBindings = new ArrayList<Module>();
 
-                // Set up transactions. Only local transactions are supported.
-                if (TransactionStrategy.LOCAL != config.getTransactionStrategy())
-                    throw new IllegalArgumentException("Unsupported Hibernate transaction strategy: " + config.getTransactionStrategy());
-                MethodInterceptor txInterceptor = new HibernateLocalTxnInterceptor(sessionProvider);
-                bindTransactionInterceptor(config, txInterceptor);
+        private HibernatePersistenceModule(PersistenceConfiguration config) {
+            super(annotation);
+            this.config = config;
+            // Need instance here for the work manager.
+            this.annotationDebugString = annotation!=null?annotation.getSimpleName():"";
+            this.sfProvider = new SessionFactoryProvider(getConfigurationKey(), annotationDebugString);
+            // Need instance here for the interceptors.
+            this.sessionProvider = new SessionProvider(sfProvider);
+            // Need WorkManager here so we can register it on the SPR filter if the UnitOfWork is REQUEST
+            this.workManager = new HibernateWorkManager(sfProvider, config.getUnitOfWork(), annotationDebugString);
+            // Needs to be able to initialize Provider<SessionFactory>
+            this.pService = new HibernatePersistenceService(sfProvider);
+        }
+        
+        @Override
+        protected void configure() {
+            for (Module m : scheduledBindings) install(m);
+            
+            bindSpecial(SessionFactory.class).toProvider(sfProvider);
+            bindSpecial(Session.class).toProvider(sessionProvider);
+            bindSpecial(WorkManager.class).toInstance(workManager);
+            bindSpecial(PersistenceService.class).toInstance(pService);
 
-                // Set up Dynamic Finders.
-                MethodInterceptor finderInterceptor = new HibernateFinderInterceptor(sessionProvider);
-                bindFinderInterceptor(finderInterceptor);
-                bindDynamicAccessors(config.getAccessors(), finderInterceptor);
+            // Set up transactions. Only local transactions are supported.
+            if (TransactionStrategy.LOCAL != config.getTransactionStrategy())
+                throw new IllegalArgumentException("Unsupported Hibernate transaction strategy: " + config.getTransactionStrategy());
+            MethodInterceptor txInterceptor = new HibernateLocalTxnInterceptor(sessionProvider);
+            bindTransactionInterceptor(config, txInterceptor);
 
-                if (UnitOfWork.REQUEST == config.getUnitOfWork()) {
-                    // statics -- we don't have a choice.
-                    SessionFilter.registerWorkManager(workManager);
-                    LifecycleSessionFilter.registerPersistenceService(pService);
-                }
+            // Set up Dynamic Finders.
+            MethodInterceptor finderInterceptor = new HibernateFinderInterceptor(sessionProvider);
+            bindFinderInterceptor(finderInterceptor);
+            bindDynamicAccessors(config.getAccessors(), finderInterceptor);
+        }
+
+        /**
+         * Gets the Key to which the Hibernate Configuration has been bound.
+         */
+        private Key<Configuration> getConfigurationKey() {
+            final Key<Configuration> key = key(Configuration.class);
+            if (inMultiModulesMode()) {
+                scheduledBindings.add(new AbstractModule() {
+                    protected void configure() {
+                        bind(key).toInstance(configuration);
+                    }
+                });
             }
+            return key;
+        }
 
-            /**
-             * Gets the Key to which the Hibernate Configuration has been bound.
-             */
-            private Key<Configuration> getConfigurationKey() {
-                Key<Configuration> key = key(Configuration.class);
-                if (inMultiModulesMode()) bind(key).toInstance(configuration);
-                return key;
-            }
+        public WorkManager getWorkManager() {
+            return unitOfWorkRequest(config) ? this.workManager : null;
+        }
 
-            public WorkManager getWorkManager() {
-                return null;
-            }
-
-            public PersistenceService getPersistenceService() {
-                return null;
-            }
-        };
+        public PersistenceService getPersistenceService() {
+            return unitOfWorkRequest(config) ? this.pService : null;
+        }
     }
 
     public static HibernatePersistenceStrategyBuilder builder() {

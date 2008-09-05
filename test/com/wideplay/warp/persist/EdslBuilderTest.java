@@ -16,12 +16,10 @@
 
 package com.wideplay.warp.persist;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
+import com.google.inject.*;
 import com.google.inject.matcher.Matchers;
 import com.wideplay.codemonkey.web.startup.Initializer;
+import com.wideplay.warp.hibernate.HibernatePersistenceStrategy;
 import com.wideplay.warp.hibernate.HibernateTestEntity;
 import com.wideplay.warp.jpa.JpaPersistenceStrategy;
 import com.wideplay.warp.persist.dao.HibernateTestAccessor;
@@ -29,6 +27,8 @@ import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.testng.annotations.Test;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.Properties;
 
 /**
@@ -53,7 +53,6 @@ public class EdslBuilderTest {
         Injector injector = Guice.createInjector(PersistenceService.usingHibernate().across(UnitOfWork.TRANSACTION)
                 .transactedWith(TransactionStrategy.LOCAL).buildModule(),
                 new AbstractModule() {
-
                     protected void configure() {
                         bind(Configuration.class).toInstance(new AnnotationConfiguration().addAnnotatedClass(HibernateTestEntity.class)
                                 .setProperties(Initializer.loadProperties("spt-persistence.properties")));
@@ -76,7 +75,7 @@ public class EdslBuilderTest {
     }
 
     @Test
-    public final void testMultimodulesConfig() {
+    public final void testMultimodulesConfigJpa() {
         PersistenceStrategy jpa = JpaPersistenceStrategy.builder()
                                                         .properties(new Properties())
                                                         .unit("myUnit")
@@ -89,6 +88,24 @@ public class EdslBuilderTest {
         
         //Guice.createInjector(m);
     }
+
+    @Test
+    public final void testMultimodulesConfigHibernate() {
+        PersistenceStrategy h = HibernatePersistenceStrategy.builder()
+                                                        .configuration(new Configuration())
+                                                        .annotatedWith(MyUnit.class).build();
+        Module m = PersistenceService.using(h)
+                                     .across(UnitOfWork.TRANSACTION)
+                                     .transactedWith(TransactionStrategy.LOCAL)
+                                     .forAll(Matchers.any(), Matchers.annotatedWith(Transactional.class))
+                                     .buildModule();
+
+        //Guice.createInjector(m);
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @BindingAnnotation
+    @interface MyUnit {}
 
     static class TransactionalObject {
         @Transactional public void txnMethod() {

@@ -105,6 +105,10 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
         return this.annotation != null;
     }
 
+    protected boolean unitOfWorkRequest(PersistenceConfiguration config) {
+        return UnitOfWork.REQUEST == config.getUnitOfWork();
+    }
+
     protected <T> Key<T> key(Class<T> clazz) {
         if (annotation != null) {
             return Key.get(clazz, annotation);
