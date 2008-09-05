@@ -47,7 +47,6 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
 
     class HibernatePersistenceModule extends AbstractPersistenceModule {
         private final PersistenceConfiguration config;
-        private String annotationDebugString;
         private WorkManager workManager;
         private Provider<SessionFactory> sfProvider;
         private Provider<Session> sessionProvider;
@@ -59,7 +58,7 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
             super(annotation);
             this.config = config;
             // Need instance here for the work manager.
-            this.annotationDebugString = annotation!=null?annotation.getSimpleName():"";
+            String annotationDebugString = annotation != null ? annotation.getSimpleName() : "";
             this.sfProvider = new SessionFactoryProvider(getConfigurationKey(), annotationDebugString);
             // Need instance here for the interceptors.
             this.sessionProvider = new SessionProvider(sfProvider);
