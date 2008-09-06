@@ -77,9 +77,6 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
             bindSpecial(WorkManager.class).toInstance(workManager);
             bindSpecial(PersistenceService.class).toInstance(pService);
 
-            // Set up transactions. Only local transactions are supported.
-            if (TransactionStrategy.LOCAL != config.getTransactionStrategy())
-                throw new IllegalArgumentException("Unsupported Hibernate transaction strategy: " + config.getTransactionStrategy());
             MethodInterceptor txInterceptor = new HibernateLocalTxnInterceptor(sessionProvider);
             bindTransactionInterceptor(config, txInterceptor);
 

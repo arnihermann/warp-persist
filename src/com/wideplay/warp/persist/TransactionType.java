@@ -17,9 +17,6 @@
 package com.wideplay.warp.persist;
 
 /**
- * Created with IntelliJ IDEA.
- * On: May 26, 2007 3:05:50 PM
- *
  * <p>
  * Enumerates options for an experimental feature: read/write or read/only transactions. Currently
  * *not* supported in JPA and experimental in Hibernate. The underlying mechanism actually alters
@@ -28,14 +25,16 @@ package com.wideplay.warp.persist;
  * </p>
  *
  * <p>
- *   Prefer driver-level read only transactions if your database supports it (using JTA global
+ *  Prefer driver-level read only transactions if your database supports it (using JTA global
  * transactions).
  * </p>
  *
  * @author Dhanji R. Prasanna (dhanji@gmail.com)
  */
 public enum TransactionType {
-
+    // TODO We should throw exceptions in all tx interceptors but the Hibernate one if
+    // READ_ONLY is used.
+    
     /**
      * Used to instruct warp-persist in the {@code @Transactional} annotation of methods/classes
      * that this transaction is READ-ONLY. This feature is not supported for JPA and is experimental

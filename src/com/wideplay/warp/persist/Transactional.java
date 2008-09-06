@@ -19,8 +19,6 @@ package com.wideplay.warp.persist;
 import java.lang.annotation.*;
 
 /**
- * Created with IntelliJ IDEA.
- * On: May 26, 2007 2:54:07 PM
  * <p>
  * Any method or class marked with this annotation will be considered for transactionality.
  * Consult the documentation on http://www.wideplay.com for detailed semantics.

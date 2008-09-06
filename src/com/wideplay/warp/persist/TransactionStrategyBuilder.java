@@ -32,7 +32,9 @@ public interface TransactionStrategyBuilder extends PersistenceModuleBuilder {
      *  See warp-persist website for details. By default {@code TransactionStrategy.LOCAL} is set.
      * 
      * @return Returns the next step in the builder chain
+     * @deprecated see {@link TransactionStrategy}
      */
+    @Deprecated
     TransactionStrategyBuilder transactedWith(TransactionStrategy transactionStrategy);
 
     /**

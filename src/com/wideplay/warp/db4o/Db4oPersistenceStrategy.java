@@ -34,9 +34,6 @@ public class Db4oPersistenceStrategy implements PersistenceStrategy {
 		        bind(PersistenceService.class).to(Db4oPersistenceService.class).in(Singleton.class);
 		        bind(WorkManager.class).to(Db4oWorkManager.class);
 
-                // Set up transactions. Only local transactions are supported.
-                if (TransactionStrategy.LOCAL != config.getTransactionStrategy())
-                    throw new IllegalArgumentException("Unsupported Db4o transaction strategy: " + config.getTransactionStrategy());
                 Db4oLocalTxnInterceptor.setUnitOfWork(config.getUnitOfWork());
                 bindInterceptor(config.getTransactionClassMatcher(),
                                 config.getTransactionMethodMatcher(),

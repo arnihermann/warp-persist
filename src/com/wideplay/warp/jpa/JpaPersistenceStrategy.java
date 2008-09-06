@@ -74,10 +74,6 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
             bindSpecial(JpaPersistenceService.class).toInstance(pService);
             bindSpecial(WorkManager.class).toInstance(workManager);
 
-            // Set up transactions. Only local transactions are supported.
-            if (TransactionStrategy.LOCAL != config.getTransactionStrategy())
-                throw new IllegalArgumentException("Unsupported JPA transaction strategy: " + config.getTransactionStrategy());
-
             bindTransactionInterceptor(config, new JpaLocalTxnInterceptor(emfProvider, emProvider, config.getUnitOfWork()));
 
             // Set up Dynamic Finders.
