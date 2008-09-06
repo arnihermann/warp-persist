@@ -37,18 +37,6 @@ public class Db4oSettings {
         this.hostKind = hostKind;
     }
 
-    //default settings
-    public Db4oSettings() {
-        user = null;
-        password = null;
-        host = null;
-        port = 0;
-        configuration = null;
-        // TODO should this be null?
-        databaseFileName = null;
-        hostKind = HostKind.FILE;
-    }
-
     public boolean isLocal() {
         return HostKind.LOCAL.equals(hostKind);
     }

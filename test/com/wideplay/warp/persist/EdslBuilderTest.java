@@ -16,9 +16,11 @@
 
 package com.wideplay.warp.persist;
 
+import com.db4o.Db4o;
 import com.google.inject.*;
 import com.google.inject.matcher.Matchers;
 import com.wideplay.codemonkey.web.startup.Initializer;
+import com.wideplay.warp.db4o.Db4oPersistenceStrategy;
 import com.wideplay.warp.hibernate.HibernatePersistenceStrategy;
 import com.wideplay.warp.hibernate.HibernateTestEntity;
 import com.wideplay.warp.jpa.JpaPersistenceStrategy;
@@ -64,29 +66,19 @@ public class EdslBuilderTest {
         injector.getInstance(TransactionalObject.class).txnMethod();
     }
 
-//    @Test TODO working on this... 
-    public final void testDb4oConfig() {
-        Guice.createInjector(PersistenceService.usingDb4o()
-                .across(UnitOfWork.TRANSACTION)
-                .transactedWith(TransactionStrategy.LOCAL)
-                .forAll(Matchers.any(), Matchers.annotatedWith(Transactional.class))
-                .buildModule()
-        );
-    }
-
     @Test
     public final void testMultimodulesConfigJpa() {
         PersistenceStrategy jpa = JpaPersistenceStrategy.builder()
                                                         .properties(new Properties())
                                                         .unit("myUnit")
-                                                        .annotatedWith(Test.class).build();
+                                                        .annotatedWith(MyUnit.class).build();
         Module m = PersistenceService.using(jpa)
                                      .across(UnitOfWork.TRANSACTION)
                                      .transactedWith(TransactionStrategy.LOCAL)
                                      .forAll(Matchers.any(), Matchers.annotatedWith(Transactional.class))
                                      .buildModule();
         
-        //Guice.createInjector(m);
+        Guice.createInjector(m);
     }
 
     @Test
@@ -100,7 +92,21 @@ public class EdslBuilderTest {
                                      .forAll(Matchers.any(), Matchers.annotatedWith(Transactional.class))
                                      .buildModule();
 
-        //Guice.createInjector(m);
+        Guice.createInjector(m);
+    }
+
+    @Test
+    public final void testMultimodulesConfigDb4o() {
+        PersistenceStrategy h = Db4oPersistenceStrategy.builder()
+                                                        .configuration(Db4o.newConfiguration())
+                                                        .annotatedWith(MyUnit.class).databaseFileName("TestDatabase.data")
+                                                        .host("localhost").port(4321).user("autobot").password("morethanmeetstheeye")
+                                                        .build();
+        Module m = PersistenceService.using(h)
+                                     .across(UnitOfWork.TRANSACTION)
+                                     .forAll(Matchers.any(), Matchers.annotatedWith(Transactional.class))
+                                     .buildModule();
+        Guice.createInjector(m);
     }
 
     @Retention(RetentionPolicy.RUNTIME)

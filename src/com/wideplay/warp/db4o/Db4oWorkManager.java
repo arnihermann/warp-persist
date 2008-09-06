@@ -76,19 +76,6 @@ class Db4oWorkManager implements WorkManager {
         }
     }
 
-//    static ObjectServer getCurrentObjectServer() {
-//        final ObjectServer server = singletonObjectServerHolder.getObjectServer();
-//
-//        if (null == server)
-//            throw new RuntimeException("No ObjectServer was found. Did you remember to call " +
-//                    "PersistenceService.start() *before* using the ObjectServer? In servlet environments, this is typically " +
-//                    "done in the init() lifecycle method of a servlet (or equivalent webapp initialization scheme)." +
-//                    " If you are connecting to a remote ObjectServer, then do not try to inject ObjectServer " +
-//                    "(use ObjectContainer instead).");
-//
-//        return server;
-//	}
-
     public String toString() {
         return super.toString();
     }

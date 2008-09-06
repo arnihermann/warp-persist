@@ -86,7 +86,9 @@ public class Db4oPersistenceStrategy implements PersistenceStrategy {
         return new Db4oPersistenceStrategyBuilder();
     }
 
+    // Do not change to be non-static or Guice 2.0 will not be able to inject it.
     public static class Db4oPersistenceStrategyBuilder implements PersistenceStrategyBuilder<Db4oPersistenceStrategy> {
+        private boolean untouched = true;
         private String databaseFileName;
         private Configuration configuration;
         private String host;
@@ -96,58 +98,73 @@ public class Db4oPersistenceStrategy implements PersistenceStrategy {
         private Class<? extends Annotation> annotation;
 
         @Inject(optional = true)
-        public void databaseFileName(@Db4Objects String databaseFileName) {
+        public Db4oPersistenceStrategyBuilder databaseFileName(@Db4Objects String databaseFileName) {
             this.databaseFileName = databaseFileName;
 
             Text.nonEmpty(databaseFileName, "Db4o database file name was not set; please bindConstant()" +
                     ".annotatedWith(Db4Objects.class) to a string containing the name of a Db4o database file.");
+            this.untouched = false;
+            return this;
         }
 
         @Inject(optional = true)
-        private void configuration(Configuration configuration) {
+        public Db4oPersistenceStrategyBuilder configuration(Configuration configuration) {
             this.configuration = configuration;
+            this.untouched = false;
+            return this;
         }
 
         @Inject(optional = true)
-        private void host(@Named(Db4Objects.HOST)String host) {
+        public Db4oPersistenceStrategyBuilder host(@Named(Db4Objects.HOST)String host) {
             this.host = host;
 
             Text.nonEmpty(host, "Please specify a valid host name.");
+            this.untouched = false;
+            return this;
         }
 
         @Inject(optional = true)
-        private void password(@Named(Db4Objects.PASSWORD)String password) {
+        public Db4oPersistenceStrategyBuilder password(@Named(Db4Objects.PASSWORD)String password) {
             this.password = password;
+            this.untouched = false;
+            return this;
         }
 
         @Inject(optional = true)
-        private void port(@Named(Db4Objects.PORT)int port) {
+        public Db4oPersistenceStrategyBuilder port(@Named(Db4Objects.PORT)int port) {
             if (port < 0 || port > 65535)
                 throw new IllegalArgumentException("Port number was invalid (must be in range 0-65535). Was: "
                         + port);
 
             this.port = port;
+            this.untouched = false;
+            return this;
         }
 
         @Inject(optional = true)
-        private void user(@Named(Db4Objects.USER)String user) {
+        public Db4oPersistenceStrategyBuilder user(@Named(Db4Objects.USER)String user) {
             this.user = user;
+            this.untouched = false;
+            return this;
         }
 
         public Db4oPersistenceStrategyBuilder annotatedWith(Class<? extends Annotation> annotation) {
             this.annotation = annotation;
+            this.untouched = false;
             return this;
         }
 
+        // internal use only
         Db4oSettings buildDb4oSettings() {
             HostKind hostKind;
             if (databaseFileName == null) {
-                if (!empty(host))
+                if (!empty(host)) {
                     hostKind = HostKind.REMOTE;
-                else
+                } else {
                     throw new IllegalStateException("Must specify either database file name: " +
                             "bindConstant().annotatedWith(Db4Objects); or a remote server host: bindConstant()" +
                             ".annotatedWith(Names.named(Db4Objects.HOST)).to(\"localhost\")");
+                }
             } else if (!empty(host)) {
                 hostKind = HostKind.LOCAL;
             } else {
@@ -157,9 +174,8 @@ public class Db4oPersistenceStrategy implements PersistenceStrategy {
         }
 
         public Db4oPersistenceStrategy build() {
-            // TODO validate
-            // TODO detect untouched builder and pass in null?
-            return new Db4oPersistenceStrategy(null, this.annotation);
+            // TODO validate more state
+            return new Db4oPersistenceStrategy(untouched ? null : buildDb4oSettings(), this.annotation);
         }
     }
 }
