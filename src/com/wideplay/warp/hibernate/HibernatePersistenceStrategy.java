@@ -114,7 +114,7 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
         return new HibernatePersistenceStrategyBuilder();
     }
 
-    public static class HibernatePersistenceStrategyBuilder {
+    public static class HibernatePersistenceStrategyBuilder implements PersistenceStrategyBuilder<HibernatePersistenceStrategy> {
         private Configuration configuration;
         private Class<? extends Annotation> annotation;
 

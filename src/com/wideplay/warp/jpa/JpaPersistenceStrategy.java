@@ -123,7 +123,7 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
         return new JpaPersistenceStrategyBuilder();
     }
 
-    public static class JpaPersistenceStrategyBuilder {
+    public static class JpaPersistenceStrategyBuilder implements PersistenceStrategyBuilder<JpaPersistenceStrategy> {
         private Properties jpaProperties;
         private String unit;
         private Class<? extends Annotation> annotation;
