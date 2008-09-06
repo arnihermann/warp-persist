@@ -58,6 +58,7 @@ class Db4oLocalTxnInterceptor implements MethodInterceptor {
                     oc.commit();
 
             } finally {
+                // TODO (Robbie) Unlike in others, in this TX interceptor we don't clean the ThreadLocal. Why?
                 if (isUnitOfWorkTransaction())
                     oc.close();
             }
