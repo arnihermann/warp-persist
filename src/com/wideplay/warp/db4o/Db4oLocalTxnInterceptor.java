@@ -129,6 +129,6 @@ class Db4oLocalTxnInterceptor implements MethodInterceptor {
 	}
 
     private boolean isUnitOfWorkTransaction() {
-        return this.unitOfWork == UnitOfWork.TRANSACTION;
+        return UnitOfWork.TRANSACTION.equals(this.unitOfWork);
     }
 }
