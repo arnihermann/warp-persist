@@ -8,5 +8,5 @@ package com.wideplay.warp.persist;
  */
 public interface InternalWorkManager<T> {
     T beginWork();
-    T endWork();
+    void endWork();
 }

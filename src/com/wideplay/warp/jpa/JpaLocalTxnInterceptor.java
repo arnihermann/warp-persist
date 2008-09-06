@@ -16,8 +16,7 @@
 
 package com.wideplay.warp.jpa;
 
-import com.google.inject.Provider;
-import com.wideplay.warp.persist.ManagedContext;
+import com.wideplay.warp.persist.InternalWorkManager;
 import com.wideplay.warp.persist.Transactional;
 import com.wideplay.warp.persist.UnitOfWork;
 import net.jcip.annotations.ThreadSafe;
@@ -25,7 +24,6 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import java.lang.reflect.Method;
 
@@ -34,22 +32,20 @@ import java.lang.reflect.Method;
  */
 @ThreadSafe
 class JpaLocalTxnInterceptor implements MethodInterceptor {
+    private final InternalWorkManager<EntityManager> internalWorkManager;
     private final UnitOfWork unitOfWork;
-    private final Provider<EntityManagerFactory> emfProvider;
-    private final Provider<EntityManager> emProvider;
 
     //TODO this is a clunky hack, make a TransactionalImpl and make it customizable 
     @Transactional
     private static class Internal { }
 
-    public JpaLocalTxnInterceptor(Provider<EntityManagerFactory> emfProvider, Provider<EntityManager> emProvider, UnitOfWork unitOfWork) {
-        this.emfProvider = emfProvider;
-        this.emProvider = emProvider;
+    public JpaLocalTxnInterceptor(InternalWorkManager<EntityManager> internalWorkManager, UnitOfWork unitOfWork) {
+        this.internalWorkManager = internalWorkManager;
         this.unitOfWork = unitOfWork;
     }
 
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-        EntityManager em = emProvider.get();
+        EntityManager em = this.internalWorkManager.beginWork();
 
         //allow joining of transactions if there is an enclosing @Transactional method
         if (em.getTransaction().isActive())
@@ -97,13 +93,8 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
         return result;
     }
 
-    // TODO this looks very similar to JpaWorkManager.endWork()
     private void closeEntityManager() {
-        EntityManagerFactory emf = emfProvider.get();
-        if (ManagedContext.hasBind(EntityManager.class, emf)) {
-            EntityManager em = ManagedContext.unbind(EntityManager.class, emf);
-            if (em != null && em.isOpen()) em.close();
-        }
+        this.internalWorkManager.endWork();
     }
 
     private Transactional readTransactionMetadata(MethodInvocation methodInvocation) {

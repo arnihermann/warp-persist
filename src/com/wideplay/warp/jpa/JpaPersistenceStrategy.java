@@ -54,14 +54,16 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
         private final JpaPersistenceService pService;
         // needed for bindings created in the constructor.
         private final List<Module> scheduledBindings = new ArrayList<Module>();
+        private InternalWorkManager<EntityManager> internalWm;
 
         private JpaPersistenceModule(PersistenceConfiguration configuration) {
             super(annotation);
             this.config = configuration;
             this.emfProvider = new EntityManagerFactoryProvider(getPersistenceUnitKey(),
                                                                 getExtraPersistencePropertiesKey());
-            this.emProvider = new EntityManagerProvider(emfProvider);
-            this.workManager = new JpaWorkManager(emfProvider);
+            internalWm = new JpaInternalWorkManager(emfProvider);
+            this.emProvider = new EntityManagerProvider(internalWm);
+            this.workManager = new JpaWorkManager(internalWm);
             this.pService = new JpaPersistenceService(emfProvider);
         }
         
@@ -74,7 +76,7 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
             bindSpecial(JpaPersistenceService.class).toInstance(pService);
             bindSpecial(WorkManager.class).toInstance(workManager);
 
-            bindTransactionInterceptor(config, new JpaLocalTxnInterceptor(emfProvider, emProvider, config.getUnitOfWork()));
+            bindTransactionInterceptor(config, new JpaLocalTxnInterceptor(this.internalWm, config.getUnitOfWork()));
 
             // Set up Dynamic Finders.
             MethodInterceptor finderInterceptor = new JpaFinderInterceptor(emProvider);

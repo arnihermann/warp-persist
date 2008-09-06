@@ -17,11 +17,10 @@
 package com.wideplay.warp.jpa;
 
 import com.google.inject.Provider;
-import com.wideplay.warp.persist.ManagedContext;
+import com.wideplay.warp.persist.InternalWorkManager;
 import net.jcip.annotations.Immutable;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 
 /**
  * @author Dhanji R. Prasanna (dhanji@gmail.com)
@@ -29,20 +28,13 @@ import javax.persistence.EntityManagerFactory;
  */
 @Immutable
 class EntityManagerProvider implements Provider<EntityManager> {
-    private final Provider<EntityManagerFactory> emfProvider;
+    private final InternalWorkManager<EntityManager> internalWorkManager;
 
-    public EntityManagerProvider(Provider<EntityManagerFactory> emfProvider) {
-        this.emfProvider = emfProvider;
+    public EntityManagerProvider(InternalWorkManager<EntityManager> internalWorkManager) {
+        this.internalWorkManager = internalWorkManager;
     }
 
-    // TODO this looks very similar to JpaWorkManager.beginWork()
     public EntityManager get() {
-        EntityManagerFactory emf = this.emfProvider.get();
-        EntityManager em = ManagedContext.getBind(EntityManager.class, emf);
-        if (em == null) {
-            em = emf.createEntityManager();
-            ManagedContext.bind(EntityManager.class, emf, em);
-        }
-        return em;
+        return internalWorkManager.beginWork();
     }
 }

@@ -16,14 +16,12 @@
 
 package com.wideplay.warp.jpa;
 
-import com.google.inject.Provider;
-import com.wideplay.warp.persist.ManagedContext;
+import com.wideplay.warp.persist.InternalWorkManager;
 import com.wideplay.warp.persist.WorkManager;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 
 /**
  * @author Dhanji R. Prasanna (dhanji gmail com)
@@ -31,25 +29,18 @@ import javax.persistence.EntityManagerFactory;
 @Immutable
 @ThreadSafe // Thread confinement through ThreadLocal
 class JpaWorkManager implements WorkManager {
-    private final Provider<EntityManagerFactory> entityManagerFactoryProvider;
+    private final InternalWorkManager<EntityManager> internalWorkManager;
 
-    public JpaWorkManager(Provider<EntityManagerFactory> entityManagerFactoryProvider) {
-        this.entityManagerFactoryProvider = entityManagerFactoryProvider;
+    public JpaWorkManager(InternalWorkManager<EntityManager> internalWorkManager) {
+        this.internalWorkManager = internalWorkManager;
     }
 
     public void beginWork() {
-        EntityManagerFactory emf = this.entityManagerFactoryProvider.get();
-        if (!ManagedContext.hasBind(EntityManager.class, emf)) {
-            ManagedContext.bind(EntityManager.class, emf, emf.createEntityManager());
-        }
+        this.internalWorkManager.beginWork();
     }
 
     public void endWork() {
-        EntityManagerFactory emf = this.entityManagerFactoryProvider.get();
-        if (ManagedContext.hasBind(EntityManager.class, emf)) {
-            EntityManager em = ManagedContext.unbind(EntityManager.class, emf);
-            if (em != null && em.isOpen()) em.close();
-        }
+        this.internalWorkManager.endWork();
     }
 
     public String toString() {

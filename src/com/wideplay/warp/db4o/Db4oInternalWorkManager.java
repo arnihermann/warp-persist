@@ -70,13 +70,11 @@ public class Db4oInternalWorkManager implements InternalWorkManager<ObjectContai
         }
     }
 
-    public ObjectContainer endWork() {
+    public void endWork() {
         ObjectServer os = this.objectServerProvider.get();
         if (ManagedContext.hasBind(ObjectContainer.class, os)) {
             ObjectContainer objectContainer = ManagedContext.unbind(ObjectContainer.class, os);
             if (objectContainer != null && !objectContainer.ext().isClosed()) objectContainer.close();
-            return objectContainer;
         }
-        return null;
     }
 }
