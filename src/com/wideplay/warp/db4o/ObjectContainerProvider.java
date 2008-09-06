@@ -16,59 +16,22 @@
 
 package com.wideplay.warp.db4o;
 
-import com.db4o.Db4o;
 import com.db4o.ObjectContainer;
-import com.db4o.ObjectServer;
 import com.google.inject.Provider;
-import com.wideplay.warp.persist.ManagedContext;
+import com.wideplay.warp.persist.InternalWorkManager;
 
 /**
  * @author Jeffrey Chung (jeffreymchung@gmail.com)
  * @author Robbie Vanbrabant
  */
 class ObjectContainerProvider implements Provider<ObjectContainer> {
-	private final ObjectServerProvider objectServer;
-	
-	public ObjectContainerProvider(ObjectServerProvider objectServer) {
-		this.objectServer = objectServer;
+    private final InternalWorkManager<ObjectContainer> internalWorkManager;
+
+    public ObjectContainerProvider(InternalWorkManager<ObjectContainer> internalWorkManager) {
+        this.internalWorkManager = internalWorkManager;
 	}
 	
 	public ObjectContainer get() {
-		ObjectServer objectServer = this.objectServer.get();
-        Db4oSettings settings = this.objectServer.getSettings();
-        ObjectContainer objectContainer;
-        // TODO this is a shameless copy paste from the WorkManager
-        if (!ManagedContext.hasBind(ObjectContainer.class, objectServer)) {
-            //open local server client
-            if (settings.isLocal()) {
-                objectContainer = Db4o.openClient(objectServer.ext().configure(),
-                        settings.getHost(),
-                        settings.getPort(),
-                        settings.getUser(),
-                        settings.getPassword());
-
-            //open remote client
-            } else if (settings.isRemote()) {
-                objectContainer = Db4o.openClient(settings.getConfiguration(),
-                        settings.getHost(),
-                        settings.getPort(),
-                        settings.getUser(),
-                        settings.getPassword());
-
-            //open file based client
-            } else {
-                objectContainer = objectServer.openClient();
-            }
-            ManagedContext.bind(ObjectContainer.class, objectServer, objectContainer);
-        } else {
-            objectContainer = ManagedContext.getBind(ObjectContainer.class, objectServer);
-        }
-        if (!objectContainer.ext().isClosed()) {
-            return objectContainer;
-        } else {
-            // this one has been closed, try again
-            ManagedContext.unbind(ObjectContainer.class, objectServer);
-            return get();
-        }
+		return internalWorkManager.beginWork();
     }
 }

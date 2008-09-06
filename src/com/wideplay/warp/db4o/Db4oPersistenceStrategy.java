@@ -55,9 +55,10 @@ public class Db4oPersistenceStrategy implements PersistenceStrategy {
             super(annotation);
             this.config = config;
             this.osp = new ObjectServerProvider(db4oSettings);
-            this.ocp = new ObjectContainerProvider(osp);
+            InternalWorkManager<ObjectContainer> iwm = new Db4oInternalWorkManager(osp);
+            this.ocp = new ObjectContainerProvider(iwm);
             this.pService = new Db4oPersistenceService(osp);
-            this.workManager = new Db4oWorkManager(osp);
+            this.workManager = new Db4oWorkManager(iwm);
         }
 
         protected void configure() {
