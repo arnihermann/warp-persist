@@ -17,6 +17,7 @@
 package com.wideplay.warp.db4o;
 
 import com.db4o.ObjectContainer;
+import com.google.inject.Provider;
 import com.wideplay.warp.persist.Transactional;
 import com.wideplay.warp.persist.UnitOfWork;
 import net.jcip.annotations.ThreadSafe;
@@ -32,13 +33,19 @@ import java.lang.reflect.Method;
  */
 @ThreadSafe
 class Db4oLocalTxnInterceptor implements MethodInterceptor {
-	private static volatile UnitOfWork unitOfWork = UnitOfWork.TRANSACTION;
+	private final UnitOfWork unitOfWork;
+    private final Provider<ObjectContainer> objectContainerProvider;
 
-	@Transactional
+    @Transactional
 	private static class Internal {}
 
-	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-		ObjectContainer oc = ObjectServerHolder.getCurrentObjectContainer();
+    public Db4oLocalTxnInterceptor(Provider<ObjectContainer> objectContainerProvider, UnitOfWork unitOfWork) {
+        this.objectContainerProvider = objectContainerProvider;
+        this.unitOfWork = unitOfWork;
+    }
+
+    public Object invoke(MethodInvocation methodInvocation) throws Throwable {
+		ObjectContainer oc = this.objectContainerProvider.get();
 		
 		Object result;
 		try {
@@ -62,7 +69,6 @@ class Db4oLocalTxnInterceptor implements MethodInterceptor {
 		try {
 			oc.commit();
 		} finally {
-
             if (isUnitOfWorkTransaction())
                 oc.close();
 		}
@@ -121,15 +127,7 @@ class Db4oLocalTxnInterceptor implements MethodInterceptor {
 		return commit;
 	}
 
-	private static boolean isUnitOfWorkTransaction() {
-		return UnitOfWork.TRANSACTION.equals(unitOfWork);
-	}
-
-    static UnitOfWork getUnitOfWork() {
-        return unitOfWork;
+    private boolean isUnitOfWorkTransaction() {
+        return this.unitOfWork == UnitOfWork.TRANSACTION;
     }
-
-    static void setUnitOfWork(UnitOfWork unitOfWork) {
-		Db4oLocalTxnInterceptor.unitOfWork = unitOfWork;
-	}
 }

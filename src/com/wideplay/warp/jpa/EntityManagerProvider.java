@@ -17,6 +17,7 @@
 package com.wideplay.warp.jpa;
 
 import com.google.inject.Provider;
+import com.wideplay.warp.persist.ManagedContext;
 import net.jcip.annotations.Immutable;
 
 import javax.persistence.EntityManager;
@@ -37,10 +38,10 @@ class EntityManagerProvider implements Provider<EntityManager> {
     // TODO this looks very similar to JpaWorkManager.beginWork()
     public EntityManager get() {
         EntityManagerFactory emf = this.emfProvider.get();
-        EntityManager em = ManagedEntityManagerContext.getBind(emf);
+        EntityManager em = ManagedContext.getBind(EntityManager.class, emf);
         if (em == null) {
             em = emf.createEntityManager();
-            ManagedEntityManagerContext.bind(emf, em);
+            ManagedContext.bind(EntityManager.class, emf, em);
         }
         return em;
     }

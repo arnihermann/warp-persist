@@ -117,4 +117,9 @@ public class SessionFilter implements Filter {
     public static void registerWorkManager(WorkManager wm) {
         workManagers.add(wm);
     }
+
+    /** Only use when you know what you're doing. Mainly for testing. */
+    public static void clearWorkManagers() {
+        workManagers.clear();
+    }
 }

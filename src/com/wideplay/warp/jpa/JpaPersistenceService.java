@@ -56,6 +56,6 @@ class JpaPersistenceService extends PersistenceService {
     }
     
     private static enum State {
-        FRESH, STARTED, STOPPED;
+        FRESH, STARTED, STOPPED
     }
 }

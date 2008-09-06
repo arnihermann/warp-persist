@@ -24,10 +24,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.wideplay.warp.persist.PersistenceService;
-import com.wideplay.warp.persist.TransactionStrategy;
-import com.wideplay.warp.persist.Transactional;
-import com.wideplay.warp.persist.UnitOfWork;
+import com.wideplay.warp.persist.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
@@ -70,7 +67,7 @@ public class JoiningLocalTransactionsTest {
     
     @AfterTest
     public void postTest() {
-    	ObjectServerHolder.closeCurrentObjectContainer();
+    	injector.getInstance(WorkManager.class).endWork();
     }
     
     @Test
@@ -84,7 +81,7 @@ public class JoiningLocalTransactionsTest {
 	    			return obj.getText().equals(UNIQUE_TEXT);
 	    		}
 	    	});
-    	ObjectServerHolder.closeCurrentObjectContainer();
+    	injector.getInstance(WorkManager.class).endWork();
     	
     	assert objSet.get(0) != null : "Nothing returned from predicate query: fatal";
     	assert objSet.get(0).getText().equals(UNIQUE_TEXT) : "Queried object did not match";
@@ -105,7 +102,7 @@ public class JoiningLocalTransactionsTest {
     			return obj.getText().equals(OTHER_UNIQUE_TEXT);
     		}
     	});
-		ObjectServerHolder.closeCurrentObjectContainer();
+		injector.getInstance(WorkManager.class).endWork();
 		
 		assert objSet.isEmpty() : "Result was returned: rollback did not occur";
     }
@@ -125,7 +122,7 @@ public class JoiningLocalTransactionsTest {
     			return obj.getText().equals(OTHER_UNIQUE_TEXT);
     		}
     	});
-		ObjectServerHolder.closeCurrentObjectContainer();
+		injector.getInstance(WorkManager.class).endWork();
 		
 		assert objSet.isEmpty() : "Result was returned: rollback did not occur";
     }

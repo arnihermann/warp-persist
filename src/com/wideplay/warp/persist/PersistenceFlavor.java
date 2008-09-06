@@ -36,7 +36,7 @@ public enum PersistenceFlavor implements HasPersistenceStrategy {
     },
     DB4O {
         public PersistenceStrategy getPersistenceStrategy() {
-            return new Db4oPersistenceStrategy();
+            return Db4oPersistenceStrategy.builder().build();
         }
     }
 }

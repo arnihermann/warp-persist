@@ -17,6 +17,7 @@
 package com.wideplay.warp.jpa;
 
 import com.google.inject.Provider;
+import com.wideplay.warp.persist.ManagedContext;
 import com.wideplay.warp.persist.Transactional;
 import com.wideplay.warp.persist.UnitOfWork;
 import net.jcip.annotations.ThreadSafe;
@@ -99,8 +100,8 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
     // TODO this looks very similar to JpaWorkManager.endWork()
     private void closeEntityManager() {
         EntityManagerFactory emf = emfProvider.get();
-        if (ManagedEntityManagerContext.hasBind(emf)) {
-            EntityManager em = ManagedEntityManagerContext.unbind(emf);
+        if (ManagedContext.hasBind(EntityManager.class, emf)) {
+            EntityManager em = ManagedContext.unbind(EntityManager.class, emf);
             if (em != null && em.isOpen()) em.close();
         }
     }

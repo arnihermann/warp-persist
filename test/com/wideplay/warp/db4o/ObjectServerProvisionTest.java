@@ -16,11 +16,6 @@
 
 package com.wideplay.warp.db4o;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectServer;
 import com.google.inject.AbstractModule;
@@ -29,6 +24,11 @@ import com.google.inject.Injector;
 import com.wideplay.warp.persist.PersistenceService;
 import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.UnitOfWork;
+import com.wideplay.warp.persist.WorkManager;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * 
@@ -60,13 +60,13 @@ public class ObjectServerProvisionTest {
 	
 	@AfterTest
     public void postTest() {
-    	ObjectServerHolder.closeCurrentObjectContainer();
+    	injector.getInstance(WorkManager.class).endWork();
     }
 	
 	@Test
 	public void testObjectContainerStartup() {
-		assert injector.getInstance(ObjectServerHolder.class).equals(injector.getInstance(ObjectServerHolder.class));
-		assert injector.getInstance(Db4oPersistenceService.class).equals(injector.getInstance(Db4oPersistenceService.class))
+		//assert injector.getInstance(ObjectServerHolder.class).equals(injector.getInstance(ObjectServerHolder.class));
+		assert injector.getInstance(PersistenceService.class).equals(injector.getInstance(PersistenceService.class))
 				: "Singleton violation: " + Db4oPersistenceService.class.getName();
 		
 		injector.getInstance(PersistenceService.class).start();

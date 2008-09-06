@@ -16,10 +16,10 @@
 
 package com.wideplay.warp.db4o;
 
+import com.google.inject.BindingAnnotation;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-
-import com.google.inject.BindingAnnotation;
 
 /**
  *

@@ -16,21 +16,78 @@
 
 package com.wideplay.warp.db4o;
 
+import com.db4o.Db4o;
+import com.db4o.ObjectContainer;
+import com.db4o.ObjectServer;
+import com.wideplay.warp.persist.ManagedContext;
 import com.wideplay.warp.persist.WorkManager;
 
 /**
- * 
  * @author Jeffrey Chung (jeffreymchung@gmail.com)
  */
 class Db4oWorkManager implements WorkManager {
+    private final ObjectServerProvider objectServer;
 
-	public void beginWork() {
-		ObjectServerHolder.getCurrentObjectContainer();
-	}
+    public Db4oWorkManager(ObjectServerProvider objectServer) {
+        this.objectServer = objectServer;
+    }
 
-	public void endWork() {
-		ObjectServerHolder.closeCurrentObjectContainer();
-	}
+    public void beginWork() {
+        ObjectServer objectServer = this.objectServer.get();
+        Db4oSettings settings = this.objectServer.getSettings();
+        ObjectContainer objectContainer;
+        if (!ManagedContext.hasBind(ObjectContainer.class, objectServer)) {
+            //open local server client
+            if (settings.isLocal()) {
+                objectContainer = Db4o.openClient(objectServer.ext().configure(),
+                        settings.getHost(),
+                        settings.getPort(),
+                        settings.getUser(),
+                        settings.getPassword());
+
+            //open remote client
+            } else if (settings.isRemote()) {
+                objectContainer = Db4o.openClient(settings.getConfiguration(),
+                        settings.getHost(),
+                        settings.getPort(),
+                        settings.getUser(),
+                        settings.getPassword());
+
+            //open file based client
+            } else {
+                objectContainer = objectServer.openClient();
+            }
+            ManagedContext.bind(ObjectContainer.class, objectServer, objectContainer);
+        } else {
+            objectContainer = ManagedContext.getBind(ObjectContainer.class, objectServer);
+        }
+        if (objectContainer.ext().isClosed()) {
+            // this one has been closed, try again
+            ManagedContext.unbind(ObjectContainer.class, objectServer);
+            beginWork();
+        }
+    }
+
+    public void endWork() {
+        ObjectServer os = this.objectServer.get();
+        if (ManagedContext.hasBind(ObjectContainer.class, os)) {
+            ObjectContainer objectContainer = ManagedContext.unbind(ObjectContainer.class, os);
+            if (objectContainer != null && !objectContainer.ext().isClosed()) objectContainer.close();
+        }
+    }
+
+//    static ObjectServer getCurrentObjectServer() {
+//        final ObjectServer server = singletonObjectServerHolder.getObjectServer();
+//
+//        if (null == server)
+//            throw new RuntimeException("No ObjectServer was found. Did you remember to call " +
+//                    "PersistenceService.start() *before* using the ObjectServer? In servlet environments, this is typically " +
+//                    "done in the init() lifecycle method of a servlet (or equivalent webapp initialization scheme)." +
+//                    " If you are connecting to a remote ObjectServer, then do not try to inject ObjectServer " +
+//                    "(use ObjectContainer instead).");
+//
+//        return server;
+//	}
 
     public String toString() {
         return super.toString();

@@ -17,6 +17,7 @@
 package com.wideplay.warp.jpa;
 
 import com.google.inject.Provider;
+import com.wideplay.warp.persist.ManagedContext;
 import com.wideplay.warp.persist.WorkManager;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
@@ -38,15 +39,15 @@ class JpaWorkManager implements WorkManager {
 
     public void beginWork() {
         EntityManagerFactory emf = this.entityManagerFactoryProvider.get();
-        if (!ManagedEntityManagerContext.hasBind(emf)) {
-            ManagedEntityManagerContext.bind(emf, emf.createEntityManager());
+        if (!ManagedContext.hasBind(EntityManager.class, emf)) {
+            ManagedContext.bind(EntityManager.class, emf, emf.createEntityManager());
         }
     }
 
     public void endWork() {
         EntityManagerFactory emf = this.entityManagerFactoryProvider.get();
-        if (ManagedEntityManagerContext.hasBind(emf)) {
-            EntityManager em = ManagedEntityManagerContext.unbind(emf);
+        if (ManagedContext.hasBind(EntityManager.class, emf)) {
+            EntityManager em = ManagedContext.unbind(EntityManager.class, emf);
             if (em != null && em.isOpen()) em.close();
         }
     }

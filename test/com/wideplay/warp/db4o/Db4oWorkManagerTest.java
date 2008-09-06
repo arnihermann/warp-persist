@@ -16,10 +16,6 @@
 
 package com.wideplay.warp.db4o;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
 import com.db4o.Db4o;
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectServer;
@@ -30,6 +26,9 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.name.Names;
 import com.wideplay.warp.persist.*;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  *
@@ -67,7 +66,8 @@ public class Db4oWorkManagerTest {
 	@AfterClass
 	public void postClass() {
 		injector.getInstance(ObjectServer.class).close();
-	}
+        SessionFilter.clearWorkManagers();
+    }
 
 	@Test
 	public void verifySingleObjectContainerOverUnitOfWork() {
