@@ -37,7 +37,6 @@ class ObjectServerProvider implements Provider<ObjectServer> {
     /**
      * Lazily loaded ObjectServer.
      */
-    // TODO refactor this ugly mess
     private LazyReference<ObjectServer> objectServer =
             LazyReference.of(new Provider<ObjectServer>() {
                 public ObjectServer get() {
@@ -61,6 +60,7 @@ class ObjectServerProvider implements Provider<ObjectServer> {
                     } else if (HostKind.FILE.equals(actualSettings.getHostKind())) {
                         return Db4o.openServer(actualSettings.getDatabaseFileName(), actualSettings.getPort());
                     }
+                    // TODO (Robbie) I don't understand why we don't do REMOTE here.
                     throw new UnsupportedOperationException("Can't create ObjectServer using HostKind.REMOTE");
                 }
             });
