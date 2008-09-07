@@ -18,8 +18,6 @@ package com.wideplay.warp.db4o;
 
 import com.db4o.Db4o;
 import com.db4o.ObjectServer;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Provider;
 import com.wideplay.warp.util.LazyReference;
 import static com.wideplay.warp.util.Text.empty;
@@ -30,10 +28,7 @@ import net.jcip.annotations.Immutable;
  * @author Robbie Vanbrabant
  */
 @Immutable
-class ObjectServerProvider implements Provider<ObjectServer> {
-    @Inject
-    private final Injector injector = null;
-
+class ObjectServerProvider extends AbstractObjectServerProvider {
     /**
      * Lazily loaded ObjectServer.
      */
@@ -65,19 +60,12 @@ class ObjectServerProvider implements Provider<ObjectServer> {
                 }
             });
     
-    private final Db4oSettings settings;
 
     public ObjectServerProvider(Db4oSettings settings) {
-        this.settings = settings;
+        super(settings);
     }
 	
 	public ObjectServer get() {
 		return this.objectServer.get();
 	}
-
-    Db4oSettings getSettings() {
-        return this.settings != null ?
-                this.settings :
-                injector.getInstance(Db4oPersistenceStrategy.Db4oPersistenceStrategyBuilder.class).buildDb4oSettings();
-    }
 }

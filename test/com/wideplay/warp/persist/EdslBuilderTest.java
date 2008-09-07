@@ -99,14 +99,16 @@ public class EdslBuilderTest {
     public final void testMultimodulesConfigDb4o() {
         PersistenceStrategy h = Db4oPersistenceStrategy.builder()
                                                         .configuration(Db4o.newConfiguration())
-                                                        .annotatedWith(MyUnit.class).databaseFileName("TestDatabase.data")
+                                                        .annotatedWith(MyUnit.class)//.databaseFileName("TestDatabase.data")
                                                         .host("localhost").port(4321).user("autobot").password("morethanmeetstheeye")
                                                         .build();
         Module m = PersistenceService.using(h)
                                      .across(UnitOfWork.TRANSACTION)
                                      .forAll(Matchers.any(), Matchers.annotatedWith(Transactional.class))
                                      .buildModule();
-        Guice.createInjector(m);
+        PersistenceService service = Guice.createInjector(m).getInstance(Key.get(PersistenceService.class, MyUnit.class));
+        service.start();
+        service.shutdown();
     }
 
     @Retention(RetentionPolicy.RUNTIME)
