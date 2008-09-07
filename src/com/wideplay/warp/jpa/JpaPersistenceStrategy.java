@@ -89,11 +89,13 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
                 return Key.get(String.class, JpaUnit.class);
             } else {
                 final Key<String> key = Key.get(String.class, JpaUnitInstance.of(annotation));
-                scheduledBindings.add(new AbstractModule() {
-                    protected void configure() {
-                        bind(key).toInstance(unit);
-                    }
-                });
+                if (unit != null) {
+                    scheduledBindings.add(new AbstractModule() {
+                        protected void configure() {
+                            bind(key).toInstance(unit);
+                        }
+                    });
+                }
                 return key;
             }
         }
@@ -103,11 +105,13 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
                 return Key.get(Properties.class, JpaUnit.class);
             } else {
                 final Key<Properties> key = Key.get(Properties.class, JpaUnitInstance.of(JpaPersistenceStrategy.this.annotation));
-                scheduledBindings.add(new AbstractModule() {
-                    protected void configure() {
-                        bind(key).toInstance(jpaProperties);
-                    }
-                });
+                if (jpaProperties != null) {
+                    scheduledBindings.add(new AbstractModule() {
+                        protected void configure() {
+                            bind(key).toInstance(jpaProperties);
+                        }
+                    });
+                }
                 return key;
             }
         }

@@ -92,11 +92,13 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
         private Key<Configuration> getConfigurationKey() {
             final Key<Configuration> key = key(Configuration.class);
             if (inMultiModulesMode()) {
-                scheduledBindings.add(new AbstractModule() {
-                    protected void configure() {
-                        bind(key).toInstance(configuration);
-                    }
-                });
+                if (configuration != null) {
+                    scheduledBindings.add(new AbstractModule() {
+                        protected void configure() {
+                            bind(key).toInstance(configuration);
+                        }
+                    });
+                }
             }
             return key;
         }
