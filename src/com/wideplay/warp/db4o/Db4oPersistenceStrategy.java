@@ -49,14 +49,13 @@ public class Db4oPersistenceStrategy implements PersistenceStrategy {
         private final PersistenceService pService;
         private final WorkManager workManager;
         private final Provider<ObjectContainer> ocp;
-        private final AbstractObjectServerProvider osp;
+        private final ObjectServerProvider osp;
         private InternalWorkManager<ObjectContainer> iwm;
 
         Db4oPersistenceModule(PersistenceConfiguration config) {
             super(annotation);
             this.config = config;
-            this.osp = db4oSettings.isRemote() ? new NullObjectObjectServerProvider(db4oSettings) :
-                                                 new ObjectServerProvider(db4oSettings);
+            this.osp = new ObjectServerProvider(db4oSettings);
             iwm = new Db4oInternalWorkManager(osp);
             this.ocp = new ObjectContainerProvider(iwm);
             this.pService = new Db4oPersistenceService(osp);
@@ -65,9 +64,8 @@ public class Db4oPersistenceStrategy implements PersistenceStrategy {
 
         protected void configure() {
             // Set up Db4o.
-            if (!db4oSettings.isRemote()) {
-                bindSpecial(ObjectServer.class).toProvider(osp);
-            }
+            bindSpecial(ObjectServer.class).toProvider(osp);
+            
             bindSpecial(ObjectContainer.class).toProvider(ocp);
             bindSpecial(PersistenceService.class).toInstance(pService);
             bindSpecial(WorkManager.class).toInstance(workManager);

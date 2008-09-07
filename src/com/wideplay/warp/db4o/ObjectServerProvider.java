@@ -18,6 +18,8 @@ package com.wideplay.warp.db4o;
 
 import com.db4o.Db4o;
 import com.db4o.ObjectServer;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.Provider;
 import com.wideplay.warp.util.LazyReference;
 import static com.wideplay.warp.util.Text.empty;
@@ -28,7 +30,7 @@ import net.jcip.annotations.Immutable;
  * @author Robbie Vanbrabant
  */
 @Immutable
-class ObjectServerProvider extends AbstractObjectServerProvider {
+class ObjectServerProvider implements Provider<ObjectServer> {
     /**
      * Lazily loaded ObjectServer.
      */
@@ -55,18 +57,27 @@ class ObjectServerProvider extends AbstractObjectServerProvider {
                     } else if (HostKind.FILE.equals(actualSettings.getHostKind())) {
                         return Db4o.openServer(actualSettings.getDatabaseFileName(), actualSettings.getPort());
                     }
-                    throw new AssertionError();
+                    // remote, fake objectServer.
+                    return new NullObjectServer();
                 }
             });
 
+    @Inject
+    private final Injector injector = null;
+
+    private final Db4oSettings settings;
+
     public ObjectServerProvider(Db4oSettings settings) {
-        super(settings);
-        if (settings.isRemote()) {
-            throw new UnsupportedOperationException("Can't create ObjectServer using HostKind.REMOTE");
-        }
+        this.settings = settings;
     }
-	
-	public ObjectServer get() {
+
+    public ObjectServer get() {
 		return this.objectServer.get();
 	}
+
+    protected Db4oSettings getSettings() {
+        return this.settings != null ?
+                this.settings :
+                injector.getInstance(Db4oPersistenceStrategy.Db4oPersistenceStrategyBuilder.class).buildDb4oSettings();
+    }
 }
