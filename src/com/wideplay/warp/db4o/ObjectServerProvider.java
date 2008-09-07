@@ -55,14 +55,15 @@ class ObjectServerProvider extends AbstractObjectServerProvider {
                     } else if (HostKind.FILE.equals(actualSettings.getHostKind())) {
                         return Db4o.openServer(actualSettings.getDatabaseFileName(), actualSettings.getPort());
                     }
-                    // TODO (Robbie) I don't understand why we don't do REMOTE here.
-                    throw new UnsupportedOperationException("Can't create ObjectServer using HostKind.REMOTE");
+                    throw new AssertionError();
                 }
             });
-    
 
     public ObjectServerProvider(Db4oSettings settings) {
         super(settings);
+        if (settings.isRemote()) {
+            throw new UnsupportedOperationException("Can't create ObjectServer using HostKind.REMOTE");
+        }
     }
 	
 	public ObjectServer get() {
