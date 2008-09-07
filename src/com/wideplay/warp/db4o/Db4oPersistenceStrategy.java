@@ -50,12 +50,13 @@ public class Db4oPersistenceStrategy implements PersistenceStrategy {
         private final WorkManager workManager;
         private final Provider<ObjectContainer> ocp;
         private final ObjectServerProvider osp;
+        private InternalWorkManager<ObjectContainer> iwm;
 
         Db4oPersistenceModule(PersistenceConfiguration config) {
             super(annotation);
             this.config = config;
             this.osp = new ObjectServerProvider(db4oSettings);
-            InternalWorkManager<ObjectContainer> iwm = new Db4oInternalWorkManager(osp);
+            iwm = new Db4oInternalWorkManager(osp);
             this.ocp = new ObjectContainerProvider(iwm);
             this.pService = new Db4oPersistenceService(osp);
             this.workManager = new Db4oWorkManager(iwm);
@@ -68,7 +69,7 @@ public class Db4oPersistenceStrategy implements PersistenceStrategy {
             bindSpecial(PersistenceService.class).toInstance(pService);
             bindSpecial(WorkManager.class).toInstance(workManager);
 
-            MethodInterceptor txInterceptor = new Db4oLocalTxnInterceptor(ocp, config.getUnitOfWork());
+            MethodInterceptor txInterceptor = new Db4oLocalTxnInterceptor(iwm, config.getUnitOfWork());
             bindTransactionInterceptor(config, txInterceptor);
 
             // No Dynamic Finders yet.

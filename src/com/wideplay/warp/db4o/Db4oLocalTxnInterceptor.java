@@ -17,7 +17,7 @@
 package com.wideplay.warp.db4o;
 
 import com.db4o.ObjectContainer;
-import com.google.inject.Provider;
+import com.wideplay.warp.persist.InternalWorkManager;
 import com.wideplay.warp.persist.Transactional;
 import com.wideplay.warp.persist.UnitOfWork;
 import net.jcip.annotations.ThreadSafe;
@@ -34,18 +34,18 @@ import java.lang.reflect.Method;
 @ThreadSafe
 class Db4oLocalTxnInterceptor implements MethodInterceptor {
 	private final UnitOfWork unitOfWork;
-    private final Provider<ObjectContainer> objectContainerProvider;
+    private final InternalWorkManager<ObjectContainer> internalWorkManager;
 
     @Transactional
 	private static class Internal {}
 
-    public Db4oLocalTxnInterceptor(Provider<ObjectContainer> objectContainerProvider, UnitOfWork unitOfWork) {
-        this.objectContainerProvider = objectContainerProvider;
+    public Db4oLocalTxnInterceptor(InternalWorkManager<ObjectContainer> internalWorkManager, UnitOfWork unitOfWork) {
+        this.internalWorkManager = internalWorkManager;
         this.unitOfWork = unitOfWork;
     }
 
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-		ObjectContainer oc = this.objectContainerProvider.get();
+		ObjectContainer oc = internalWorkManager.beginWork();
 		
 		Object result;
 		try {
@@ -58,9 +58,8 @@ class Db4oLocalTxnInterceptor implements MethodInterceptor {
                     oc.commit();
 
             } finally {
-                // TODO (Robbie) Unlike in others, in this TX interceptor we don't clean the ThreadLocal. Why?
                 if (isUnitOfWorkTransaction())
-                    oc.close();
+                    endWork();
             }
 
 			throw e;
@@ -71,13 +70,17 @@ class Db4oLocalTxnInterceptor implements MethodInterceptor {
 			oc.commit();
 		} finally {
             if (isUnitOfWorkTransaction())
-                oc.close();
-		}
+                endWork();
+        }
 
 		return result;
 	}
 
-	private Transactional readTransactionMetadata(MethodInvocation methodInvocation) {
+    private void endWork() {
+        this.internalWorkManager.endWork();
+    }
+
+    private Transactional readTransactionMetadata(MethodInvocation methodInvocation) {
 		Transactional transactional;
 		Method method = methodInvocation.getMethod();
 
