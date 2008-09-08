@@ -53,7 +53,7 @@ public class SessionFilter implements Filter {
             } catch (RuntimeException e) {
                 // clean up what we did so far and end this madness.
                 try {
-                    endAsMuchWorkAsPossible(localWorkManagers.subList(0, i-1));
+                    endAsMuchWorkAsPossible(localWorkManagers.subList(0, i));
                 } catch (final RuntimeException closeErrors) {
                     // Better than nothing.
                     throw new RuntimeException(e) {

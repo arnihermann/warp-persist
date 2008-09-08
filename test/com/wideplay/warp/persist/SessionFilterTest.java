@@ -22,12 +22,12 @@ import com.google.inject.Injector;
 import com.google.inject.matcher.Matchers;
 import com.wideplay.codemonkey.web.startup.Initializer;
 import com.wideplay.warp.hibernate.HibernateTestEntity;
-import com.wideplay.warp.hibernate.SessionPerRequestFilter;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.context.ManagedSessionContext;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -67,11 +67,16 @@ public class SessionFilterTest {
         injector.getInstance(PersistenceService.class).shutdown();
     }
 
+    @AfterMethod
+    public void cleanSessionFilter() {
+        SessionFilter.clearWorkManagers();
+    }
+
     @Test
     public final void testUseWorkManager() throws IOException, ServletException {
-        SessionPerRequestFilter spr = new SessionPerRequestFilter();
+        SessionFilter spr = new SessionFilter();
         final ValidatableWorkManager workManager = new ValidatableWorkManager();
-        SessionPerRequestFilter.registerWorkManager(workManager);
+        SessionFilter.registerWorkManager(workManager);
         FilterChain chain = new FilterChain() {
             public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse) throws IOException, ServletException {
                 assert workManager.beginCalled;
@@ -81,6 +86,33 @@ public class SessionFilterTest {
         spr.doFilter(null, null, chain);
         assert workManager.beginCalled;
         assert workManager.endCalled;
+    }
+
+    @Test
+    public final void testWorkManagerBeginThrowsException() throws IOException, ServletException {
+        SessionFilter spr = new SessionFilter();
+        final ValidatableWorkManager workManager1 = new ValidatableWorkManager();
+        final ValidatableWorkManager workManager2 = new ValidatableWorkManager() {
+            public void beginWork() {
+                throw new RuntimeException();
+            }
+        };
+        SessionFilter.registerWorkManager(workManager1);
+        SessionFilter.registerWorkManager(workManager2);
+        
+        FilterChain chain = new FilterChain() {
+            public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse) throws IOException, ServletException {
+                throw new AssertionError();
+            }
+        };
+        try {
+            spr.doFilter(null, null, chain);
+            throw new AssertionError();
+        } catch (RuntimeException e) {}
+
+        assert workManager1.beginCalled;
+        assert workManager1.endCalled;
+        assert !workManager2.endCalled;
     }
 
     @Test
