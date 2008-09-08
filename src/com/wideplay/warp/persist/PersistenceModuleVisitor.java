@@ -1,6 +1,11 @@
 package com.wideplay.warp.persist;
 
 /**
+ * Used to visit a {@link com.wideplay.warp.persist.PersistenceModule}
+ * and gather state that needs to be used with static methods. This
+ * hides the only static state we need (Servlet Filters) behind
+ * some OO goodness.
+ *
  * @author Robbie Vanbrabant
  */
 public interface PersistenceModuleVisitor {
