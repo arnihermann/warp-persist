@@ -76,11 +76,11 @@ public class Db4oPersistenceStrategy implements PersistenceStrategy {
             // No Dynamic Finders yet.
         }
 
-        public WorkManager getWorkManager() {
+        public WorkManager publishWorkManager() {
             return unitOfWorkRequest(config) ? this.workManager : null;
         }
 
-        public PersistenceService getPersistenceService() {
+        public PersistenceService publishPersistenceService() {
             return unitOfWorkRequest(config) ? this.pService : null;
         }
     }

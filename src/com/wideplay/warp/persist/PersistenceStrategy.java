@@ -20,5 +20,13 @@ package com.wideplay.warp.persist;
  * @author Robbie Vanbrabant
  */
 public interface PersistenceStrategy {
+    /**
+     * Produces a {@link com.wideplay.warp.persist.PersistenceModule}
+     * from the given configuration.
+     * 
+     * @param config all configuration gathered through the public fluent interface API
+     * @return the {@link com.wideplay.warp.persist.PersistenceModule} containing all
+     *         that's needed for configuring this {@code PersistenceStrategy}
+     */
     PersistenceModule getBindings(PersistenceConfiguration config);
 }

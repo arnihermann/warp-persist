@@ -116,11 +116,11 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
             }
         }
 
-        public WorkManager getWorkManager() {
+        public WorkManager publishWorkManager() {
             return unitOfWorkRequest(config) ? this.workManager : null;
         }
 
-        public PersistenceService getPersistenceService() {
+        public PersistenceService publishPersistenceService() {
             return unitOfWorkRequest(config) ? this.pService : null;
         }
     }

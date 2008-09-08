@@ -19,6 +19,8 @@ package com.wideplay.warp.persist;
 import com.google.inject.Module;
 
 /**
+ * Builds a {@link com.google.inject.Module} for use with
+ * Guice.
  *
  * @author Dhanji R. Prasanna (dhanji@gmail.com)
  * @since 1.0

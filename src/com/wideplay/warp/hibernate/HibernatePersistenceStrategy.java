@@ -103,11 +103,11 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
             return key;
         }
 
-        public WorkManager getWorkManager() {
+        public WorkManager publishWorkManager() {
             return unitOfWorkRequest(config) ? this.workManager : null;
         }
 
-        public PersistenceService getPersistenceService() {
+        public PersistenceService publishPersistenceService() {
             return unitOfWorkRequest(config) ? this.pService : null;
         }
     }

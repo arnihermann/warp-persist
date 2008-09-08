@@ -84,6 +84,14 @@ public abstract class PersistenceService {
         return new PersistenceServiceBuilderImpl(PersistenceFlavor.DB4O);
     }
 
+    /**
+     * Configure a given {@link com.wideplay.warp.persist.PersistenceStrategy}, either
+     * because it is not part of Warp Persist, or because you need support for multiple
+     * persistence modules (bound to an annotation).
+     *
+     * @param ps the {@code PersistenceService} to configure
+     * @return the next step in the configuration chain
+     */
     public static SessionStrategyBuilder using(PersistenceStrategy ps) {
         return new PersistenceServiceBuilderImpl(ps);
     }

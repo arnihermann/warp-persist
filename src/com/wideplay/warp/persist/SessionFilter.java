@@ -31,7 +31,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  *
  * @author Dhanji R. Prasanna (dhanji@gmail.com)
  * @author Robbie Vanbrabant
- * @since 1.0
+ * @since 2.0
  * @see UnitOfWork
  */
 @ThreadSafe

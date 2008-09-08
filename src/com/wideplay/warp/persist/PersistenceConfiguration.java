@@ -32,5 +32,10 @@ public interface PersistenceConfiguration {
 
     Matcher<? super Class<?>> getTransactionClassMatcher();
 
+    /**
+     * Returns the configured Dynamic Accessors, which are
+     * Dynamic Finders that are interfaces.
+     * @return all configured Dynamic Accessors
+     */
     Set<Class<?>> getAccessors();
 }
