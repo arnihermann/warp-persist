@@ -85,7 +85,7 @@ public class SessionFilter implements Filter {
                 wm.endWork();
             } catch (RuntimeException e) {
                 // record the exception and proceed
-                exceptionMessages.append(String.format("Could not end work for WorkManager '%s':%n%s%n%s%n",
+                exceptionMessages.append(String.format("Could not end work for WorkManager '%s': %s%n%s%n",
                                                        wm.toString(), e.getMessage(), stackTraceAsString(e)));
             }
         }

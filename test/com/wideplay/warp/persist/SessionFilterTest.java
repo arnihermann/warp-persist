@@ -39,33 +39,14 @@ import java.io.IOException;
 
 /** Unit tests the SPR filter. */
 public class SessionFilterTest {
-    private Injector injector;
-
     @BeforeClass
     public void pre() {
         // protect against sloppy tests elsewhere
         SessionFilter.clearWorkManagers();
-        injector = Guice.createInjector(PersistenceService.usingHibernate()
-            .across(UnitOfWork.REQUEST)
-            .transactedWith(TransactionStrategy.LOCAL)
-            .forAll(Matchers.any())
-            .buildModule(),
-                new AbstractModule() {
-                    protected void configure() {
-                        bind(Configuration.class).toInstance(new AnnotationConfiguration()
-                            .addAnnotatedClass(HibernateTestEntity.class)
-                            .setProperties(Initializer.loadProperties("spt-persistence.properties")));
-                    }
-                });
-
-        //startup persistence
-        injector.getInstance(PersistenceService.class).start();
     }
 
     @AfterClass
-    public void post() {
-        injector.getInstance(PersistenceService.class).shutdown();
-    }
+    public void post() { }
 
     @AfterMethod
     public void cleanSessionFilter() {
@@ -94,29 +75,118 @@ public class SessionFilterTest {
         final ValidatableWorkManager workManager1 = new ValidatableWorkManager();
         final ValidatableWorkManager workManager2 = new ValidatableWorkManager() {
             public void beginWork() {
+                beginCalled = true;
                 throw new RuntimeException();
             }
         };
+        
+        final ValidatableWorkManager workManager3 = new ValidatableWorkManager();
         SessionFilter.registerWorkManager(workManager1);
         SessionFilter.registerWorkManager(workManager2);
+        SessionFilter.registerWorkManager(workManager3);
         
-        FilterChain chain = new FilterChain() {
-            public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse) throws IOException, ServletException {
-                throw new AssertionError();
-            }
-        };
         try {
-            spr.doFilter(null, null, chain);
+            spr.doFilter(null, null, null);
             throw new AssertionError();
         } catch (RuntimeException e) {}
 
         assert workManager1.beginCalled;
         assert workManager1.endCalled;
+        
+        assert workManager2.beginCalled;
         assert !workManager2.endCalled;
+
+        assert !workManager3.beginCalled;
+        assert !workManager3.endCalled;
+    }
+
+    @Test
+    public final void testWorkManagerEndThrowsException() throws IOException, ServletException {
+        SessionFilter spr = new SessionFilter();
+        final ValidatableWorkManager workManager1 = new ValidatableWorkManager();
+        final ValidatableWorkManager workManager2 = new ValidatableWorkManager() {
+            public void endWork() {
+                endCalled = true;
+                throw new RuntimeException("eep");
+            }
+        };
+
+        final ValidatableWorkManager workManager3 = new ValidatableWorkManager();
+        SessionFilter.registerWorkManager(workManager1);
+        SessionFilter.registerWorkManager(workManager2);
+        SessionFilter.registerWorkManager(workManager3);
+
+        FilterChain chain = new FilterChain() {
+            public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse) throws IOException, ServletException {
+                assert workManager1.beginCalled;
+                assert workManager2.beginCalled;
+                assert workManager3.beginCalled;
+            }
+        };
+
+        try {
+            spr.doFilter(null, null, chain);
+            throw new AssertionError();
+        } catch (RuntimeException e) {}
+
+        assert workManager1.endCalled;
+        assert workManager2.endCalled;
+        assert workManager3.endCalled;
+    }
+
+    @Test
+    public final void testWorkManagerBeginAndEndThrowException() throws IOException, ServletException {
+        SessionFilter spr = new SessionFilter();
+        final ValidatableWorkManager workManager1 = new ValidatableWorkManager() {
+            public void endWork() {
+                endCalled = true;
+                throw new RuntimeException("eep");
+            }
+        };
+        final ValidatableWorkManager workManager2 = new ValidatableWorkManager() {
+            public void beginWork() {
+                beginCalled = true;
+                throw new RuntimeException();
+            }
+        };
+
+        final ValidatableWorkManager workManager3 = new ValidatableWorkManager();
+        
+        SessionFilter.registerWorkManager(workManager1);
+        SessionFilter.registerWorkManager(workManager2);
+        SessionFilter.registerWorkManager(workManager3);
+
+        try {
+            spr.doFilter(null, null, null);
+            throw new AssertionError();
+        } catch (RuntimeException e) {}
+        
+        assert workManager1.beginCalled;
+        assert workManager2.beginCalled;
+        assert !workManager3.beginCalled;
+        assert workManager1.endCalled;
+        assert !workManager2.endCalled;
+        assert !workManager3.endCalled;
     }
 
     @Test
     public final void testUseRealWorkManager() throws IOException, ServletException {
+        final Injector injector = Guice.createInjector(PersistenceService.usingHibernate()
+            .across(UnitOfWork.REQUEST)
+            .transactedWith(TransactionStrategy.LOCAL)
+            .forAll(Matchers.any())
+            .buildModule(),
+                new AbstractModule() {
+                    protected void configure() {
+                        bind(Configuration.class).toInstance(new AnnotationConfiguration()
+                            .addAnnotatedClass(HibernateTestEntity.class)
+                            .setProperties(Initializer.loadProperties("spt-persistence.properties")));
+                    }
+                });
+
+        //startup persistence
+        injector.getInstance(PersistenceService.class).start();
+
         SessionFilter spr = new SessionFilter();
         FilterChain chain = new FilterChain() {
             public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse) throws IOException, ServletException {
@@ -125,6 +195,8 @@ public class SessionFilterTest {
         };
         spr.doFilter(null, null, chain);
         assert !ManagedSessionContext.hasBind(injector.getInstance(SessionFactory.class));
+
+        injector.getInstance(PersistenceService.class).shutdown();
     }
 
     static class ValidatableWorkManager implements WorkManager {
