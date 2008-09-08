@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package com.wideplay.warp.hibernate;
+package com.wideplay.warp.persist;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.matcher.Matchers;
 import com.wideplay.codemonkey.web.startup.Initializer;
-import com.wideplay.warp.persist.PersistenceService;
-import com.wideplay.warp.persist.TransactionStrategy;
-import com.wideplay.warp.persist.UnitOfWork;
-import com.wideplay.warp.persist.WorkManager;
+import com.wideplay.warp.hibernate.HibernateTestEntity;
+import com.wideplay.warp.hibernate.SessionPerRequestFilter;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
@@ -40,11 +38,13 @@ import javax.servlet.ServletResponse;
 import java.io.IOException;
 
 /** Unit tests the SPR filter. */
-public class HibernateSPRFilterTest {
+public class SessionFilterTest {
     private Injector injector;
-    
+
     @BeforeClass
     public void pre() {
+        // protect against sloppy tests elsewhere
+        SessionFilter.clearWorkManagers();
         injector = Guice.createInjector(PersistenceService.usingHibernate()
             .across(UnitOfWork.REQUEST)
             .transactedWith(TransactionStrategy.LOCAL)
@@ -64,7 +64,7 @@ public class HibernateSPRFilterTest {
 
     @AfterClass
     public void post() {
-        injector.getInstance(SessionFactory.class).close();
+        injector.getInstance(PersistenceService.class).shutdown();
     }
 
     @Test
@@ -85,8 +85,7 @@ public class HibernateSPRFilterTest {
 
     @Test
     public final void testUseRealWorkManager() throws IOException, ServletException {
-        SessionPerRequestFilter spr = new SessionPerRequestFilter();
-        SessionPerRequestFilter.registerWorkManager(injector.getInstance(WorkManager.class));
+        SessionFilter spr = new SessionFilter();
         FilterChain chain = new FilterChain() {
             public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse) throws IOException, ServletException {
                 assert ManagedSessionContext.hasBind(injector.getInstance(SessionFactory.class));
