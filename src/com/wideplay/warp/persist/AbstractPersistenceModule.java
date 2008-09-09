@@ -18,15 +18,12 @@ package com.wideplay.warp.persist;
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
 import com.google.inject.cglib.proxy.Proxy;
-import com.google.inject.matcher.AbstractMatcher;
-import com.google.inject.matcher.Matcher;
 import static com.google.inject.matcher.Matchers.annotatedWith;
 import static com.google.inject.matcher.Matchers.any;
 import com.wideplay.warp.persist.dao.Finder;
 import org.aopalliance.intercept.MethodInterceptor;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.Set;
 
 /**
@@ -74,14 +71,13 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
     protected void bindTransactionInterceptor(PersistenceConfiguration config, MethodInterceptor txInterceptor) {
         if (inMultiModulesMode()) {
             // We support forAll, and assume the user knows what he/she is doing.
-            // TODO make our custom method matcher public?
             if (config.getTransactionMethodMatcher() != Defaults.TX_METHOD_MATCHER) {
                 bindInterceptor(config.getTransactionClassMatcher(),
                                 config.getTransactionMethodMatcher(),
                                 txInterceptor);
             } else {
                 bindInterceptor(config.getTransactionClassMatcher(),
-                                transactionalWithUnitIdenticalTo(annotation),
+                                Matchers.transactionalWithUnit(annotation),
                                 txInterceptor);
             }
         } else {
@@ -95,7 +91,7 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
      */
     protected void bindFinderInterceptor(MethodInterceptor finderInterceptor) {
         if (inMultiModulesMode()) {
-            bindInterceptor(any(), finderWithUnitIdenticalTo(annotation), finderInterceptor);
+            bindInterceptor(any(), Matchers.finderWithUnit(annotation), finderInterceptor);
         } else {
             bindInterceptor(any(), annotatedWith(Finder.class), finderInterceptor);
         }
@@ -114,23 +110,5 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
             return Key.get(clazz, annotation);
         }
         return Key.get(clazz);
-    }
-
-    private Matcher<Method> finderWithUnitIdenticalTo(final Class<?> annotation) {
-        return new AbstractMatcher<Method>() {
-            public boolean matches(Method method) {
-                return annotatedWith(Finder.class).matches(method) &&
-                       method.getAnnotation(Finder.class).unit() == annotation;
-            }
-        };
-    }
-
-    private Matcher<? super Method> transactionalWithUnitIdenticalTo(final Class<?> annotation) {
-        return new AbstractMatcher<Method>() {
-            public boolean matches(Method method) {
-                return annotatedWith(Transactional.class).matches(method) &&
-                       method.getAnnotation(Transactional.class).unit() == annotation;
-            }
-        };
     }
 }
