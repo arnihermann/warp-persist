@@ -37,9 +37,7 @@ public class Matchers {
      * Matches on all {@code @}{@link com.wideplay.warp.persist.dao.Finder} annotations
      * that have the specified unit.
      * <pre>
-     * {@code
-     * finderWithUnit(Sales.class) => @Finder(unit=Sales.class)
-     * }
+     * {@code finderWithUnit(Sales.class) => @Finder(unit=Sales.class)}
      * </pre>
      * @param annotation the unit annotation
      * @return a matcher that matches on {@code @Finder(unit=annotation)}
@@ -57,9 +55,7 @@ public class Matchers {
      * Matches on all {@code @}{@link com.wideplay.warp.persist.Transactional} annotations
      * that have the specified unit.
      * <pre>
-     * {@code
-     * transactionalWithUnit(Sales.class) => @Transactional(unit=Sales.class)
-     * }
+     * {@code transactionalWithUnit(Sales.class) => @Transactional(unit=Sales.class)}
      * </pre>
      * @param annotation the unit annotation
      * @return a matcher that matches on {@code @Transactional(unit=annotation)}
