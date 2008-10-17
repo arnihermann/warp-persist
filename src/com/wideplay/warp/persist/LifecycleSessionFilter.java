@@ -15,6 +15,10 @@
  */
 package com.wideplay.warp.persist;
 
+import com.wideplay.warp.util.Lifecycle;
+import com.wideplay.warp.util.LifecycleAdapter;
+import com.wideplay.warp.util.Lifecycles;
+
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import java.util.List;
@@ -30,19 +34,33 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class LifecycleSessionFilter extends SessionFilter {
     private static final List<PersistenceService> persistenceServices = new CopyOnWriteArrayList<PersistenceService>();
+    private static final LifecycleAdapter<PersistenceService> lifecycleAdapter = new LifecycleAdapter<PersistenceService>() {
+        public Lifecycle asLifecycle(final PersistenceService instance) {
+            return new Lifecycle() {
+                public void start() {
+                    instance.start();
+                }
+                public void stop() {
+                    instance.shutdown();
+                }
+            };
+        }
+    };
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        for(PersistenceService ps : persistenceServices)
-            ps.start();
+        Lifecycles<PersistenceService> lifecycles = new Lifecycles<PersistenceService>(lifecycleAdapter);
+        lifecycles.failEarly(persistenceServices);
+
         super.init(filterConfig);
     }
 
     @Override
     public void destroy() {
         super.destroy();
-        for(PersistenceService ps : persistenceServices)
-            ps.shutdown();
+        
+        Lifecycles<PersistenceService> lifecycles = new Lifecycles<PersistenceService>(lifecycleAdapter);
+        lifecycles.leaveNoOneBehind(persistenceServices, lifecycleAdapter);
         persistenceServices.clear();
     }
 
@@ -50,6 +68,7 @@ public class LifecycleSessionFilter extends SessionFilter {
      * The different persistence strategies should add their
      * {@link com.wideplay.warp.persist.PersistenceService} here
      * at configuration time if they support {@link UnitOfWork#REQUEST}.
+     * @param ps the {@code PersistenceService} to register
      */
     public static void registerPersistenceService(PersistenceService ps) {
         persistenceServices.add(ps);

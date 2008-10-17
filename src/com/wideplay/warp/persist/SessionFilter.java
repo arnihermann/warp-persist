@@ -16,12 +16,14 @@
 
 package com.wideplay.warp.persist;
 
+import com.wideplay.warp.util.ExceptionalRunnable;
+import com.wideplay.warp.util.Lifecycle;
+import com.wideplay.warp.util.LifecycleAdapter;
+import com.wideplay.warp.util.Lifecycles;
 import net.jcip.annotations.ThreadSafe;
 
 import javax.servlet.*;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -37,82 +39,45 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @ThreadSafe
 public class SessionFilter implements Filter {
     private static final List<WorkManager> workManagers = new CopyOnWriteArrayList<WorkManager>();
+    private static final LifecycleAdapter<WorkManager> lifecycleAdapter = new LifecycleAdapter<WorkManager>() {
+        public Lifecycle asLifecycle(final WorkManager instance) {
+            return new Lifecycle() {
+                public void start() {
+                    instance.beginWork();
+                }
+                public void stop() {
+                    instance.endWork();
+                }
+            };
+        }
+    };
+    private static final Lifecycles<WorkManager> lifecycles = new Lifecycles<WorkManager>(lifecycleAdapter);
 
     public void init(FilterConfig filterConfig) throws ServletException {}
     public void destroy() {}
 
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(final ServletRequest servletRequest, final ServletResponse servletResponse, final FilterChain filterChain) throws IOException, ServletException {
         // Make a copy of the current workmanager list to avoid a global lock.
         // This ensures that the list does not change in between start and end.
         List<WorkManager> localWorkManagers = new ArrayList<WorkManager>(workManagers);
 
-        // Iterate with index so we can clean up if needed.
-        for (int i=0, size=localWorkManagers.size(); i < size; i++) {
-            try {
-                localWorkManagers.get(i).beginWork();
-            } catch (RuntimeException e) {
-                // clean up what we did so far and end this madness.
+        ExceptionalRunnable<ServletException> exceptionalRunnable = new ExceptionalRunnable<ServletException>() {
+            public void run() throws ServletException {
                 try {
-                    endAsMuchWorkAsPossible(localWorkManagers.subList(0, i));
-                } catch (final RuntimeException closeErrors) {
-                    // Better than nothing.
-                    throw new RuntimeException(e) {
-                        @Override public String getMessage() {
-                            return String.format("Unable to start work: %s%nUnable to clean up after failing:%n%s",
-                                                 super.getMessage(), closeErrors.getMessage());
-                        }
-                    };
+                    filterChain.doFilter(servletRequest, servletResponse);
+                } catch (IOException e) {
+                    throw new ServletException(e);
                 }
-                throw e;
             }
-        }
-        try {
-            //continue operations
-            filterChain.doFilter(servletRequest, servletResponse);
-        } finally {
-            endAsMuchWorkAsPossible(localWorkManagers);
-        }
-    }
+        };
 
-    /**
-     * Tries to end work for as many WorkManagers as possible, in order.
-     * Accumulates exceptions and rethrows them in a RuntimeException.
-     */
-    private void endAsMuchWorkAsPossible(List<WorkManager> workManagers) {
-        StringBuilder exceptionMessages = new StringBuilder();
-        for (WorkManager wm : workManagers) {
-            try {
-                wm.endWork();
-            } catch (RuntimeException e) {
-                // record the exception and proceed
-                exceptionMessages.append(String.format("Could not end work for WorkManager '%s': %s%n%s%n",
-                                                       wm.toString(), e.getMessage(), stackTraceAsString(e)));
-            }
-        }
-        if (exceptionMessages.length() > 0) {
-            throw new RuntimeException(exceptionMessages.toString());
-        }
-    }
-
-    private String stackTraceAsString(Exception e) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        try {
-            e.printStackTrace(pw);
-            return sw.getBuffer().toString();
-        } finally {
-            try {
-                sw.close();
-            } catch (IOException ignored) {
-            } finally {
-                pw.close();
-            }
-        }
+        lifecycles.failEarlyAndLeaveNoOneBehind(localWorkManagers, exceptionalRunnable);
     }
 
     /**
      * The different persistence strategies should add their WorkManager here
      * at configuration time if they support {@link UnitOfWork#REQUEST}.
+     * @param wm the {@code WorkManager} to register
      */
     public static void registerWorkManager(WorkManager wm) {
         workManagers.add(wm);
