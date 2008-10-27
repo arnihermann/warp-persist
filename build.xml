@@ -22,12 +22,12 @@
     </target>
 
     <target name="compile" depends="init" description="compiles sources">
-        <javac srcdir="src" destdir="${build}" debug="on">
+        <javac srcdir="src" destdir="${build}" debug="on" source="1.5" target="1.5">
             <classpath refid="persist.classpath"/>
             <exclude name="com/wideplay/codemonkey/**"/>
         </javac>
 
-        <javac srcdir="test" destdir="${test}" debug="on">
+        <javac srcdir="test" destdir="${test}" debug="on" source="1.5" target="1.5">
             <classpath>
                 <path refid="persist.classpath"/>
                 <pathelement location="${build}"/>
