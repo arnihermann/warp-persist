@@ -21,6 +21,8 @@ import com.google.inject.cglib.proxy.Proxy;
 import static com.google.inject.matcher.Matchers.annotatedWith;
 import static com.google.inject.matcher.Matchers.any;
 import com.wideplay.warp.persist.dao.Finder;
+import com.wideplay.warp.util.WarpPersistNamingPolicy;
+import net.sf.cglib.proxy.Enhancer;
 import org.aopalliance.intercept.MethodInterceptor;
 
 import java.lang.annotation.Annotation;
@@ -54,6 +56,10 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
 
     @SuppressWarnings("unchecked") // Proxies are not generic.
     protected void bindDynamicAccessors(Set<Class<?>> accessors, MethodInterceptor finderInterceptor) {
+        Enhancer enhancer = new Enhancer();
+        enhancer.setNamingPolicy(new WarpPersistNamingPolicy());
+        enhancer.setCallback(new AopAllianceCglibAdapter(finderInterceptor));
+        
         for (Class accessor : accessors) {
             if (accessor.isInterface()) {
                 // TODO we should validate that all methods have @Finder on them at startup
@@ -62,8 +68,8 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
                         new Class<?>[] { accessor }, new AopAllianceJdkProxyAdapter(finderInterceptor)));
             } else {
                 //use cglib adapter to subclass the accessor (this lets us intercept abstract classes)
-                bindSpecial(accessor).toInstance(com.google.inject.cglib.proxy.Enhancer.create(accessor,
-                        new AopAllianceCglibAdapter(finderInterceptor)));
+                enhancer.setSuperclass(accessor);
+                bindSpecial(accessor).toInstance(enhancer.create());
             }
         }
     }

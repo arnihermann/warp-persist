@@ -16,15 +16,13 @@
 
 package com.wideplay.warp.persist;
 
-import com.google.inject.cglib.proxy.MethodProxy;
+import net.jcip.annotations.Immutable;
+import net.sf.cglib.proxy.MethodProxy;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.AccessibleObject;
-
-import net.jcip.annotations.ThreadSafe;
-import net.jcip.annotations.Immutable;
+import java.lang.reflect.Method;
 
 /**
  * Created with IntelliJ IDEA.
@@ -40,7 +38,7 @@ import net.jcip.annotations.Immutable;
  * @author Dhanji R. Prasanna (dhanji gmail com)
  */
 @Immutable
-class AopAllianceCglibAdapter implements com.google.inject.cglib.proxy.MethodInterceptor {
+class AopAllianceCglibAdapter implements net.sf.cglib.proxy.MethodInterceptor {
     private final MethodInterceptor finderInterceptor;
 
     public AopAllianceCglibAdapter(MethodInterceptor finderInterceptor) {
