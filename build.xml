@@ -67,9 +67,10 @@
     <target name="assemble.jar" depends="make"
             description="builds and assembles a library jar for drop in persistence support in guice injectors">
         <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"
-          classpath="lib/jarjar-1.0rc8.jar"/>
-        <jarjar basedir="${build}" jarfile="${dist}/warp-persist-${version}.jar"
+          classpath="lib/jarjar-1.0rc5.jar"/>
+        <jarjar jarfile="${dist}/warp-persist-${version}.jar"
             description="Persistence support for Warp, or any guice-based project using hibernate or JPA (www.wideplay.com)">
+          <fileset dir="${build}"/>
           <zipfileset src="lib/cglib-nodep-2.2.jar"/>
           <rule pattern="net.sf.cglib.**" result="com.wideplay.warp.persist.cglib.@1"/>
           <keep pattern="com.wideplay.warp.**"/>

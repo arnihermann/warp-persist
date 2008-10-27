@@ -22,6 +22,7 @@ import net.sf.cglib.core.Predicate;
  * Cglib class naming policy for Warp Persist.
  *
  * @author crazybob@google.com (Bob Lee)
+ * @author Robbie Vanbrabant
  */
 public class WarpPersistNamingPolicy implements NamingPolicy {
 
