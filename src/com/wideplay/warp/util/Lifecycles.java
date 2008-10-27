@@ -20,31 +20,27 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 
-public class Lifecycles<T> {
-    private final LifecycleAdapter<T> lifecycleAdapter;
+public class Lifecycles {
+    private Lifecycles() {}
 
-    public Lifecycles(LifecycleAdapter<T> lifecycleAdapter) {
-        this.lifecycleAdapter = lifecycleAdapter;
-    }
-
-    public <E extends Exception> void failEarlyAndLeaveNoOneBehind(List<T> lifecycles, ExceptionalRunnable<E> exceptionalRunnable) throws E {
+    public static <E extends Exception> void failEarlyAndLeaveNoOneBehind(List<Lifecycle> lifecycles, ExceptionalRunnable<E> exceptionalRunnable) throws E {
         failEarly(lifecycles);
         try {
             exceptionalRunnable.run();
         } finally {
-            leaveNoOneBehind(lifecycles, lifecycleAdapter);
+            leaveNoOneBehind(lifecycles);
         }
     }
 
-    public void failEarly(List<T> lifecycles) {
+    public static void failEarly(List<Lifecycle> lifecycles) {
         // Iterate with index so we can clean up if needed.
         for (int i = 0, size = lifecycles.size(); i < size; i++) {
             try {
-                lifecycleAdapter.asLifecycle(lifecycles.get(i)).start();
+                lifecycles.get(i).start();
             } catch (RuntimeException e) {
                 // clean up what we did so far and end this madness.
                 try {
-                    leaveNoOneBehind(lifecycles.subList(0, i), lifecycleAdapter);
+                    leaveNoOneBehind(lifecycles.subList(0, i));
                 } catch (final RuntimeException closeErrors) {
                     // Better than nothing.
                     throw new MessageDelegatingRuntimeException(closeErrors.getMessage(), e);
@@ -58,15 +54,15 @@ public class Lifecycles<T> {
      * Tries to end work for as much work as possible, in order.
      * Accumulates exceptions and rethrows them in a RuntimeException.
      */
-    public void leaveNoOneBehind(List<T> lifecycles, LifecycleAdapter<T> lifecycleAdapter) {
+    public static void leaveNoOneBehind(List<Lifecycle> lifecycles) {
         StringBuilder exceptionMessages = new StringBuilder();
-        for (T wm : lifecycles) {
+        for (Lifecycle lifecycle : lifecycles) {
             try {
-                lifecycleAdapter.asLifecycle(wm).stop();
+                lifecycle.stop();
             } catch (RuntimeException e) {
                 // record the exception and proceed
                 exceptionMessages.append(String.format("Could not end work for '%s': %s%n%s%n",
-                        wm.toString(), e.getMessage(), stackTraceAsString(e)));
+                        lifecycle.toString(), e.getMessage(), stackTraceAsString(e)));
             }
         }
         if (exceptionMessages.length() > 0) {

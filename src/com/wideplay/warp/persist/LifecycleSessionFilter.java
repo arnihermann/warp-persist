@@ -18,11 +18,15 @@ package com.wideplay.warp.persist;
 import com.wideplay.warp.util.Lifecycle;
 import com.wideplay.warp.util.LifecycleAdapter;
 import com.wideplay.warp.util.Lifecycles;
+import net.jcip.annotations.GuardedBy;
+import net.jcip.annotations.ThreadSafe;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * SessionFilter that starts and stops all registered {@link PersistenceService} instances
@@ -32,8 +36,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Robbie Vanbrabant
  * @see com.wideplay.warp.persist.SessionFilter
  */
+@ThreadSafe
 public class LifecycleSessionFilter extends SessionFilter {
-    private static final List<PersistenceService> persistenceServices = new CopyOnWriteArrayList<PersistenceService>();
+    private static final ReadWriteLock lock = new ReentrantReadWriteLock();
+
+    @GuardedBy("LifecycleSessionFilter.lock")
+    private static final List<Lifecycle> persistenceServices = new ArrayList<Lifecycle>();
+
     private static final LifecycleAdapter<PersistenceService> lifecycleAdapter = new LifecycleAdapter<PersistenceService>() {
         public Lifecycle asLifecycle(final PersistenceService instance) {
             return new Lifecycle() {
@@ -49,19 +58,32 @@ public class LifecycleSessionFilter extends SessionFilter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        Lifecycles<PersistenceService> lifecycles = new Lifecycles<PersistenceService>(lifecycleAdapter);
-        lifecycles.failEarly(persistenceServices);
-
+        lock.readLock().lock();
+        try {
+            Lifecycles.failEarly(persistenceServices);
+        } finally {
+            lock.readLock().unlock();
+        }
         super.init(filterConfig);
     }
 
     @Override
     public void destroy() {
         super.destroy();
-        
-        Lifecycles<PersistenceService> lifecycles = new Lifecycles<PersistenceService>(lifecycleAdapter);
-        lifecycles.leaveNoOneBehind(persistenceServices, lifecycleAdapter);
-        persistenceServices.clear();
+
+        lock.readLock().lock();
+        try {
+            Lifecycles.leaveNoOneBehind(persistenceServices);
+        } finally {
+            lock.readLock().unlock();
+        }
+
+        lock.writeLock().lock();
+        try {
+            persistenceServices.clear();
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     /**
@@ -71,6 +93,11 @@ public class LifecycleSessionFilter extends SessionFilter {
      * @param ps the {@code PersistenceService} to register
      */
     public static void registerPersistenceService(PersistenceService ps) {
-        persistenceServices.add(ps);
+        lock.writeLock().lock();
+        try {
+            persistenceServices.add(lifecycleAdapter.asLifecycle(ps));
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 }
