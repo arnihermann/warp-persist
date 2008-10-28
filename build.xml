@@ -33,7 +33,7 @@
                 <pathelement location="${build}"/>
             </classpath>
         </javac>
-        
+
         <!-- copy necessary config stuff for tests -->
         <copy todir="${test}">
             <fileset dir="test">
@@ -62,23 +62,26 @@
             <classfileset dir="${test}" includes="**/*Test.class"/>
         </testng>
     </target>
-    
+
 
     <target name="assemble.jar" depends="make"
             description="builds and assembles a library jar for drop in persistence support in guice injectors">
         <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"
-          classpath="lib/jarjar-1.0rc5.jar"/>
+                 classpath="lib/jarjar-1.0rc5.jar"/>
         <jarjar jarfile="${dist}/warp-persist-${version}.jar"
-            description="Persistence support for Warp, or any guice-based project using hibernate or JPA (www.wideplay.com)">
-          <fileset dir="${build}"/>
-          <zipfileset src="lib/cglib-nodep-2.2.jar"/>
-          <rule pattern="net.sf.cglib.**" result="com.wideplay.warp.persist.cglib.@1"/>
-          <keep pattern="com.wideplay.warp.**"/>
+                description="Persistence support for Warp, or any guice-based project using hibernate or JPA (www.wideplay.com)">
+            <fileset dir="${build}"/>
+            <zipfileset src="lib/cglib-nodep-2.2.jar"/>
+            <rule pattern="net.sf.cglib.**" result="com.wideplay.warp.persist.cglib.@1"/>
+            <keep pattern="com.wideplay.warp.**"/>
         </jarjar>
+        <!-- Source jar -->
+        <jar destfile="${dist}/warp-persist-${version}-src.jar">
+            <zipfileset dir="src"
+                        excludes="build/**/*,build,.svn,.svn/**/*,**/.svn,classes,classes/**/*"/>
+        </jar>
     </target>
 
-
-    
     <target name="test.dist" depends="compile"
             description="tests against distribution jar (assumes you have already built one in dist)">
         <!-- then test against it -->
@@ -98,4 +101,32 @@
             <classfileset dir="${test}" includes="**/*Test.class"/>
         </testng>
     </target>
+
+    <target name="dist" depends="assemble.jar, test.dist, javadoc"
+            description="Build entire distribution.">
+
+        <zip destfile="${dist}/warp-persist-${version}.zip">
+            <zipfileset file="COPYING" prefix="warp-persist-${version}"/>
+            <zipfileset file="${dist}/warp-persist-${version}.jar" prefix="warp-persist-${version}"/>
+            <zipfileset file="${dist}/warp-persist-${version}-src.jar" prefix="warp-persist-${version}"/>
+            <zipfileset dir="${build}/javadoc" prefix="warp-persist-${version}/javadoc"/>
+        </zip>
+    </target>
+
+    <target name="javadoc"
+            description="Generate Javadocs.">
+        <mkdir dir="${build}/javadoc"/>
+        <javadoc destdir="${build}/javadoc"
+                 author="false"
+                 protected="true"
+                 windowtitle="Warp Persist ${version} API">
+            <packageset dir="src" defaultexcludes="yes">
+                <include name="com/wideplay/warp/**"/>
+            </packageset>
+            <classpath refid="persist.classpath"/>
+            <link href="http://aopalliance.sourceforge.net/doc"/>
+            <link href="http://java.sun.com/javase/6/docs/api"/>
+        </javadoc>
+    </target>
+
 </project>
