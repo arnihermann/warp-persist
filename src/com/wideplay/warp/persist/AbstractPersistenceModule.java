@@ -17,12 +17,12 @@ package com.wideplay.warp.persist;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
-import com.google.inject.cglib.proxy.Proxy;
 import static com.google.inject.matcher.Matchers.annotatedWith;
 import static com.google.inject.matcher.Matchers.any;
 import com.wideplay.warp.persist.dao.Finder;
 import com.wideplay.warp.util.WarpPersistNamingPolicy;
 import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.Proxy;
 import org.aopalliance.intercept.MethodInterceptor;
 
 import java.lang.annotation.Annotation;

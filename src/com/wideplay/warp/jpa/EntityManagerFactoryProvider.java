@@ -59,7 +59,7 @@ class EntityManagerFactoryProvider implements Provider<EntityManagerFactory> {
             });
 
     private boolean customPropertiesBound() {
-        return injector.getBinding(persistenceProperties) != null;
+        return injector.getBindings().get(persistenceProperties) != null;
     }
 
     public EntityManagerFactoryProvider(Key<String> persistenceUnitName, Key<Properties> persistenceProperties) {
