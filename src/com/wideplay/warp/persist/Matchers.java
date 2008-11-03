@@ -29,6 +29,8 @@ import java.lang.reflect.AnnotatedElement;
 public class Matchers {
     private Matchers() {}
 
+    // TODO These matchers could log warnings if you omit unit=... in multimodules mode
+
     // Finders matcher is package private because it's useless to external users
     // without user-configurable matchers. We should consider adding that functionality
     // though.

@@ -26,6 +26,7 @@ import net.sf.cglib.proxy.Proxy;
 import org.aopalliance.intercept.MethodInterceptor;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.Set;
 
 /**
@@ -62,8 +63,17 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
         
         for (Class accessor : accessors) {
             if (accessor.isInterface()) {
-                // TODO we should validate that all methods have @Finder on them at startup
-                //      and use Guice's addError.
+                for (Method method : accessor.getMethods()) {
+                    Finder finder = method.getAnnotation(Finder.class);
+                    if (finder == null) {
+                        addError(method + " has been specified as a Dynamic Accessor but does not have the @Finder annotation.");
+                    } else {
+                        if (finder.unit() == Defaults.DefaultUnit.class && inMultiModulesMode()) {
+                             addError(String.format("%s is a Dynamic Finder but does not have the unit annotation '%s'. " +
+                                     "Specify as @Finder(unit=%s.class)", method, this.annotation, this.annotation.getSimpleName()));
+                        }
+                    }
+                }
                 bindSpecial(accessor).toInstance(Proxy.newProxyInstance(accessor.getClassLoader(),
                         new Class<?>[] { accessor }, new AopAllianceJdkProxyAdapter(finderInterceptor)));
             } else {
