@@ -20,11 +20,13 @@ import com.db4o.ObjectServer;
 import com.db4o.config.Configuration;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.Stage;
 import com.google.inject.name.Named;
 import com.wideplay.warp.persist.*;
 import com.wideplay.warp.util.Text;
 import static com.wideplay.warp.util.Text.empty;
 import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 
 import java.lang.annotation.Annotation;
 
@@ -68,7 +70,6 @@ public class Db4oPersistenceStrategy implements PersistenceStrategy {
         }
 
         protected void configure() {
-            // Set up Db4o.
             bindSpecial(ObjectServer.class).toProvider(osp);
             
             bindSpecial(ObjectContainer.class).toProvider(ocp);
@@ -77,6 +78,17 @@ public class Db4oPersistenceStrategy implements PersistenceStrategy {
 
             MethodInterceptor txInterceptor = new Db4oLocalTxnInterceptor(iwm, config.getUnitOfWork());
             bindTransactionInterceptor(config, txInterceptor);
+
+            if (binder().currentStage() == Stage.DEVELOPMENT) {
+                MethodInterceptor throwingMethodInterceptor = new MethodInterceptor() {
+                    public Object invoke(MethodInvocation methodInvocation) throws Throwable {
+                        throw new UnsupportedOperationException("Dynamic Finders are not supported with DB4O. " +
+                                "Remove the @Finder annotations and make sure to use unit annotations " +
+                                "when using multiple modules (avoids interception conflicts).");
+                    }
+                };
+                bindFinderInterceptor(throwingMethodInterceptor);
+            }
         }
 
         public void visit(PersistenceModuleVisitor visitor) {
