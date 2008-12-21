@@ -26,8 +26,8 @@ import java.lang.reflect.AnnotatedElement;
  * Custom matchers for use with Warp Persist.
  * @author Robbie Vanbrabant
  */
-public class Matchers {
-    private Matchers() {}
+public class PersistenceMatchers {
+    private PersistenceMatchers() {}
 
     // TODO These matchers could log warnings if you omit unit=... in multimodules mode
 

@@ -15,9 +15,7 @@
  */
 package com.wideplay.warp.persist;
 
-import com.google.inject.matcher.Matcher;
-
-import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -28,9 +26,7 @@ public interface PersistenceConfiguration {
 
     TransactionStrategy getTransactionStrategy();
 
-    Matcher<? super Method> getTransactionMethodMatcher();
-
-    Matcher<? super Class<?>> getTransactionClassMatcher();
+    List<TransactionMatcher> getTransactionMatchers();
 
     /**
      * Returns the configured Dynamic Accessors, which are

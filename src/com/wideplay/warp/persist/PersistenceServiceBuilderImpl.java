@@ -78,16 +78,14 @@ class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, Persisten
         return this;
     }
 
-    public PersistenceModuleBuilder forAll(Matcher<? super Class<?>> classMatcher) {
-        persistenceConfiguration.transactionClassMatcher(classMatcher);
+    public TransactionStrategyBuilder forAll(Matcher<? super Class<?>> classMatcher) {
+        persistenceConfiguration.transactionMatcher(new TransactionMatcher(classMatcher));
 
         return this;
     }
 
-
-    public PersistenceModuleBuilder forAll(Matcher<? super Class<?>> classMatcher, Matcher<? super Method> methodMatcher) {
-        persistenceConfiguration.transactionClassMatcher(classMatcher);
-        persistenceConfiguration.transactionMethodMatcher(methodMatcher);
+    public TransactionStrategyBuilder forAll(Matcher<? super Class<?>> classMatcher, Matcher<? super Method> methodMatcher) {
+        persistenceConfiguration.transactionMatcher(new TransactionMatcher(classMatcher, methodMatcher));
 
         return this;
     }

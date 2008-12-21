@@ -87,17 +87,25 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
     protected void bindTransactionInterceptor(PersistenceConfiguration config, MethodInterceptor txInterceptor) {
         if (inMultiModulesMode()) {
             // We support forAll, and assume the user knows what he/she is doing.
-            if (config.getTransactionMethodMatcher() != Defaults.TX_METHOD_MATCHER) {
-                bindInterceptor(config.getTransactionClassMatcher(),
-                                config.getTransactionMethodMatcher(),
-                                txInterceptor);
+            if (config.getTransactionMatchers().size() > 0) {
+                for (TransactionMatcher matcher : config.getTransactionMatchers()) {
+                    bindInterceptor(matcher.getTxClassMatcher(), matcher.getTxMethodMatcher(), txInterceptor);
+                }
             } else {
-                bindInterceptor(config.getTransactionClassMatcher(),
-                                Matchers.transactionalWithUnit(annotation),
+                TransactionMatcher matcher = new TransactionMatcher();
+                bindInterceptor(matcher.getTxClassMatcher(),
+                                PersistenceMatchers.transactionalWithUnit(annotation),
                                 txInterceptor);
             }
         } else {
-            bindInterceptor(config.getTransactionClassMatcher(), config.getTransactionMethodMatcher(), txInterceptor);
+            if (config.getTransactionMatchers().size() > 0) {
+                for (TransactionMatcher matcher : config.getTransactionMatchers()) {
+                    bindInterceptor(matcher.getTxClassMatcher(), matcher.getTxMethodMatcher(), txInterceptor);
+                }
+            } else {
+                TransactionMatcher matcher = new TransactionMatcher();
+                bindInterceptor(matcher.getTxClassMatcher(), matcher.getTxMethodMatcher(), txInterceptor);
+            }
         }
     }
 
@@ -107,7 +115,7 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
      */
     protected void bindFinderInterceptor(MethodInterceptor finderInterceptor) {
         if (inMultiModulesMode()) {
-            bindInterceptor(any(), Matchers.finderWithUnit(annotation), finderInterceptor);
+            bindInterceptor(any(), PersistenceMatchers.finderWithUnit(annotation), finderInterceptor);
         } else {
             bindInterceptor(any(), annotatedWith(Finder.class), finderInterceptor);
         }

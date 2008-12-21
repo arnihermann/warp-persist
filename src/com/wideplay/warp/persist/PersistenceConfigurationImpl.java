@@ -15,15 +15,10 @@
  */
 package com.wideplay.warp.persist;
 
-import com.google.inject.matcher.Matcher;
-import com.google.inject.matcher.Matchers;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Value object that indicates how a persistence service should be configured.
@@ -37,15 +32,13 @@ import java.util.Set;
 public class PersistenceConfigurationImpl implements PersistenceConfiguration {
     private final UnitOfWork unitOfWork;
     private final TransactionStrategy txStrategy;
-    private final Matcher<? super Class<?>> txClassMatcher;
-    private final Matcher<? super Method> txMethodMatcher;
     private final Set<Class<?>> accessors;
+    private final List<TransactionMatcher> transactionMatchers;
 
     private PersistenceConfigurationImpl(PersistenceConfigurationBuilder builder) {
         this.unitOfWork = builder.unitOfWork;
         this.txStrategy = builder.txStrategy;
-        this.txClassMatcher = builder.txClassMatcher;
-        this.txMethodMatcher = builder.txMethodMatcher;
+        this.transactionMatchers = Collections.unmodifiableList(builder.transactionMatchers);
         this.accessors = Collections.unmodifiableSet(builder.accessors);
     }
 
@@ -55,16 +48,13 @@ public class PersistenceConfigurationImpl implements PersistenceConfiguration {
     public TransactionStrategy getTransactionStrategy() {
         return this.txStrategy;
     }
-    public Matcher<? super Method> getTransactionMethodMatcher() {
-        return this.txMethodMatcher;
-    }
-    public Matcher<? super Class<?>> getTransactionClassMatcher() {
-        return this.txClassMatcher;
-    }
     public Set<Class<?>> getAccessors() {
         return this.accessors;
     }
-    
+    public List<TransactionMatcher> getTransactionMatchers() {
+        return transactionMatchers;
+    }
+
     public static PersistenceConfigurationBuilder builder() {
         return new PersistenceConfigurationBuilder();
     }
@@ -73,8 +63,7 @@ public class PersistenceConfigurationImpl implements PersistenceConfiguration {
         // default values
         private UnitOfWork unitOfWork = UnitOfWork.TRANSACTION;
         private TransactionStrategy txStrategy = TransactionStrategy.LOCAL;
-        private Matcher<? super Class<?>> txClassMatcher = Matchers.any();
-        private Matcher<? super Method> txMethodMatcher = Matchers.annotatedWith(Transactional.class);
+        private List<TransactionMatcher> transactionMatchers = new ArrayList<TransactionMatcher>();
 
         private final Set<Class<?>> accessors = new LinkedHashSet<Class<?>>();
 
@@ -86,12 +75,8 @@ public class PersistenceConfigurationImpl implements PersistenceConfiguration {
             this.txStrategy = strategy;
             return this;
         }
-        public PersistenceConfigurationBuilder transactionClassMatcher(Matcher<? super Class<?>> matcher) {
-            this.txClassMatcher = matcher;
-            return this;
-        }
-        public PersistenceConfigurationBuilder transactionMethodMatcher(Matcher<? super Method> matcher) {
-            this.txMethodMatcher = matcher;
+        public PersistenceConfigurationBuilder transactionMatcher(TransactionMatcher txMatcher) {
+            this.transactionMatchers.add(txMatcher);
             return this;
         }
         public PersistenceConfigurationBuilder accessor(Class<?> accessor) {

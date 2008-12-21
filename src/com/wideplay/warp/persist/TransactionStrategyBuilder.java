@@ -44,7 +44,7 @@ public interface TransactionStrategyBuilder extends PersistenceModuleBuilder {
      * @param classMatcher A {@code Matcher} on classes to watch for transactional methods
      * @return Returns the next step in the builder chain
      */
-    PersistenceModuleBuilder forAll(Matcher<? super Class<?>> classMatcher);
+    TransactionStrategyBuilder forAll(Matcher<? super Class<?>> classMatcher);
 
     /**
      *
@@ -57,7 +57,7 @@ public interface TransactionStrategyBuilder extends PersistenceModuleBuilder {
      * @param methodMatcher A Matcher on methods
      * @return Returns the next step in the builder chain
      */
-    PersistenceModuleBuilder forAll(Matcher<? super Class<?>> classMatcher, Matcher<? super Method> methodMatcher);
+    TransactionStrategyBuilder forAll(Matcher<? super Class<?>> classMatcher, Matcher<? super Method> methodMatcher);
 
     /**
      *
