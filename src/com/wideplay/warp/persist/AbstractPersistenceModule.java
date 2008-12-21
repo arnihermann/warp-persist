@@ -29,7 +29,8 @@ import org.aopalliance.intercept.MethodInvocation;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Base module for persistence strategies that holds a bunch
@@ -58,12 +59,12 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
     }
 
     @SuppressWarnings("unchecked") // Proxies are not generic.
-    protected void bindDynamicAccessors(Set<Class<?>> accessors, MethodInterceptor finderInterceptor) {
+    private void bindDynamicAccessors(PersistenceConfiguration config, MethodInterceptor finderInterceptor,
+                                      MethodInterceptor transactionalFinderInterceptor) {
         Enhancer enhancer = new Enhancer();
         enhancer.setNamingPolicy(new WarpPersistNamingPolicy());
-        enhancer.setCallback(new AopAllianceCglibAdapter(finderInterceptor));
-        
-        for (Class accessor : accessors) {
+
+        for (Class accessor : config.getAccessors()) {
             if (accessor.isInterface()) {
                 for (Method method : accessor.getMethods()) {
                     Finder finder = method.getAnnotation(Finder.class);
@@ -74,18 +75,37 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
                     }
                     validateTransactional(method);
                 }
+                MethodInterceptor interceptorToUse =
+                        determineDynamicAccessorInterceptor(config, finderInterceptor, transactionalFinderInterceptor,
+                                accessor);
                 bindSpecial(accessor).toInstance(Proxy.newProxyInstance(accessor.getClassLoader(),
-                        new Class<?>[] { accessor }, new AopAllianceJdkProxyAdapter(finderInterceptor)));
+                        new Class<?>[] { accessor }, new AopAllianceJdkProxyAdapter(interceptorToUse)));
             } else {
                 for (Method method : accessor.getMethods()) {
                     validateFinder(method.getAnnotation(Finder.class), method);
                     validateTransactional(method);
                 }
+                MethodInterceptor interceptorToUse =
+                    determineDynamicAccessorInterceptor(config, finderInterceptor, transactionalFinderInterceptor,
+                            accessor);
+
                 //use cglib adapter to subclass the accessor (this lets us intercept abstract classes)
+                enhancer.setCallback(new AopAllianceCglibAdapter(interceptorToUse));
                 enhancer.setSuperclass(accessor);
                 bindSpecial(accessor).toInstance(enhancer.create());
             }
         }
+    }
+
+    private MethodInterceptor determineDynamicAccessorInterceptor(PersistenceConfiguration config,
+                                                                  MethodInterceptor finderInterceptor,
+                                                                  MethodInterceptor transactionalFinderInterceptor,
+                                                                  Class<?> accessor) {
+        boolean matches = false;
+        for (TransactionMatcher matcher : config.getTransactionMatchers()) {
+            matches |= matcher.getTxClassMatcher().matches(accessor);
+        }
+        return matches ? transactionalFinderInterceptor : finderInterceptor;
     }
 
     private void validateFinder(Finder finder, Method method) {
@@ -104,11 +124,22 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
         }
     }
 
-    protected void bindTransactionalDynamicAccessors(Set<Class<?>> accessors, final MethodInterceptor finderInterceptor,
+    protected void bindTransactionalDynamicAccessors(final PersistenceConfiguration config,
+                                                     final MethodInterceptor finderInterceptor,
                                                      final MethodInterceptor txInterceptor) {
         MethodInterceptor transactionalFinderInterceptor = new MethodInterceptor() {
+            private ConcurrentMap<Method, Boolean> matcherCache = new ConcurrentHashMap<Method, Boolean>();
             public Object invoke(final MethodInvocation methodInvocation) throws Throwable {
-                if (methodInvocation.getMethod().isAnnotationPresent(Transactional.class)) {
+                // Don't care about a theoretical extra write, so we don't lock
+                if (!matcherCache.containsKey(methodInvocation.getMethod())) {
+                    boolean matches = false;
+                    for (TransactionMatcher matcher : config.getTransactionMatchers()) {
+                        matches |= matcher.getTxMethodMatcher().matches(methodInvocation.getMethod());
+                    }
+                    matcherCache.putIfAbsent(methodInvocation.getMethod(), matches);
+                }
+                
+                if (matcherCache.get(methodInvocation.getMethod())) {
                     return txInterceptor.invoke(new MethodInvocation() {
                         public Object[] getArguments() {
                             return methodInvocation.getArguments();
@@ -131,7 +162,7 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
                 }
             }
         };
-        bindDynamicAccessors(accessors, transactionalFinderInterceptor);
+        bindDynamicAccessors(config, finderInterceptor, transactionalFinderInterceptor);
     }
 
     protected void bindTransactionInterceptor(PersistenceConfiguration config, MethodInterceptor txInterceptor) {

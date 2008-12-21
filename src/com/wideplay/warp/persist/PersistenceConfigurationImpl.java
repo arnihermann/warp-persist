@@ -85,7 +85,9 @@ public class PersistenceConfigurationImpl implements PersistenceConfiguration {
         }
 
         public PersistenceConfiguration build() {
-            // TODO validate state
+            if (transactionMatchers.size() == 0) {
+                transactionMatchers.add(new TransactionMatcher());
+            }
             return new PersistenceConfigurationImpl(this);
         }
     }
