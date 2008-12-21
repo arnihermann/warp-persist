@@ -53,6 +53,12 @@ public class SessionFilterTest {
         SessionFilter.clearWorkManagers();
     }
 
+    @Test(expectedExceptions = ServletException.class)
+    public final void testNoWorkManagersFailure() throws IOException, ServletException {
+        SessionFilter spr = new SessionFilter();
+        spr.doFilter(null, null, null);
+    }
+
     @Test
     public final void testUseWorkManager() throws IOException, ServletException {
         SessionFilter spr = new SessionFilter();

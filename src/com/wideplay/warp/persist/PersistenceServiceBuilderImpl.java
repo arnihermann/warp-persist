@@ -59,7 +59,7 @@ class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, Persisten
                  SessionFilter.registerWorkManager(wm);
             }
             public void publishPersistenceService(PersistenceService persistenceService) {
-                LifecycleSessionFilter.registerPersistenceService(persistenceService);
+                PersistenceServiceSessionFilter.registerPersistenceService(persistenceService);
             }
         });
         return bindings;

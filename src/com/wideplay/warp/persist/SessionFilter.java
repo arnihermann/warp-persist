@@ -74,6 +74,11 @@ public class SessionFilter implements Filter {
 
         lock.readLock().lock();
         try {
+            if (workManagers.size() == 0) {
+                // getClass() so that users see the correct name when using subclasses
+                throw new ServletException(String.format("You have registered the %s but you have not configured" +
+                        " a persistence strategy that uses UnitOfWork.REQUEST", getClass().getSimpleName()));
+            }
             Lifecycles.failEarlyAndLeaveNoOneBehind(workManagers, exceptionalRunnable);
         } finally {
             lock.readLock().unlock();
@@ -94,8 +99,11 @@ public class SessionFilter implements Filter {
         }
     }
 
-    /** Only use when you know what you're doing. Mainly for testing. */
-    public static void clearWorkManagers() {
+    /**
+     * Removes all registered WorkManagers from the filter.
+     * Only use when you know what you're doing. Mainly for testing.
+     */
+    static void clearWorkManagers() {
         lock.writeLock().lock();
         try {
             workManagers.clear();

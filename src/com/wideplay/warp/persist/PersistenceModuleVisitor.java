@@ -13,7 +13,7 @@ public interface PersistenceModuleVisitor {
      * Publishes the module's {@link com.wideplay.warp.persist.WorkManager}
      * for consumption by Warp Persist's common infrastructure,
      * notably {@link com.wideplay.warp.persist.SessionFilter}
-     * and {@link com.wideplay.warp.persist.LifecycleSessionFilter}.
+     * and {@link PersistenceServiceSessionFilter}.
      * <p>
      * Only use with {@link com.wideplay.warp.persist.UnitOfWork#REQUEST}.
      *
@@ -24,11 +24,11 @@ public interface PersistenceModuleVisitor {
     /**
      * Publishes the module's {@link com.wideplay.warp.persist.PersistenceService}
      * for consumption by Warp Persist's common infrastructure,
-     * notably {@link com.wideplay.warp.persist.LifecycleSessionFilter}.
+     * notably {@link PersistenceServiceSessionFilter}.
      * <p>
      * Usually used with {@link com.wideplay.warp.persist.UnitOfWork#REQUEST}, but
      * technically it could make sense to use the
-     * {@link com.wideplay.warp.persist.LifecycleSessionFilter} with other units
+     * {@link PersistenceServiceSessionFilter} with other units
      * of work.
      *
      * @param persistenceService the {@code PersistenceService} to publish

@@ -36,11 +36,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author Robbie Vanbrabant
  * @see com.wideplay.warp.persist.SessionFilter
  */
-@ThreadSafe
-public class LifecycleSessionFilter extends SessionFilter {
+@ThreadSafe // No locks in common with SessionFilter because PersistenceServices automatically start using DCL
+public class PersistenceServiceSessionFilter extends SessionFilter {
     private static final ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    @GuardedBy("LifecycleSessionFilter.lock")
+    @GuardedBy("PersistenceServiceSessionFilter.lock")
     private static final List<Lifecycle> persistenceServices = new ArrayList<Lifecycle>();
 
     private static final LifecycleAdapter<PersistenceService> lifecycleAdapter = new LifecycleAdapter<PersistenceService>() {

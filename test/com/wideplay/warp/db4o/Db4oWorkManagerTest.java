@@ -66,7 +66,7 @@ public class Db4oWorkManagerTest {
 	@AfterClass
 	public void postClass() {
 		injector.getInstance(ObjectServer.class).close();
-        SessionFilter.clearWorkManagers();
+        TestCleanup.clearWorkManagers();
     }
 
 	@Test

@@ -18,7 +18,7 @@ package com.wideplay.warp.jpa;
 
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;
-import com.wideplay.warp.persist.LifecycleSessionFilter;
+import com.wideplay.warp.persist.PersistenceServiceSessionFilter;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
@@ -81,7 +81,7 @@ import java.io.IOException;
  */
 @Immutable
 @ThreadSafe
-public class SessionPerRequestInterceptor extends LifecycleSessionFilter implements Interceptor {
+public class SessionPerRequestInterceptor extends PersistenceServiceSessionFilter implements Interceptor {
     /**
      * Makes sure an {@link javax.persistence.EntityManager} instance is available while
      * the current request is being processed.
