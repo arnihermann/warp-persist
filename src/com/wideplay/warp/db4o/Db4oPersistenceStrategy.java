@@ -41,6 +41,11 @@ public class Db4oPersistenceStrategy implements PersistenceStrategy {
     }
 
     public PersistenceModule getBindings(final PersistenceConfiguration config) {
+        // No Dynamic Finders yet.
+        if (config.getAccessors().size() > 0) {
+            throw new UnsupportedOperationException("Dynamic Finders or Accessors are not supported with DB4O. " +
+                    "Please remove all configured Accessor interfaces.");
+        }
         return new Db4oPersistenceModule(config);
     }
 
@@ -72,8 +77,6 @@ public class Db4oPersistenceStrategy implements PersistenceStrategy {
 
             MethodInterceptor txInterceptor = new Db4oLocalTxnInterceptor(iwm, config.getUnitOfWork());
             bindTransactionInterceptor(config, txInterceptor);
-
-            // No Dynamic Finders yet.
         }
 
         public void visit(PersistenceModuleVisitor visitor) {
