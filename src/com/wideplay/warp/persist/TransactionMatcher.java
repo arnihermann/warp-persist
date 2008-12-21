@@ -16,7 +16,6 @@
 package com.wideplay.warp.persist;
 
 import com.google.inject.matcher.Matcher;
-import com.google.inject.matcher.Matchers;
 
 import java.lang.reflect.Method;
 
@@ -24,8 +23,8 @@ import java.lang.reflect.Method;
  * @author Robbie Vanbrabant
  */
 class TransactionMatcher {
-    private Matcher<? super Class<?>> txClassMatcher = Matchers.any();
-    private Matcher<? super Method> txMethodMatcher = Matchers.annotatedWith(Transactional.class);
+    private Matcher<? super Class<?>> txClassMatcher = Defaults.TX_CLASS_MATCHER;
+    private Matcher<? super Method> txMethodMatcher = Defaults.TX_METHOD_MATCHER;
 
     TransactionMatcher() {
     }
