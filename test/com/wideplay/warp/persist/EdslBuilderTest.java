@@ -31,6 +31,7 @@ import org.testng.annotations.Test;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -96,6 +97,34 @@ public class EdslBuilderTest {
     }
 
     @Test
+    public final void testPersistenceServicesProvider() {
+        PersistenceStrategy h = HibernatePersistenceStrategy.builder()
+                                                        .configuration(new Configuration())
+                                                        .annotatedWith(MyUnit.class).build();
+        Module hibernateModule = PersistenceService.using(h)
+                                     .across(UnitOfWork.TRANSACTION)
+                                     .transactedWith(TransactionStrategy.LOCAL)
+                                     .forAll(Matchers.any(), Matchers.annotatedWith(Transactional.class))
+                                     .buildModule();
+
+        PersistenceStrategy jpa = JpaPersistenceStrategy.builder()
+                                            .properties(new Properties())
+                                            .unit("myUnit")
+                                            .annotatedWith(MySecondUnit.class).build();
+        Module jpaModule = PersistenceService.using(jpa)
+                                     .across(UnitOfWork.TRANSACTION)
+                                     .transactedWith(TransactionStrategy.LOCAL)
+                                     .forAll(Matchers.any(), Matchers.annotatedWith(Transactional.class))
+                                     .buildModule();
+
+        List<PersistenceService> persistenceServices = Guice.createInjector(hibernateModule, jpaModule,
+                new PersistenceServiceExtrasModule())
+                .getInstance(Key.get(new TypeLiteral<List<PersistenceService>>() {}));
+
+        assert persistenceServices.size() == 2;
+    }
+
+    @Test
     public final void testMultimodulesConfigDb4o() {
         PersistenceStrategy h = Db4oPersistenceStrategy.builder()
                                                         .configuration(Db4o.newConfiguration())
@@ -114,6 +143,10 @@ public class EdslBuilderTest {
     @Retention(RetentionPolicy.RUNTIME)
     @BindingAnnotation
     @interface MyUnit {}
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @BindingAnnotation
+    @interface MySecondUnit {}
 
     static class TransactionalObject {
         @Transactional public void txnMethod() {
