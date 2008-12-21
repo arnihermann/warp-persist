@@ -24,8 +24,10 @@ import com.wideplay.warp.util.WarpPersistNamingPolicy;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.Proxy;
 import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.Set;
 
@@ -68,20 +70,68 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
                     if (finder == null) {
                         addError(method + " has been specified as a Dynamic Accessor but does not have the @Finder annotation.");
                     } else {
-                        if (finder.unit() == Defaults.DefaultUnit.class && inMultiModulesMode()) {
-                             addError(String.format("%s is a Dynamic Finder but does not have the unit annotation '%s'. " +
-                                     "Specify as @Finder(unit=%s.class)", method, this.annotation, this.annotation.getSimpleName()));
-                        }
+                        validateFinder(finder, method);
                     }
+                    validateTransactional(method);
                 }
                 bindSpecial(accessor).toInstance(Proxy.newProxyInstance(accessor.getClassLoader(),
                         new Class<?>[] { accessor }, new AopAllianceJdkProxyAdapter(finderInterceptor)));
             } else {
+                for (Method method : accessor.getMethods()) {
+                    validateFinder(method.getAnnotation(Finder.class), method);
+                    validateTransactional(method);
+                }
                 //use cglib adapter to subclass the accessor (this lets us intercept abstract classes)
                 enhancer.setSuperclass(accessor);
                 bindSpecial(accessor).toInstance(enhancer.create());
             }
         }
+    }
+
+    private void validateFinder(Finder finder, Method method) {
+        if (finder != null && finder.unit() == Defaults.DefaultUnit.class && inMultiModulesMode()) {
+             addError(String.format("%s is a Dynamic Finder but does not have the unit annotation '%s'. " +
+                     "Specify as @Finder(unit=%s.class)", method, this.annotation, this.annotation.getSimpleName()));
+        }
+    }
+
+    private void validateTransactional(Method method) {
+        Transactional transactional = method.getAnnotation(Transactional.class);
+        if (transactional != null && transactional.unit() == Defaults.DefaultUnit.class &&
+                inMultiModulesMode()) {
+             addError(String.format("%s is @Transactional but does not have the unit annotation '%s'. " +
+                     "Specify as @Transactional(unit=%s.class)", method, this.annotation, this.annotation.getSimpleName()));
+        }
+    }
+
+    protected void bindTransactionalDynamicAccessors(Set<Class<?>> accessors, final MethodInterceptor finderInterceptor,
+                                                     final MethodInterceptor txInterceptor) {
+        MethodInterceptor transactionalFinderInterceptor = new MethodInterceptor() {
+            public Object invoke(final MethodInvocation methodInvocation) throws Throwable {
+                if (methodInvocation.getMethod().isAnnotationPresent(Transactional.class)) {
+                    return txInterceptor.invoke(new MethodInvocation() {
+                        public Object[] getArguments() {
+                            return methodInvocation.getArguments();
+                        }
+                        public Method getMethod() {
+                            return methodInvocation.getMethod();
+                        }
+                        public Object proceed() throws Throwable {
+                            return finderInterceptor.invoke(methodInvocation);
+                        }
+                        public Object getThis() {
+                            return methodInvocation.getThis();
+                        }
+                        public AccessibleObject getStaticPart() {
+                            return methodInvocation.getStaticPart();
+                        }
+                    });
+                } else {
+                    return finderInterceptor.invoke(methodInvocation);
+                }
+            }
+        };
+        bindDynamicAccessors(accessors, transactionalFinderInterceptor);
     }
 
     protected void bindTransactionInterceptor(PersistenceConfiguration config, MethodInterceptor txInterceptor) {

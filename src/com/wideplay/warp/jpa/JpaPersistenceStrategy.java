@@ -76,12 +76,13 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
             bindSpecial(JpaPersistenceService.class).toInstance(pService);
             bindSpecial(WorkManager.class).toInstance(workManager);
 
-            bindTransactionInterceptor(config, new JpaLocalTxnInterceptor(this.internalWm, config.getUnitOfWork()));
+            MethodInterceptor txInterceptor = new JpaLocalTxnInterceptor(this.internalWm, config.getUnitOfWork());
+            bindTransactionInterceptor(config, txInterceptor);
 
             // Set up Dynamic Finders.
             MethodInterceptor finderInterceptor = new JpaFinderInterceptor(emProvider);
             bindFinderInterceptor(finderInterceptor);
-            bindDynamicAccessors(config.getAccessors(), finderInterceptor);
+            bindTransactionalDynamicAccessors(config.getAccessors(), finderInterceptor, txInterceptor);
         }
 
         private Key<String> getPersistenceUnitKey() {
