@@ -33,7 +33,7 @@ public final class PersistenceServiceExtrasModule extends AbstractModule {
     }
 
     static class ListOfPersistenceServicesProvider implements Provider<List<PersistenceService>> {
-            private final Injector injector;
+        private final Injector injector;
 
         @Inject
         public ListOfPersistenceServicesProvider(Injector injector) {
