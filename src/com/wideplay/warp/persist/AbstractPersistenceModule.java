@@ -187,7 +187,6 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
         return Key.get(clazz);
     }
 
-    @SuppressWarnings("unchecked") // Proxies are not generic.
     private void bindDynamicAccessors(MethodInterceptor finderInterceptor,
                                       MethodInterceptor transactionalFinderInterceptor) {
         Enhancer enhancer = new Enhancer();
@@ -195,34 +194,47 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
 
         for (Class accessor : config.getAccessors()) {
             if (accessor.isInterface()) {
-                for (Method method : accessor.getMethods()) {
-                    Finder finder = method.getAnnotation(Finder.class);
-                    if (finder == null) {
-                        addError(method + " has been specified as a Dynamic Accessor but does not have the @Finder annotation.");
-                    } else {
-                        validateFinder(finder, method);
-                    }
-                    validateTransactional(method);
-                }
-                MethodInterceptor interceptorToUse =
-                        determineDynamicAccessorInterceptor(finderInterceptor, transactionalFinderInterceptor,
-                                accessor);
-                bindWithUnitAnnotation(accessor).toInstance(Proxy.newProxyInstance(accessor.getClassLoader(),
-                        new Class<?>[] { accessor }, new AopAllianceJdkProxyAdapter(interceptorToUse)));
+                bindDynamicAccessorInterface(finderInterceptor, transactionalFinderInterceptor, accessor);
             } else {
-                for (Method method : accessor.getMethods()) {
-                    validateFinder(method.getAnnotation(Finder.class), method);
-                    validateTransactional(method);
-                }
-                MethodInterceptor interceptorToUse =
-                    determineDynamicAccessorInterceptor(finderInterceptor, transactionalFinderInterceptor, accessor);
-
-                //use cglib adapter to subclass the accessor (this lets us intercept abstract classes)
-                enhancer.setCallback(new AopAllianceCglibAdapter(interceptorToUse));
-                enhancer.setSuperclass(accessor);
-                bindWithUnitAnnotation(accessor).toInstance(enhancer.create());
+                bindDynamicAccessorClass(finderInterceptor, transactionalFinderInterceptor, enhancer, accessor);
             }
         }
+    }
+
+    @SuppressWarnings("unchecked") // Proxies are not generic.
+    private void bindDynamicAccessorClass(MethodInterceptor finderInterceptor,
+                                          MethodInterceptor transactionalFinderInterceptor, Enhancer enhancer,
+                                          Class accessor) {
+        for (Method method : accessor.getMethods()) {
+            validateFinder(method.getAnnotation(Finder.class), method);
+            validateTransactional(method);
+        }
+        MethodInterceptor interceptorToUse =
+            determineDynamicAccessorInterceptor(finderInterceptor, transactionalFinderInterceptor, accessor);
+
+        //use cglib adapter to subclass the accessor (this lets us intercept abstract classes)
+        enhancer.setCallback(new AopAllianceCglibAdapter(interceptorToUse));
+        enhancer.setSuperclass(accessor);
+        bindWithUnitAnnotation(accessor).toInstance(enhancer.create());
+    }
+    
+    @SuppressWarnings("unchecked") // Proxies are not generic.
+    private void bindDynamicAccessorInterface(MethodInterceptor finderInterceptor,
+                                              MethodInterceptor transactionalFinderInterceptor, Class accessor) {
+        for (Method method : accessor.getMethods()) {
+            Finder finder = method.getAnnotation(Finder.class);
+            if (finder == null) {
+                addError(method + " has been specified as a Dynamic Accessor but does not have the @Finder annotation.");
+            } else {
+                validateFinder(finder, method);
+            }
+            validateTransactional(method);
+        }
+        MethodInterceptor interceptorToUse =
+                determineDynamicAccessorInterceptor(finderInterceptor, transactionalFinderInterceptor,
+                        accessor);
+        bindWithUnitAnnotation(accessor).toInstance(Proxy.newProxyInstance(accessor.getClassLoader(),
+                        new Class<?>[] { accessor }, new AopAllianceJdkProxyAdapter(interceptorToUse)));
     }
 
     private MethodInterceptor determineDynamicAccessorInterceptor(MethodInterceptor finderInterceptor,
