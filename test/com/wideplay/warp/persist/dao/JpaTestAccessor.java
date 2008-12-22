@@ -43,4 +43,13 @@ public interface JpaTestAccessor {
 
     @Finder(query = "from JpaTestEntity where id = ?")
     JpaTestEntity fetchById(Long id);
+
+    @Finder(query = "from JpaTestEntity where id IN(:list)")
+    JpaTestEntity fetchByIdArray(@Named("list") Long[] ids);
+
+    @Finder(query = "from JpaTestEntity where id IN(:list)")
+    JpaTestEntity fetchByIdList(@Named("list") List<Long> ids);
+
+    @Finder(query = "from JpaTestEntity where id IN(?)")
+    JpaTestEntity fetchByIdUnnamedList(List<Long> ids);
 }

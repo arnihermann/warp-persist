@@ -25,13 +25,13 @@ import com.wideplay.warp.jpa.JpaUnit;
 import com.wideplay.warp.persist.PersistenceService;
 import com.wideplay.warp.persist.Transactional;
 import com.wideplay.warp.persist.UnitOfWork;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import org.testng.annotations.AfterTest;
-import org.hibernate.SessionFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -160,6 +160,58 @@ public class JpaDynamicFindersTest {
         assert result.getId().equals(id) : "attribs not persisted correctly";
     }
 
+    @Test
+    public void testListParamemter() {
+
+        //set up some test data
+        Long id = injector.getInstance(FinderDao.class).store().getId();
+
+        //now attempt to query it out
+        JpaTestAccessor accessor = injector.getInstance(JpaTestAccessor.class);
+
+        List<Long> list = new ArrayList<Long>();
+        list.add(id);
+        JpaTestEntity result = accessor.fetchByIdList(list);
+
+        assert null != result : "result not returned!";
+
+        assert result.getId().equals(id) : "attribs not persisted correctly";
+    }
+
+    @Test(expectedExceptions = ClassCastException.class)
+    public void testUnnamedListParamemter() {
+
+        //set up some test data
+        Long id = injector.getInstance(FinderDao.class).store().getId();
+
+        //now attempt to query it out
+        JpaTestAccessor accessor = injector.getInstance(JpaTestAccessor.class);
+
+        List<Long> list = new ArrayList<Long>();
+        list.add(id);
+        JpaTestEntity result = accessor.fetchByIdUnnamedList(list);
+
+        assert null != result : "result not returned!";
+
+        assert result.getId().equals(id) : "attribs not persisted correctly";
+    }
+
+    @Test(expectedExceptions = ClassCastException.class)
+    public void testArrayParamemter() {
+
+        //set up some test data
+        Long id = injector.getInstance(FinderDao.class).store().getId();
+
+        //now attempt to query it out
+        JpaTestAccessor accessor = injector.getInstance(JpaTestAccessor.class);
+
+        JpaTestEntity result = accessor.fetchByIdArray(new Long[]{id});
+
+        assert null != result : "result not returned!";
+
+        assert result.getId().equals(id) : "attribs not persisted correctly";
+    }
+    
     public static class FinderDao {
         private final EntityManager em;
 
