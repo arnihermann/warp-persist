@@ -38,19 +38,32 @@ import java.util.concurrent.ConcurrentMap;
  * @author Robbie Vanbrabant
  */
 public abstract class AbstractPersistenceModule extends AbstractModule implements PersistenceModule {
+    private final PersistenceConfiguration config;
     private final Class<? extends Annotation> annotation;
 
-    protected AbstractPersistenceModule(Class<? extends Annotation> annotation) {
-        this.annotation = annotation;
+    /**
+     * @param config the non-{@code null} PersistenceConfiguration obtained from
+     *               {@link com.wideplay.warp.persist.PersistenceStrategy#getBindings(PersistenceConfiguration)}.
+     * @param unitAnnotation the unit annotation or {@code null} if there is none
+     */
+    protected AbstractPersistenceModule(PersistenceConfiguration config, Class<? extends Annotation> unitAnnotation) {
+        this.config = config;
+        this.annotation = unitAnnotation;
     }
 
+    /**
+     * To be implemented by subclasses.
+     * @see com.google.inject.AbstractModule#configure()
+     */
     protected abstract void configure();
 
     /**
-     * Bind with an optional binding annotation type. A binding annotation needs
-     * to be specified when using two Hibernate configurations within the same Injector.
+     * Bind with an optional unit annotation type, which is a binding annotation used only
+     * in multimodules mode and specified in the constructor of this class.
+     * @param tClass the type to bind
+     * @return the next step in the binding builder
      */
-    protected <T> com.google.inject.binder.LinkedBindingBuilder<T> bindSpecial(java.lang.Class<T> tClass) {
+    protected <T> com.google.inject.binder.LinkedBindingBuilder<T> bindWithUnitAnnotation(java.lang.Class<T> tClass) {
         if (inMultiModulesMode()) {
             return super.bind(tClass).annotatedWith(annotation);
         } else {
@@ -58,74 +71,14 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
         }
     }
 
-    @SuppressWarnings("unchecked") // Proxies are not generic.
-    private void bindDynamicAccessors(PersistenceConfiguration config, MethodInterceptor finderInterceptor,
-                                      MethodInterceptor transactionalFinderInterceptor) {
-        Enhancer enhancer = new Enhancer();
-        enhancer.setNamingPolicy(new WarpPersistNamingPolicy());
-
-        for (Class accessor : config.getAccessors()) {
-            if (accessor.isInterface()) {
-                for (Method method : accessor.getMethods()) {
-                    Finder finder = method.getAnnotation(Finder.class);
-                    if (finder == null) {
-                        addError(method + " has been specified as a Dynamic Accessor but does not have the @Finder annotation.");
-                    } else {
-                        validateFinder(finder, method);
-                    }
-                    validateTransactional(method);
-                }
-                MethodInterceptor interceptorToUse =
-                        determineDynamicAccessorInterceptor(config, finderInterceptor, transactionalFinderInterceptor,
-                                accessor);
-                bindSpecial(accessor).toInstance(Proxy.newProxyInstance(accessor.getClassLoader(),
-                        new Class<?>[] { accessor }, new AopAllianceJdkProxyAdapter(interceptorToUse)));
-            } else {
-                for (Method method : accessor.getMethods()) {
-                    validateFinder(method.getAnnotation(Finder.class), method);
-                    validateTransactional(method);
-                }
-                MethodInterceptor interceptorToUse =
-                    determineDynamicAccessorInterceptor(config, finderInterceptor, transactionalFinderInterceptor,
-                            accessor);
-
-                //use cglib adapter to subclass the accessor (this lets us intercept abstract classes)
-                enhancer.setCallback(new AopAllianceCglibAdapter(interceptorToUse));
-                enhancer.setSuperclass(accessor);
-                bindSpecial(accessor).toInstance(enhancer.create());
-            }
-        }
-    }
-
-    private MethodInterceptor determineDynamicAccessorInterceptor(PersistenceConfiguration config,
-                                                                  MethodInterceptor finderInterceptor,
-                                                                  MethodInterceptor transactionalFinderInterceptor,
-                                                                  Class<?> accessor) {
-        boolean matches = false;
-        for (TransactionMatcher matcher : config.getTransactionMatchers()) {
-            matches |= matcher.getTxClassMatcher().matches(accessor);
-        }
-        return matches ? transactionalFinderInterceptor : finderInterceptor;
-    }
-
-    private void validateFinder(Finder finder, Method method) {
-        if (finder != null && finder.unit() == Defaults.DefaultUnit.class && inMultiModulesMode()) {
-             addError(String.format("%s is a Dynamic Finder but does not have the unit annotation '%s'. " +
-                     "Specify as @Finder(unit=%s.class)", method, this.annotation, this.annotation.getSimpleName()));
-        }
-    }
-
-    private void validateTransactional(Method method) {
-        Transactional transactional = method.getAnnotation(Transactional.class);
-        if (transactional != null && transactional.unit() == Defaults.DefaultUnit.class &&
-                inMultiModulesMode()) {
-             addError(String.format("%s is @Transactional but does not have the unit annotation '%s'. " +
-                     "Specify as @Transactional(unit=%s.class)", method, this.annotation, this.annotation.getSimpleName()));
-        }
-    }
-
-    protected void bindTransactionalDynamicAccessors(final PersistenceConfiguration config,
-                                                     final MethodInterceptor finderInterceptor,
+    /**
+     * Binds the finder and transaction interceptor for use with Dynamic Accessors. The transaction interceptor
+     * will use the same matchers used for regular transactions.
+     * 
+     * @param finderInterceptor the finder interceptor to bind for dynamic accessors
+     * @param txInterceptor the transaction interceptor to use for transactional dynamic accessors
+     */
+    protected void bindTransactionalDynamicAccessors(final MethodInterceptor finderInterceptor,
                                                      final MethodInterceptor txInterceptor) {
         MethodInterceptor transactionalFinderInterceptor = new MethodInterceptor() {
             private ConcurrentMap<Method, Boolean> matcherCache = new ConcurrentHashMap<Method, Boolean>();
@@ -162,10 +115,14 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
                 }
             }
         };
-        bindDynamicAccessors(config, finderInterceptor, transactionalFinderInterceptor);
+        bindDynamicAccessors(finderInterceptor, transactionalFinderInterceptor);
     }
 
-    protected void bindTransactionInterceptor(PersistenceConfiguration config, MethodInterceptor txInterceptor) {
+    /**
+     * Bind the transaction interceptor.
+     * @param txInterceptor the transaction interceptor to bind
+     */
+    protected void bindTransactionInterceptor(MethodInterceptor txInterceptor) {
         if (inMultiModulesMode()) {
             // We support forAll, and assume the user knows what he/she is doing.
             if (config.getTransactionMatchers().size() > 0) {
@@ -193,6 +150,7 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
     /**
      * Binds a finder interceptor with support for multiple modules. When the user specifies
      * an annotation to bind the module to, we match on {@code @Finder(unit=UserAnnotation.class)}.
+     * @param finderInterceptor the finder interceptor to bind
      */
     protected void bindFinderInterceptor(MethodInterceptor finderInterceptor) {
         if (inMultiModulesMode()) {
@@ -202,18 +160,94 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
         }
     }
 
+    /**
+     * @return whether we're in multimodules mode or not
+     */
     protected boolean inMultiModulesMode() {
         return this.annotation != null;
     }
 
-    protected boolean unitOfWorkRequest(PersistenceConfiguration config) {
+    /**
+     * @return whether the {@link com.wideplay.warp.persist.UnitOfWork#REQUEST} was configured or not
+     */
+    protected boolean unitOfWorkRequest() {
         return UnitOfWork.REQUEST == config.getUnitOfWork();
     }
 
-    protected <T> Key<T> key(Class<T> clazz) {
-        if (annotation != null) {
+    /**
+     * Generates a key for the given class, with an optional unit annotation (multimodules mode).
+     * @param clazz the type to bind
+     * @param <T> the bound type
+     * @return the generated key
+     */
+    protected <T> Key<T> keyWithUnitAnnotation(Class<T> clazz) {
+        if (inMultiModulesMode()) {
             return Key.get(clazz, annotation);
         }
         return Key.get(clazz);
+    }
+
+    @SuppressWarnings("unchecked") // Proxies are not generic.
+    private void bindDynamicAccessors(MethodInterceptor finderInterceptor,
+                                      MethodInterceptor transactionalFinderInterceptor) {
+        Enhancer enhancer = new Enhancer();
+        enhancer.setNamingPolicy(new WarpPersistNamingPolicy());
+
+        for (Class accessor : config.getAccessors()) {
+            if (accessor.isInterface()) {
+                for (Method method : accessor.getMethods()) {
+                    Finder finder = method.getAnnotation(Finder.class);
+                    if (finder == null) {
+                        addError(method + " has been specified as a Dynamic Accessor but does not have the @Finder annotation.");
+                    } else {
+                        validateFinder(finder, method);
+                    }
+                    validateTransactional(method);
+                }
+                MethodInterceptor interceptorToUse =
+                        determineDynamicAccessorInterceptor(finderInterceptor, transactionalFinderInterceptor,
+                                accessor);
+                bindWithUnitAnnotation(accessor).toInstance(Proxy.newProxyInstance(accessor.getClassLoader(),
+                        new Class<?>[] { accessor }, new AopAllianceJdkProxyAdapter(interceptorToUse)));
+            } else {
+                for (Method method : accessor.getMethods()) {
+                    validateFinder(method.getAnnotation(Finder.class), method);
+                    validateTransactional(method);
+                }
+                MethodInterceptor interceptorToUse =
+                    determineDynamicAccessorInterceptor(finderInterceptor, transactionalFinderInterceptor, accessor);
+
+                //use cglib adapter to subclass the accessor (this lets us intercept abstract classes)
+                enhancer.setCallback(new AopAllianceCglibAdapter(interceptorToUse));
+                enhancer.setSuperclass(accessor);
+                bindWithUnitAnnotation(accessor).toInstance(enhancer.create());
+            }
+        }
+    }
+
+    private MethodInterceptor determineDynamicAccessorInterceptor(MethodInterceptor finderInterceptor,
+                                                              MethodInterceptor transactionalFinderInterceptor,
+                                                              Class<?> accessor) {
+        boolean matches = false;
+        for (TransactionMatcher matcher : config.getTransactionMatchers()) {
+            matches |= matcher.getTxClassMatcher().matches(accessor);
+        }
+        return matches ? transactionalFinderInterceptor : finderInterceptor;
+    }
+
+    private void validateFinder(Finder finder, Method method) {
+        if (finder != null && finder.unit() == Defaults.DefaultUnit.class && inMultiModulesMode()) {
+             addError(String.format("%s is a Dynamic Finder but does not have the unit annotation '%s'. " +
+                     "Specify as @Finder(unit=%s.class)", method, this.annotation, this.annotation.getSimpleName()));
+        }
+    }
+
+    private void validateTransactional(Method method) {
+        Transactional transactional = method.getAnnotation(Transactional.class);
+        if (transactional != null && transactional.unit() == Defaults.DefaultUnit.class &&
+                inMultiModulesMode()) {
+             addError(String.format("%s is @Transactional but does not have the unit annotation '%s'. " +
+                     "Specify as @Transactional(unit=%s.class)", method, this.annotation, this.annotation.getSimpleName()));
+        }
     }
 }

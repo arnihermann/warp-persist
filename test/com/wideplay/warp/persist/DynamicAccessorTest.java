@@ -83,7 +83,6 @@ public class DynamicAccessorTest {
     @interface MyUnit {}
 
     public interface ValidTransactionalAccessor {
-        // Invalid when in multi-modules mode, needs unit=...
         @Finder(unit=MyUnit.class, query = "from HibernateTestEntity")
         @Transactional(unit=MyUnit.class)
         List<HibernateTestEntity> listAll();

@@ -46,7 +46,6 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
     }
 
     class HibernatePersistenceModule extends AbstractPersistenceModule {
-        private final PersistenceConfiguration config;
         private WorkManager workManager;
         private Provider<SessionFactory> sfProvider;
         private Provider<Session> sessionProvider;
@@ -55,8 +54,7 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
         private final List<Module> scheduledBindings = new ArrayList<Module>();
 
         private HibernatePersistenceModule(PersistenceConfiguration config) {
-            super(annotation);
-            this.config = config;
+            super(config, annotation);
             // Need instance here for the work manager.
             String annotationDebugString = annotation != null ? annotation.getSimpleName() : "";
             this.sfProvider = new SessionFactoryProvider(getConfigurationKey(), annotationDebugString);
@@ -72,25 +70,25 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
         protected void configure() {
             for (Module m : scheduledBindings) install(m);
             
-            bindSpecial(SessionFactory.class).toProvider(sfProvider);
-            bindSpecial(Session.class).toProvider(sessionProvider);
-            bindSpecial(WorkManager.class).toInstance(workManager);
-            bindSpecial(PersistenceService.class).toInstance(pService);
+            bindWithUnitAnnotation(SessionFactory.class).toProvider(sfProvider);
+            bindWithUnitAnnotation(Session.class).toProvider(sessionProvider);
+            bindWithUnitAnnotation(WorkManager.class).toInstance(workManager);
+            bindWithUnitAnnotation(PersistenceService.class).toInstance(pService);
 
             MethodInterceptor txInterceptor = new HibernateLocalTxnInterceptor(sessionProvider);
-            bindTransactionInterceptor(config, txInterceptor);
+            bindTransactionInterceptor(txInterceptor);
 
             // Set up Dynamic Finders.
             MethodInterceptor finderInterceptor = new HibernateFinderInterceptor(sessionProvider);
             bindFinderInterceptor(finderInterceptor);
-            bindTransactionalDynamicAccessors(config, finderInterceptor, txInterceptor);
+            bindTransactionalDynamicAccessors(finderInterceptor, txInterceptor);
         }
 
         /**
          * Gets the Key to which the Hibernate Configuration has been bound.
          */
         private Key<Configuration> getConfigurationKey() {
-            final Key<Configuration> key = key(Configuration.class);
+            final Key<Configuration> key = keyWithUnitAnnotation(Configuration.class);
             if (inMultiModulesMode()) {
                 if (configuration != null) {
                     scheduledBindings.add(new AbstractModule() {
@@ -104,7 +102,7 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
         }
 
         public void visit(PersistenceModuleVisitor visitor) {
-            if (unitOfWorkRequest(config)) {
+            if (unitOfWorkRequest()) {
                 visitor.publishWorkManager(this.workManager);
                 visitor.publishPersistenceService(this.pService);
             }

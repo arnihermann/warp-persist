@@ -57,7 +57,7 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
         private InternalWorkManager<EntityManager> internalWm;
 
         private JpaPersistenceModule(PersistenceConfiguration configuration) {
-            super(annotation);
+            super(configuration, annotation);
             this.config = configuration;
             this.emfProvider = new EntityManagerFactoryProvider(getPersistenceUnitKey(),
                                                                 getExtraPersistencePropertiesKey());
@@ -70,19 +70,19 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
         protected void configure() {
             for (Module m : scheduledBindings) install(m);
             // Set up JPA.
-            bindSpecial(EntityManagerFactory.class).toProvider(emfProvider);
-            bindSpecial(EntityManager.class).toProvider(emProvider);
-            bindSpecial(PersistenceService.class).toInstance(pService);
-            bindSpecial(JpaPersistenceService.class).toInstance(pService);
-            bindSpecial(WorkManager.class).toInstance(workManager);
+            bindWithUnitAnnotation(EntityManagerFactory.class).toProvider(emfProvider);
+            bindWithUnitAnnotation(EntityManager.class).toProvider(emProvider);
+            bindWithUnitAnnotation(PersistenceService.class).toInstance(pService);
+            bindWithUnitAnnotation(JpaPersistenceService.class).toInstance(pService);
+            bindWithUnitAnnotation(WorkManager.class).toInstance(workManager);
 
             MethodInterceptor txInterceptor = new JpaLocalTxnInterceptor(this.internalWm, config.getUnitOfWork());
-            bindTransactionInterceptor(config, txInterceptor);
+            bindTransactionInterceptor(txInterceptor);
 
             // Set up Dynamic Finders.
             MethodInterceptor finderInterceptor = new JpaFinderInterceptor(emProvider);
             bindFinderInterceptor(finderInterceptor);
-            bindTransactionalDynamicAccessors(config, finderInterceptor, txInterceptor);
+            bindTransactionalDynamicAccessors(finderInterceptor, txInterceptor);
         }
 
         private Key<String> getPersistenceUnitKey() {
@@ -118,7 +118,7 @@ public class JpaPersistenceStrategy implements PersistenceStrategy {
         }
 
         public void visit(PersistenceModuleVisitor visitor) {
-            if (unitOfWorkRequest(config)) {
+            if (unitOfWorkRequest()) {
                 visitor.publishWorkManager(this.workManager);
                 visitor.publishPersistenceService(this.pService);
             }

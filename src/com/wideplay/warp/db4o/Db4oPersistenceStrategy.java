@@ -60,7 +60,7 @@ public class Db4oPersistenceStrategy implements PersistenceStrategy {
         private InternalWorkManager<ObjectContainer> iwm;
 
         Db4oPersistenceModule(PersistenceConfiguration config) {
-            super(annotation);
+            super(config, annotation);
             this.config = config;
             this.osp = new ObjectServerProvider(db4oSettings);
             iwm = new Db4oInternalWorkManager(osp);
@@ -70,14 +70,14 @@ public class Db4oPersistenceStrategy implements PersistenceStrategy {
         }
 
         protected void configure() {
-            bindSpecial(ObjectServer.class).toProvider(osp);
+            bindWithUnitAnnotation(ObjectServer.class).toProvider(osp);
             
-            bindSpecial(ObjectContainer.class).toProvider(ocp);
-            bindSpecial(PersistenceService.class).toInstance(pService);
-            bindSpecial(WorkManager.class).toInstance(workManager);
+            bindWithUnitAnnotation(ObjectContainer.class).toProvider(ocp);
+            bindWithUnitAnnotation(PersistenceService.class).toInstance(pService);
+            bindWithUnitAnnotation(WorkManager.class).toInstance(workManager);
 
             MethodInterceptor txInterceptor = new Db4oLocalTxnInterceptor(iwm, config.getUnitOfWork());
-            bindTransactionInterceptor(config, txInterceptor);
+            bindTransactionInterceptor(txInterceptor);
 
             if (binder().currentStage() == Stage.DEVELOPMENT) {
                 MethodInterceptor throwingMethodInterceptor = new MethodInterceptor() {
@@ -92,7 +92,7 @@ public class Db4oPersistenceStrategy implements PersistenceStrategy {
         }
 
         public void visit(PersistenceModuleVisitor visitor) {
-            if (unitOfWorkRequest(config)) {
+            if (unitOfWorkRequest()) {
                 visitor.publishWorkManager(this.workManager);
                 visitor.publishPersistenceService(this.pService);
             }
