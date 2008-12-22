@@ -18,6 +18,7 @@ package com.wideplay.warp.db4o;
 
 import com.db4o.ObjectContainer;
 import com.wideplay.warp.persist.InternalWorkManager;
+import com.wideplay.warp.persist.TransactionType;
 import com.wideplay.warp.persist.Transactional;
 import com.wideplay.warp.persist.UnitOfWork;
 import net.jcip.annotations.ThreadSafe;
@@ -46,13 +47,16 @@ class Db4oLocalTxnInterceptor implements MethodInterceptor {
 
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
 		ObjectContainer oc = internalWorkManager.beginWork();
-		
+
+        Transactional transactional = readTransactionMetadata(methodInvocation);
+        if (transactional.type() != null && transactional.type() == TransactionType.READ_ONLY) {
+            throw new UnsupportedOperationException("Transaction type READ_ONLY not supported with DB4O");
+        }
+
 		Object result;
 		try {
 			result = methodInvocation.proceed();
 		} catch (Exception e) {
-			Transactional transactional = readTransactionMetadata(methodInvocation);
-
             try {
                 if (rollbackIfNecessary(transactional, e, oc))
                     oc.commit();

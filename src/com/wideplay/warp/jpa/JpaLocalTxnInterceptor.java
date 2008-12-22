@@ -17,6 +17,7 @@
 package com.wideplay.warp.jpa;
 
 import com.wideplay.warp.persist.InternalWorkManager;
+import com.wideplay.warp.persist.TransactionType;
 import com.wideplay.warp.persist.Transactional;
 import com.wideplay.warp.persist.UnitOfWork;
 import net.jcip.annotations.ThreadSafe;
@@ -51,6 +52,11 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
         if (em.getTransaction().isActive())
             return methodInvocation.proceed();
 
+        Transactional transactional = readTransactionMetadata(methodInvocation);
+        if (transactional.type() != null && transactional.type() == TransactionType.READ_ONLY) {
+            throw new UnsupportedOperationException("Transaction type READ_ONLY not supported with JPA");
+        }
+
         //otherwise...
 
         //start txn
@@ -62,8 +68,6 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
             result = methodInvocation.proceed();
 
         } catch (Exception e) {
-            Transactional transactional = readTransactionMetadata(methodInvocation);
-
             //commit transaction only if rollback didnt occur
             if (rollbackIfNecessary(transactional, e, txn))
                 txn.commit();
