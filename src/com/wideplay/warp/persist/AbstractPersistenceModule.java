@@ -29,6 +29,10 @@ import org.aopalliance.intercept.MethodInvocation;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -40,15 +44,45 @@ import java.util.concurrent.ConcurrentMap;
 public abstract class AbstractPersistenceModule extends AbstractModule implements PersistenceModule {
     private final PersistenceConfiguration config;
     private final Class<? extends Annotation> annotation;
+    private final List<TransactionMatcher> transactionMatchers;
 
     /**
-     * @param config the non-{@code null} PersistenceConfiguration obtained from
+     * @param configuration the non-{@code null} PersistenceConfiguration obtained from
      *               {@link com.wideplay.warp.persist.PersistenceStrategy#getBindings(PersistenceConfiguration)}.
      * @param unitAnnotation the unit annotation or {@code null} if there is none
      */
-    protected AbstractPersistenceModule(PersistenceConfiguration config, Class<? extends Annotation> unitAnnotation) {
-        this.config = config;
+    protected AbstractPersistenceModule(final PersistenceConfiguration configuration, Class<? extends Annotation> unitAnnotation) {
         this.annotation = unitAnnotation;
+
+        // Do NOT use configuration.getTransactionMatchers() directly after we set the local variable.
+        if (configuration.getTransactionMatchers().size() == 0) {
+            List<TransactionMatcher> matchers = new ArrayList<TransactionMatcher>();
+            if (inMultiModulesMode()) {
+                matchers.add(new TransactionMatcher(Defaults.TX_CLASS_MATCHER,
+                        PersistenceMatchers.transactionalWithUnit(annotation)));
+            } else {
+                matchers.add(new TransactionMatcher());
+            }
+            this.transactionMatchers = Collections.unmodifiableList(matchers);
+        } else {
+            this.transactionMatchers = configuration.getTransactionMatchers();
+        }
+
+        // protect from programming mistakes
+        this.config = new PersistenceConfiguration() {
+            public UnitOfWork getUnitOfWork() {
+                return configuration.getUnitOfWork();
+            }
+            public TransactionStrategy getTransactionStrategy() {
+                return configuration.getTransactionStrategy();
+            }
+            public List<TransactionMatcher> getTransactionMatchers() {
+                throw new UnsupportedOperationException();
+            }
+            public Set<Class<?>> getAccessors() {
+                return configuration.getAccessors();
+            }
+        };
     }
 
     /**
@@ -83,10 +117,10 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
         MethodInterceptor transactionalFinderInterceptor = new MethodInterceptor() {
             private ConcurrentMap<Method, Boolean> matcherCache = new ConcurrentHashMap<Method, Boolean>();
             public Object invoke(final MethodInvocation methodInvocation) throws Throwable {
-                // Don't care about a theoretical extra write, so we don't lock
+                // Don't care about a theoretical extra run through this, so we don't lock
                 if (!matcherCache.containsKey(methodInvocation.getMethod())) {
                     boolean matches = false;
-                    for (TransactionMatcher matcher : config.getTransactionMatchers()) {
+                    for (TransactionMatcher matcher : transactionMatchers) {
                         matches |= matcher.getTxMethodMatcher().matches(methodInvocation.getMethod());
                     }
                     matcherCache.putIfAbsent(methodInvocation.getMethod(), matches);
@@ -123,27 +157,9 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
      * @param txInterceptor the transaction interceptor to bind
      */
     protected void bindTransactionInterceptor(MethodInterceptor txInterceptor) {
-        if (inMultiModulesMode()) {
-            // We support forAll, and assume the user knows what he/she is doing.
-            if (config.getTransactionMatchers().size() > 0) {
-                for (TransactionMatcher matcher : config.getTransactionMatchers()) {
-                    bindInterceptor(matcher.getTxClassMatcher(), matcher.getTxMethodMatcher(), txInterceptor);
-                }
-            } else {
-                TransactionMatcher matcher = new TransactionMatcher();
-                bindInterceptor(matcher.getTxClassMatcher(),
-                                PersistenceMatchers.transactionalWithUnit(annotation),
-                                txInterceptor);
-            }
-        } else {
-            if (config.getTransactionMatchers().size() > 0) {
-                for (TransactionMatcher matcher : config.getTransactionMatchers()) {
-                    bindInterceptor(matcher.getTxClassMatcher(), matcher.getTxMethodMatcher(), txInterceptor);
-                }
-            } else {
-                TransactionMatcher matcher = new TransactionMatcher();
-                bindInterceptor(matcher.getTxClassMatcher(), matcher.getTxMethodMatcher(), txInterceptor);
-            }
+        // We support forAll, and assume the user knows what he/she is doing.
+        for (TransactionMatcher matcher : transactionMatchers) {
+            bindInterceptor(matcher.getTxClassMatcher(), matcher.getTxMethodMatcher(), txInterceptor);
         }
     }
 
@@ -241,7 +257,7 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
                                                               MethodInterceptor transactionalFinderInterceptor,
                                                               Class<?> accessor) {
         boolean matches = false;
-        for (TransactionMatcher matcher : config.getTransactionMatchers()) {
+        for (TransactionMatcher matcher : transactionMatchers) {
             matches |= matcher.getTxClassMatcher().matches(accessor);
         }
         return matches ? transactionalFinderInterceptor : finderInterceptor;

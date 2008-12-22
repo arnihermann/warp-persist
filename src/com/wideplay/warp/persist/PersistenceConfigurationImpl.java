@@ -85,9 +85,6 @@ public class PersistenceConfigurationImpl implements PersistenceConfiguration {
         }
 
         public PersistenceConfiguration build() {
-            if (transactionMatchers.size() == 0) {
-                transactionMatchers.add(new TransactionMatcher());
-            }
             return new PersistenceConfigurationImpl(this);
         }
     }
