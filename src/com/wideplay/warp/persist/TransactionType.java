@@ -31,10 +31,7 @@ package com.wideplay.warp.persist;
  *
  * @author Dhanji R. Prasanna (dhanji@gmail.com)
  */
-public enum TransactionType {
-    // TODO We should throw exceptions in all tx interceptors but the Hibernate one if
-    // READ_ONLY is used.
-    
+public enum TransactionType {   
     /**
      * Used to instruct warp-persist in the {@code @Transactional} annotation of methods/classes
      * that this transaction is READ-ONLY. This feature is not supported for JPA and is experimental
