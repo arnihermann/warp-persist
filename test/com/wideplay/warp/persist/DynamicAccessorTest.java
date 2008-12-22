@@ -1,6 +1,8 @@
 package com.wideplay.warp.persist;
 
 import com.google.inject.*;
+import static com.google.inject.matcher.Matchers.any;
+import static com.google.inject.matcher.Matchers.inPackage;
 import com.wideplay.codemonkey.web.startup.Initializer;
 import com.wideplay.warp.hibernate.HibernatePersistenceStrategy;
 import com.wideplay.warp.hibernate.HibernateTestEntity;
@@ -63,6 +65,37 @@ public class DynamicAccessorTest {
                 }).getInstance(Key.get(ValidTransactionalAccessor.class, MyUnit.class)).listAll();
     }
 
+    @Test
+    public void testDynamicAccessorWithTransactionNonMultimodule() {
+        HibernatePersistenceStrategy hibernate = HibernatePersistenceStrategy.builder().build();
+        Guice.createInjector(PersistenceService.using(hibernate).across(UnitOfWork.REQUEST)
+                .addAccessor(ValidTransactionalAccessor.class)
+                .buildModule(),
+                new AbstractModule() {
+                    protected void configure() {
+                        bind(Configuration.class).toInstance(new AnnotationConfiguration()
+                            .addAnnotatedClass(HibernateTestEntity.class)
+                            .setProperties(Initializer.loadProperties("spt-persistence.properties")));
+                    }
+                }).getInstance(ValidTransactionalAccessor.class).listAll();
+    }
+
+    @Test(expectedExceptions = HibernateException.class) // finder not valid without tx
+    public void testDynamicAccessorWithTransactionButConfigThatDoesntMatch() {
+        HibernatePersistenceStrategy hibernate = HibernatePersistenceStrategy.builder().annotatedWith(MyUnit.class).build();
+        Guice.createInjector(PersistenceService.using(hibernate).across(UnitOfWork.REQUEST)
+                .addAccessor(ValidTransactionalAccessor.class)
+                .forAll(inPackage(AbstractModule.class.getPackage()), any())
+                .buildModule(),
+                new AbstractModule() {
+                    protected void configure() {
+                        bind(Configuration.class).annotatedWith(MyUnit.class).toInstance(new AnnotationConfiguration()
+                            .addAnnotatedClass(HibernateTestEntity.class)
+                            .setProperties(Initializer.loadProperties("spt-persistence.properties")));
+                    }
+                }).getInstance(Key.get(ValidTransactionalAccessor.class, MyUnit.class)).listAll();
+    }
+
     @Test(expectedExceptions = CreationException.class)
     public void testDynamicAccessorWithTransactionInvalidInterface() {
         HibernatePersistenceStrategy hibernate = HibernatePersistenceStrategy.builder().annotatedWith(MyUnit.class).build();
@@ -89,14 +122,13 @@ public class DynamicAccessorTest {
     }
 
     public interface InvalidTransactionalAccessor {
-        // Invalid when in multi-modules mode, needs unit=...
         @Finder(unit=MyUnit.class, query = "from HibernateTestEntity")
+        // Invalid when in multi-modules mode, needs unit=...
         @Transactional
         List<HibernateTestEntity> listAll();
     }
 
     public interface ValidNonTransactionalAccessor {
-        // Invalid when in multi-modules mode, needs unit=...
         @Finder(unit=MyUnit.class, query = "from HibernateTestEntity")
         List<HibernateTestEntity> listAll();
     }
