@@ -25,10 +25,6 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Dhanji R. Prasanna (dhanji@gmail.com)
- * Date: 4/06/2007
- * Time: 14:40:15
  * <p>
  *
  * This is a simple adapter to convert a JDK dynamic proxy invocation into an aopalliance invocation.

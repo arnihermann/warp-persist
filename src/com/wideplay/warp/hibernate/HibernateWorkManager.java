@@ -25,11 +25,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.context.ManagedSessionContext;
 
 /**
- * Created with IntelliJ IDEA.
- * User: dhanji
- * Date: Oct 8, 2007
- * Time: 7:30:05 AM
- *
  * @author Dhanji R. Prasanna (dhanji gmail com)
  */
 @Immutable

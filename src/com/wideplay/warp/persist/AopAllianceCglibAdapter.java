@@ -25,11 +25,6 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 
 /**
- * Created with IntelliJ IDEA.
- * User: dhanji
- * Date: Oct 9, 2007
- * Time: 2:00:03 PM
- * 
  * <p>
  * Adapter used to transform cglib interceptors to work with guice (aopalliance) interceptors.
  * Used to generate proxies for abstract classes, i.e. ones that are annotated {@code @Finder}.

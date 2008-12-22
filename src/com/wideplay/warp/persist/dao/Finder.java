@@ -23,9 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Created with IntelliJ IDEA.
- * On: 3/06/2007
- *
  * <p>
  * Marks a method stub as a dynamic finder. The method is intercepted and replaced with
  * the specified HQL or JPAQL query. Provides result auto-boxing and automatic parameter binding.

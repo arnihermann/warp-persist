@@ -24,9 +24,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Created with IntelliJ IDEA.
- * On: 3/06/2007
- *
  * <p>
  *  A guice binding annotation you should use to tell warp-persist the name of
  * the JPA persistence unit you wish to use. Bind a string with the name to this

@@ -27,9 +27,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 /**
- * Created with IntelliJ IDEA.
- * On: 30/04/2007
- *
  * @author Dhanji R. Prasanna (dhanji@gmail.com)
  * @since 1.0
  */
