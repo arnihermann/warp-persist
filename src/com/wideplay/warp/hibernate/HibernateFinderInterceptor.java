@@ -106,7 +106,13 @@ class HibernateFinderInterceptor implements MethodInterceptor {
                 continue;   //skip param as it's not bindable
             else if (annotation instanceof Named) {
                 Named named = (Named)annotation;
-                hibernateQuery.setParameter(named.value(), argument);
+                if (Collection.class.isAssignableFrom(argument.getClass())) {
+                    hibernateQuery.setParameterList(named.value(), (Collection) argument);
+                } else if (argument.getClass().isArray()) {
+                    hibernateQuery.setParameterList(named.value(), (Object[]) argument);
+                } else {
+                    hibernateQuery.setParameter(named.value(), argument);
+                }
             } else if (annotation instanceof FirstResult)
                 hibernateQuery.setFirstResult((Integer)argument);
             else if (annotation instanceof MaxResults)

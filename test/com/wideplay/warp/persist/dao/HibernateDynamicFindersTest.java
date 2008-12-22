@@ -27,8 +27,11 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -305,6 +308,94 @@ public class HibernateDynamicFindersTest {
         session.beginTransaction();
         HibernateTestAccessor accessor = injector.getInstance(HibernateTestAccessor.class);
         HibernateTestEntity result = accessor.fetchById(entity.getId(), 1, TEXT_2);
+        session.getTransaction().commit();
+
+        //assert them
+        assert result != null : "atleast 1 results expected!";
+
+        assert result.getText().equals(TEXT_2) : "attribs not persisted correctly";
+
+    }
+
+    //an accessor is an interface bound to web-ext with finder methods
+    @Test(expectedExceptions = ClassCastException.class)
+    public void testDynamicAccessorWithList() {
+        Session session = injector.getInstance(Session.class);
+        session.beginTransaction();
+
+        HibernateTestEntity entity = new HibernateTestEntity();
+        entity.setText(TEXT_1);
+        session.save(entity);
+
+        entity = new HibernateTestEntity();
+        entity.setText(TEXT_2);
+        session.save(entity);
+
+        session.getTransaction().commit();
+
+        //now test our magic finders
+        session = injector.getInstance(Session.class);
+        session.beginTransaction();
+        HibernateTestAccessor accessor = injector.getInstance(HibernateTestAccessor.class);
+        HibernateTestEntity result = accessor.fetchByIdUnnamedList(Collections.singletonList(entity.getId()));
+        session.getTransaction().commit();
+
+        //assert them
+        assert result != null : "atleast 1 results expected!";
+
+        assert result.getText().equals(TEXT_2) : "attribs not persisted correctly";
+
+    }
+
+        //an accessor is an interface bound to web-ext with finder methods
+    @Test public void testDynamicAccessorWithNamedList() {
+        Session session = injector.getInstance(Session.class);
+        session.beginTransaction();
+
+        HibernateTestEntity entity = new HibernateTestEntity();
+        entity.setText(TEXT_1);
+        session.save(entity);
+
+        entity = new HibernateTestEntity();
+        entity.setText(TEXT_2);
+        session.save(entity);
+
+        session.getTransaction().commit();
+
+        //now test our magic finders
+        session = injector.getInstance(Session.class);
+        session.beginTransaction();
+        HibernateTestAccessor accessor = injector.getInstance(HibernateTestAccessor.class);
+        HibernateTestEntity result = accessor.fetchByIdList(Collections.singletonList(entity.getId()));
+        session.getTransaction().commit();
+
+        //assert them
+        assert result != null : "atleast 1 results expected!";
+
+        assert result.getText().equals(TEXT_2) : "attribs not persisted correctly";
+
+    }
+
+    //an accessor is an interface bound to web-ext with finder methods
+    @Test public void testDynamicAccessorWithArray() {
+        Session session = injector.getInstance(Session.class);
+        session.beginTransaction();
+
+        HibernateTestEntity entity = new HibernateTestEntity();
+        entity.setText(TEXT_1);
+        session.save(entity);
+
+        entity = new HibernateTestEntity();
+        entity.setText(TEXT_2);
+        session.save(entity);
+
+        session.getTransaction().commit();
+
+        //now test our magic finders
+        session = injector.getInstance(Session.class);
+        session.beginTransaction();
+        HibernateTestAccessor accessor = injector.getInstance(HibernateTestAccessor.class);
+        HibernateTestEntity result = accessor.fetchByIdArray(new Long[]{entity.getId()});
         session.getTransaction().commit();
 
         //assert them

@@ -52,4 +52,13 @@ public interface HibernateTestAccessor {
 
     @Finder(query = "from HibernateTestEntity")
     List<HibernateTestEntity> listAll(@MaxResults int i);
+
+    @Finder(query = "from HibernateTestEntity where id IN(:list)")
+    HibernateTestEntity fetchByIdArray(@Named("list") Long[] ids);
+
+    @Finder(query = "from HibernateTestEntity where id IN(:list)")
+    HibernateTestEntity fetchByIdList(@Named("list") List<Long> ids);
+
+    @Finder(query = "from HibernateTestEntity where id IN(?)")
+    HibernateTestEntity fetchByIdUnnamedList(List<Long> ids);
 }
