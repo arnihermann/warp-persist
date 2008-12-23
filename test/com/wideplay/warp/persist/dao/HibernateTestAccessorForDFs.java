@@ -16,12 +16,10 @@
 
 package com.wideplay.warp.persist.dao;
 
-import com.wideplay.warp.hibernate.HibernateTestEntity;
-import com.wideplay.warp.persist.Transactional;
 import com.google.inject.name.Named;
 
-import java.util.List;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**

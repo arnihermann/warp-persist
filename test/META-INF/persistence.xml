@@ -8,8 +8,8 @@
     <persistence-unit name="testUnit" transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
         
-        <class>com.wideplay.warp.jpa.JpaTestEntity</class>
-        <class>com.wideplay.warp.jpa.JpaParentTestEntity</class>
+        <class>com.wideplay.warp.persist.jpa.JpaTestEntity</class>
+        <class>com.wideplay.warp.persist.jpa.JpaParentTestEntity</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
         <properties>

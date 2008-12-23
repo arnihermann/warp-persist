@@ -17,7 +17,7 @@
 package com.wideplay.warp.persist.dao;
 
 import com.google.inject.name.Named;
-import com.wideplay.warp.jpa.JpaTestEntity;
+import com.wideplay.warp.persist.jpa.JpaTestEntity;
 
 import java.util.LinkedHashSet;
 import java.util.List;

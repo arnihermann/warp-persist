@@ -17,7 +17,7 @@
 package com.wideplay.warp.persist.dao;
 
 import com.google.inject.name.Named;
-import com.wideplay.warp.hibernate.HibernateTestEntity;
+import com.wideplay.warp.persist.hibernate.HibernateTestEntity;
 
 import java.util.HashSet;
 import java.util.List;

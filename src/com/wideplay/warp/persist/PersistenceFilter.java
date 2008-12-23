@@ -16,7 +16,7 @@
 
 package com.wideplay.warp.persist;
 
-import com.wideplay.warp.util.*;
+import com.wideplay.warp.persist.internal.*;
 import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
 

@@ -18,14 +18,13 @@ package com.wideplay.codemonkey.web;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.matcher.Matchers;
+import com.wideplay.codemonkey.web.startup.InitializerWeb;
 import com.wideplay.warp.Warp;
 import com.wideplay.warp.WarpModule;
-import com.wideplay.warp.db4o.Db4Objects;
-import com.wideplay.warp.jpa.JpaUnit;
 import com.wideplay.warp.persist.PersistenceService;
 import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.UnitOfWork;
-import com.wideplay.codemonkey.web.startup.InitializerWeb;
+import com.wideplay.warp.persist.db4o.Db4Objects;
 
 /**
  * Created with IntelliJ IDEA.

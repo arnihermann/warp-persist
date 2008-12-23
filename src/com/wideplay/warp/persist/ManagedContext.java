@@ -15,7 +15,7 @@
  */
 package com.wideplay.warp.persist;
 
-import com.wideplay.warp.util.Inferred;
+import com.wideplay.warp.persist.internal.Inferred;
 
 import java.util.Map;
 

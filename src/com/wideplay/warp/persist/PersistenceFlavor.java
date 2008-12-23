@@ -15,9 +15,9 @@
  */
 package com.wideplay.warp.persist;
 
-import com.wideplay.warp.db4o.Db4oPersistenceStrategy;
-import com.wideplay.warp.hibernate.HibernatePersistenceStrategy;
-import com.wideplay.warp.jpa.JpaPersistenceStrategy;
+import com.wideplay.warp.persist.db4o.Db4oPersistenceStrategy;
+import com.wideplay.warp.persist.hibernate.HibernatePersistenceStrategy;
+import com.wideplay.warp.persist.jpa.JpaPersistenceStrategy;
 
 /**
  * Enumerates the persistence engines we support out-of-the-box.
