@@ -32,7 +32,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * The filter automatically starts and stops all registered {@link PersistenceService} instances
  * upon {@link javax.servlet.Filter#init(javax.servlet.FilterConfig)} and
  * {@link javax.servlet.Filter#destroy()}. To disable the managing of PersistenceService instances,
- * set the {code managePersistenceServices} init-param to {@code false} or override
+ * set the {@code managePersistenceServices} init-param to {@code false} or override
  * {@link javax.servlet.Filter#init(javax.servlet.FilterConfig)} and {@link javax.servlet.Filter#destroy()}.
  *
  * @author Dhanji R. Prasanna (dhanji@gmail.com)
@@ -147,6 +147,7 @@ public class PersistenceFilter implements Filter {
     }
 
     /**
+     * Internal use only, NOT part of the SPI.
      * The different persistence strategies should add their WorkManager here
      * at configuration time if they support {@link UnitOfWork#REQUEST}.
      * @param wm the {@code WorkManager} to register
@@ -161,6 +162,7 @@ public class PersistenceFilter implements Filter {
     }
 
     /**
+     * Internal use only, NOT part of the SPI.
      * The different persistence strategies should add their
      * {@link com.wideplay.warp.persist.PersistenceService} here
      * at configuration time if they support {@link UnitOfWork#REQUEST}.

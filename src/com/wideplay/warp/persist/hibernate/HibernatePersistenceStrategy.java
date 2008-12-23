@@ -61,7 +61,7 @@ public class HibernatePersistenceStrategy implements PersistenceStrategy {
             this.sfProvider = new SessionFactoryProvider(getConfigurationKey(), annotationDebugString);
             // Need instance here for the interceptors.
             this.sessionProvider = new SessionProvider(sfProvider);
-            // Need WorkManager here so we can register it on the SPR filter if the UnitOfWork is REQUEST
+            // Need WorkManager here so we can register it on the PersistenceFilter if the UnitOfWork is REQUEST
             this.workManager = new HibernateWorkManager(sfProvider, config.getUnitOfWork(), annotationDebugString);
             // Needs to be able to initialize Provider<SessionFactory>
             this.pService = new HibernatePersistenceService(sfProvider);

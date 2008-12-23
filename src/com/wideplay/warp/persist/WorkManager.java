@@ -34,7 +34,7 @@ package com.wideplay.warp.persist;
  * </p>
  *
  * <ul>
- *   <li>Using WorkManager with the SPR Filter inside a request is not recommended.</li>
+ *   <li>Using WorkManager with the PersistenceFilter inside a request is not recommended.</li>
  *
  *   <li>Using WorkManager with session-per-txn strategy is not terribly clever either.</li>
  *

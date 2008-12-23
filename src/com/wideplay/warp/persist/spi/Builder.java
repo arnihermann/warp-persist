@@ -1,6 +1,7 @@
 package com.wideplay.warp.persist.spi;
 
 /**
+ * Formalizes the builder pattern.
  * @author Robbie Vanbrabant
  */
 public interface Builder<T> {

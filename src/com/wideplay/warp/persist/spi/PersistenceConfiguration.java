@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * Configuration values gathered through the fluent interface API.
  * @author Robbie Vanbrabant
  */
 public interface PersistenceConfiguration {
