@@ -21,29 +21,44 @@ import com.wideplay.warp.persist.Defaults;
 import java.lang.reflect.Method;
 
 /**
+ * Transaction matcher configuration, represents one call to
+ * {@link com.wideplay.warp.persist.TransactionStrategyBuilder#forAll(com.google.inject.matcher.Matcher, com.google.inject.matcher.Matcher)}.
  * @author Robbie Vanbrabant
  */
 public class TransactionMatcher {
     private Matcher<? super Class<?>> txClassMatcher = Defaults.TX_CLASS_MATCHER;
     private Matcher<? super Method> txMethodMatcher = Defaults.TX_METHOD_MATCHER;
 
+    /**
+     * Creates a {@code TransactionMatcher} with default class and method matcher.
+     * @see com.wideplay.warp.persist.Defaults
+     */
     public TransactionMatcher() {
     }
 
+    /**
+     * Creates a {@code TransactionMatcher} with given class matcher and default method matcher.
+     * @param txClassMatcher the class matcher
+     */
     public TransactionMatcher(Matcher<? super Class<?>> txClassMatcher) {
         this.txClassMatcher = txClassMatcher;
     }
 
+    /**
+     * Creates a {@code TransactionMatcher} with given class and method matcher.
+     * @param txClassMatcher the class matcher
+     * @param txMethodMatcher the method matcher
+     */
     public TransactionMatcher(Matcher<? super Class<?>> txClassMatcher, Matcher<? super Method> txMethodMatcher) {
         this(txClassMatcher);
         this.txMethodMatcher = txMethodMatcher;
     }
 
-    public Matcher<? super Class<?>> getTxClassMatcher() {
+    public Matcher<? super Class<?>> getClassMatcher() {
         return txClassMatcher;
     }
 
-    public Matcher<? super Method> getTxMethodMatcher() {
+    public Matcher<? super Method> getMethodMatcher() {
         return txMethodMatcher;
     }
 }

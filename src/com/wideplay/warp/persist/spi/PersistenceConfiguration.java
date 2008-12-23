@@ -36,5 +36,5 @@ public interface PersistenceConfiguration {
      * Dynamic Finders that are interfaces.
      * @return all configured Dynamic Accessors
      */
-    Set<Class<?>> getAccessors();
+    Set<Class<?>> getDynamicAccessors();
 }
