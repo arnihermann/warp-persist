@@ -1,9 +1,11 @@
-package com.wideplay.warp.persist;
+package com.wideplay.warp.persist.spi;
+
+import com.wideplay.warp.persist.spi.Builder;
 
 import java.lang.annotation.Annotation;
 
 /**
- * Formalizes naming conventions for {@link PersistenceStrategy} builders.
+ * Formalizes naming conventions for {@link com.wideplay.warp.persist.PersistenceStrategy} builders.
  * @author Robbie Vanbrabant
  */
 public interface PersistenceStrategyBuilder<T> extends Builder<T> {

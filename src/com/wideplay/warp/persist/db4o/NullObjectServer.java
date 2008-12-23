@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author Robbie Vanbrabant
  */
-public class NullObjectServer implements ObjectServer {
+class NullObjectServer implements ObjectServer {
     private static final AtomicInteger uniqueNumber = new AtomicInteger();
     private final int number = uniqueNumber.getAndIncrement();
 

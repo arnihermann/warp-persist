@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wideplay.warp.persist;
+package com.wideplay.warp.persist.spi;
+
+import com.wideplay.warp.persist.UnitOfWork;
+import com.wideplay.warp.persist.TransactionStrategy;
 
 import java.util.List;
 import java.util.Set;

@@ -14,10 +14,17 @@
  * limitations under the License.
  */
 
-package com.wideplay.warp.persist;
+package com.wideplay.warp.persist.internal;
 
 import com.google.inject.Module;
 import com.google.inject.matcher.Matcher;
+import com.wideplay.warp.persist.spi.PersistenceModuleVisitor;
+import com.wideplay.warp.persist.*;
+import com.wideplay.warp.persist.internal.HasPersistenceStrategy;
+import com.wideplay.warp.persist.internal.PersistenceConfigurationImpl;
+import com.wideplay.warp.persist.internal.PersistenceFlavor;
+import com.wideplay.warp.persist.spi.TransactionMatcher;
+import com.wideplay.warp.persist.spi.PersistenceModule;
 import net.jcip.annotations.NotThreadSafe;
 
 import java.lang.reflect.Method;
@@ -30,15 +37,15 @@ import java.lang.reflect.Method;
  * @since 1.0
  */
 @NotThreadSafe
-class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, PersistenceModuleBuilder, TransactionStrategyBuilder {
+public class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, PersistenceModuleBuilder, TransactionStrategyBuilder {
     private final PersistenceConfigurationImpl.PersistenceConfigurationBuilder persistenceConfiguration = PersistenceConfigurationImpl.builder();
     private final HasPersistenceStrategy flavor;
 
-    PersistenceServiceBuilderImpl(PersistenceFlavor flavor) {
+    public PersistenceServiceBuilderImpl(PersistenceFlavor flavor) {
         this.flavor = flavor;
     }
 
-    PersistenceServiceBuilderImpl(final PersistenceStrategy persistenceStrategy) {
+    public PersistenceServiceBuilderImpl(final PersistenceStrategy persistenceStrategy) {
         this.flavor = new HasPersistenceStrategy() {
             public PersistenceStrategy getPersistenceStrategy() {
                 return persistenceStrategy;

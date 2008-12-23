@@ -13,27 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wideplay.warp.persist;
+package com.wideplay.warp.persist.spi;
 
 import com.google.inject.matcher.Matcher;
+import com.wideplay.warp.persist.Defaults;
 
 import java.lang.reflect.Method;
 
 /**
  * @author Robbie Vanbrabant
  */
-class TransactionMatcher {
+public class TransactionMatcher {
     private Matcher<? super Class<?>> txClassMatcher = Defaults.TX_CLASS_MATCHER;
     private Matcher<? super Method> txMethodMatcher = Defaults.TX_METHOD_MATCHER;
 
-    TransactionMatcher() {
+    public TransactionMatcher() {
     }
 
-    TransactionMatcher(Matcher<? super Class<?>> txClassMatcher) {
+    public TransactionMatcher(Matcher<? super Class<?>> txClassMatcher) {
         this.txClassMatcher = txClassMatcher;
     }
 
-    TransactionMatcher(Matcher<? super Class<?>> txClassMatcher, Matcher<? super Method> txMethodMatcher) {
+    public TransactionMatcher(Matcher<? super Class<?>> txClassMatcher, Matcher<? super Method> txMethodMatcher) {
         this(txClassMatcher);
         this.txMethodMatcher = txMethodMatcher;
     }

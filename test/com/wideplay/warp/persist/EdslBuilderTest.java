@@ -25,6 +25,7 @@ import com.wideplay.warp.persist.db4o.Db4oPersistenceStrategy;
 import com.wideplay.warp.persist.hibernate.HibernatePersistenceStrategy;
 import com.wideplay.warp.persist.hibernate.HibernateTestEntity;
 import com.wideplay.warp.persist.jpa.JpaPersistenceStrategy;
+import com.wideplay.warp.persist.PersistenceStrategy;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.testng.annotations.Test;

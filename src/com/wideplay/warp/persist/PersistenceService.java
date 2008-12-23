@@ -17,6 +17,9 @@
 package com.wideplay.warp.persist;
 
 import com.wideplay.warp.persist.dao.Finder;
+import com.wideplay.warp.persist.PersistenceStrategy;
+import com.wideplay.warp.persist.internal.PersistenceFlavor;
+import com.wideplay.warp.persist.internal.PersistenceServiceBuilderImpl;
 
 import java.lang.reflect.Method;
 
@@ -85,7 +88,7 @@ public abstract class PersistenceService {
     }
 
     /**
-     * Configure a given {@link com.wideplay.warp.persist.PersistenceStrategy}, either
+     * Configure a given {@link PersistenceStrategy}, either
      * because it is not part of Warp Persist, or because you need support for multiple
      * persistence modules (bound to an annotation).
      *

@@ -17,7 +17,7 @@ package com.wideplay.warp.persist.db4o;
 
 import com.db4o.config.Configuration;
 
-public class Db4oSettings {
+class Db4oSettings {
     private final String user;
     private final String password;
     private final String host;
@@ -26,7 +26,7 @@ public class Db4oSettings {
     private final HostKind hostKind;
     private final String databaseFileName;
 
-    public Db4oSettings(String user, String password, String host, int port,
+    Db4oSettings(String user, String password, String host, int port,
                         Configuration configuration, HostKind hostKind, String databaseFileName) {
         this.databaseFileName = databaseFileName;
         this.user = user;

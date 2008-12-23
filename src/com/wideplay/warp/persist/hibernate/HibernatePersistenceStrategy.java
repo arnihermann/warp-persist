@@ -20,6 +20,7 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.Provider;
 import com.wideplay.warp.persist.*;
+import com.wideplay.warp.persist.spi.*;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

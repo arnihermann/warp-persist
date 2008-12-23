@@ -15,17 +15,20 @@
  */
 package com.wideplay.warp.persist;
 
+import com.wideplay.warp.persist.spi.PersistenceConfiguration;
+import com.wideplay.warp.persist.spi.PersistenceModule;
+
 /**
  * Strategy for hooking persistence strategies into warp-persist.
  * @author Robbie Vanbrabant
  */
 public interface PersistenceStrategy {
     /**
-     * Produces a {@link com.wideplay.warp.persist.PersistenceModule}
+     * Produces a {@link com.wideplay.warp.persist.spi.PersistenceModule}
      * from the given configuration.
      * 
      * @param config all configuration gathered through the public fluent interface API
-     * @return the {@link com.wideplay.warp.persist.PersistenceModule} containing all
+     * @return the {@link com.wideplay.warp.persist.spi.PersistenceModule} containing all
      *         that's needed for configuring this {@code PersistenceStrategy}
      */
     PersistenceModule getBindings(PersistenceConfiguration config);
