@@ -23,7 +23,9 @@ import java.util.List;
 /**
  * Module with bindings that can be useful when using certain Warp Persist configurations.
  * Current bindings:
- * <ul><li>{@code List<PersistenceService>} (accumulating all PersistenceServices in regular or multimodules mode)</li></ul>
+ * <ul>
+ *   <li>{@code List<PersistenceService>} (accumulating all PersistenceServices in regular or multimodules mode)</li>
+ * </ul>
  *
  * @author Robbie Vanbrabant
  */
@@ -42,7 +44,7 @@ public final class PersistenceServiceExtrasModule extends AbstractModule {
 
         public List<PersistenceService> get() {
             List<Binding<PersistenceService>> bindings =
-            injector.findBindingsByType(new TypeLiteral<PersistenceService>() {});
+                injector.findBindingsByType(new TypeLiteral<PersistenceService>() {});
             List<PersistenceService> persistenceServices = new ArrayList<PersistenceService>(bindings.size());
 
             for(Binding binding : bindings) {
