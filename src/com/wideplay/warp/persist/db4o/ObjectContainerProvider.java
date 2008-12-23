@@ -18,7 +18,7 @@ package com.wideplay.warp.persist.db4o;
 
 import com.db4o.ObjectContainer;
 import com.google.inject.Provider;
-import com.wideplay.warp.persist.InternalWorkManager;
+import com.wideplay.warp.persist.internal.InternalWorkManager;
 
 /**
  * @author Jeffrey Chung (jeffreymchung@gmail.com)

@@ -29,7 +29,7 @@ import java.util.*;
  */
 @ThreadSafe
 @Immutable
-public class PersistenceConfigurationImpl implements PersistenceConfiguration {
+class PersistenceConfigurationImpl implements PersistenceConfiguration {
     private final UnitOfWork unitOfWork;
     private final TransactionStrategy txStrategy;
     private final Set<Class<?>> accessors;

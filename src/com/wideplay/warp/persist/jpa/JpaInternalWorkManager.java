@@ -16,8 +16,8 @@
 package com.wideplay.warp.persist.jpa;
 
 import com.google.inject.Provider;
-import com.wideplay.warp.persist.InternalWorkManager;
-import com.wideplay.warp.persist.ManagedContext;
+import com.wideplay.warp.persist.internal.InternalWorkManager;
+import com.wideplay.warp.persist.internal.ManagedContext;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;

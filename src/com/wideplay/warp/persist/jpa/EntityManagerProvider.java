@@ -17,7 +17,7 @@
 package com.wideplay.warp.persist.jpa;
 
 import com.google.inject.Provider;
-import com.wideplay.warp.persist.InternalWorkManager;
+import com.wideplay.warp.persist.internal.InternalWorkManager;
 import net.jcip.annotations.Immutable;
 
 import javax.persistence.EntityManager;

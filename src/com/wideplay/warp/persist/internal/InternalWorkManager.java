@@ -1,4 +1,4 @@
-package com.wideplay.warp.persist;
+package com.wideplay.warp.persist.internal;
 
 /**
  * WorkManager for internal code reuse.

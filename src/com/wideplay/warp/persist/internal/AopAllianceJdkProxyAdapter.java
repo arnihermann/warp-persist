@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.wideplay.warp.persist;
+package com.wideplay.warp.persist.internal;
 
 import net.jcip.annotations.Immutable;
 import net.sf.cglib.proxy.InvocationHandler;
@@ -35,7 +35,7 @@ import java.lang.reflect.Method;
  * @since 1.0
  */
 @Immutable
-class AopAllianceJdkProxyAdapter implements InvocationHandler {
+public class AopAllianceJdkProxyAdapter implements InvocationHandler {
     private final MethodInterceptor interceptor;
 
     public AopAllianceJdkProxyAdapter(MethodInterceptor interceptor) {

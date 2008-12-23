@@ -19,6 +19,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.wideplay.warp.persist.*;
+import com.wideplay.warp.persist.internal.InternalWorkManager;
 import org.aopalliance.intercept.MethodInterceptor;
 
 import javax.persistence.EntityManager;

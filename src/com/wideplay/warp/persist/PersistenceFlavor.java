@@ -23,7 +23,7 @@ import com.wideplay.warp.persist.jpa.JpaPersistenceStrategy;
  * Enumerates the persistence engines we support out-of-the-box.
  * @author Robbie Vanbrabant
  */
-public enum PersistenceFlavor implements HasPersistenceStrategy {
+enum PersistenceFlavor implements HasPersistenceStrategy {
     HIBERNATE {
         public PersistenceStrategy getPersistenceStrategy() {
             return HibernatePersistenceStrategy.builder().build();

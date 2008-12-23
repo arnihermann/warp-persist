@@ -18,8 +18,8 @@ package com.wideplay.warp.persist.db4o;
 import com.db4o.Db4o;
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectServer;
-import com.wideplay.warp.persist.InternalWorkManager;
-import com.wideplay.warp.persist.ManagedContext;
+import com.wideplay.warp.persist.internal.InternalWorkManager;
+import com.wideplay.warp.persist.internal.ManagedContext;
 
 /**
  * Internal WorkManager.

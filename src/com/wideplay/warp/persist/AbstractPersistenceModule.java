@@ -21,6 +21,8 @@ import static com.google.inject.matcher.Matchers.annotatedWith;
 import static com.google.inject.matcher.Matchers.any;
 import com.wideplay.warp.persist.dao.Finder;
 import com.wideplay.warp.persist.internal.WarpPersistNamingPolicy;
+import com.wideplay.warp.persist.internal.AopAllianceCglibAdapter;
+import com.wideplay.warp.persist.internal.AopAllianceJdkProxyAdapter;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.Proxy;
 import org.aopalliance.intercept.MethodInterceptor;

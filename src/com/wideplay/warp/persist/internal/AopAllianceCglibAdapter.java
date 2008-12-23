@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.wideplay.warp.persist;
+package com.wideplay.warp.persist.internal;
 
 import net.jcip.annotations.Immutable;
 import net.sf.cglib.proxy.MethodProxy;
@@ -23,6 +23,8 @@ import org.aopalliance.intercept.MethodInvocation;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
+
+import com.wideplay.warp.persist.PersistenceService;
 
 /**
  * <p>
@@ -33,7 +35,7 @@ import java.lang.reflect.Method;
  * @author Dhanji R. Prasanna (dhanji gmail com)
  */
 @Immutable
-class AopAllianceCglibAdapter implements net.sf.cglib.proxy.MethodInterceptor {
+public class AopAllianceCglibAdapter implements net.sf.cglib.proxy.MethodInterceptor {
     private final MethodInterceptor finderInterceptor;
 
     public AopAllianceCglibAdapter(MethodInterceptor finderInterceptor) {

@@ -16,7 +16,7 @@
 
 package com.wideplay.warp.persist.jpa;
 
-import com.wideplay.warp.persist.InternalWorkManager;
+import com.wideplay.warp.persist.internal.InternalWorkManager;
 import com.wideplay.warp.persist.TransactionType;
 import com.wideplay.warp.persist.Transactional;
 import com.wideplay.warp.persist.UnitOfWork;

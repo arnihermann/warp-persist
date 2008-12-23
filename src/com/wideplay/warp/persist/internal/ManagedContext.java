@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wideplay.warp.persist;
+package com.wideplay.warp.persist.internal;
 
 import com.wideplay.warp.persist.internal.Inferred;
 
@@ -23,8 +23,8 @@ import java.util.Map;
  * <p>
  * Utility analogous to Hibernate's {@link org.hibernate.context.ManagedSessionContext},
  * but not limited to a single persistence engine.<br/> 
- * In {@link UnitOfWork#REQUEST}, this class is used by the
- * {@link com.wideplay.warp.persist.WorkManager}, in {@link UnitOfWork#TRANSACTION} by
+ * In {@link com.wideplay.warp.persist.UnitOfWork#REQUEST}, this class is used by the
+ * {@link com.wideplay.warp.persist.WorkManager}, in {@link com.wideplay.warp.persist.UnitOfWork#TRANSACTION} by
  * the context artifact (like EntityManager, ObjectContainer, ...) provider and
  * local transaction interceptor.
  * </p>

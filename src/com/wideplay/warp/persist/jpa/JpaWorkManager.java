@@ -16,7 +16,7 @@
 
 package com.wideplay.warp.persist.jpa;
 
-import com.wideplay.warp.persist.InternalWorkManager;
+import com.wideplay.warp.persist.internal.InternalWorkManager;
 import com.wideplay.warp.persist.WorkManager;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;

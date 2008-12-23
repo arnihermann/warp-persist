@@ -24,6 +24,7 @@ import com.google.inject.Stage;
 import com.google.inject.name.Named;
 import com.wideplay.warp.persist.*;
 import com.wideplay.warp.persist.internal.Text;
+import com.wideplay.warp.persist.internal.InternalWorkManager;
 import static com.wideplay.warp.persist.internal.Text.empty;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
