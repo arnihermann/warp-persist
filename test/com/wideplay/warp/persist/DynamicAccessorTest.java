@@ -69,7 +69,7 @@ public class DynamicAccessorTest {
     public void testDynamicAccessorWithTransactionNonMultimodule() {
         HibernatePersistenceStrategy hibernate = HibernatePersistenceStrategy.builder().build();
         Guice.createInjector(PersistenceService.using(hibernate).across(UnitOfWork.REQUEST)
-                .addAccessor(ValidTransactionalAccessor.class)
+                .addAccessor(ValidUnitlessTransactionalAccessor.class)
                 .buildModule(),
                 new AbstractModule() {
                     protected void configure() {
@@ -77,7 +77,7 @@ public class DynamicAccessorTest {
                             .addAnnotatedClass(HibernateTestEntity.class)
                             .setProperties(Initializer.loadProperties("spt-persistence.properties")));
                     }
-                }).getInstance(ValidTransactionalAccessor.class).listAll();
+                }).getInstance(ValidUnitlessTransactionalAccessor.class).listAll();
     }
 
     @Test(expectedExceptions = HibernateException.class) // finder not valid without tx
@@ -118,6 +118,12 @@ public class DynamicAccessorTest {
     public interface ValidTransactionalAccessor {
         @Finder(unit=MyUnit.class, query = "from HibernateTestEntity")
         @Transactional(unit=MyUnit.class)
+        List<HibernateTestEntity> listAll();
+    }
+
+    public interface ValidUnitlessTransactionalAccessor {
+        @Finder(query = "from HibernateTestEntity")
+        @Transactional
         List<HibernateTestEntity> listAll();
     }
 

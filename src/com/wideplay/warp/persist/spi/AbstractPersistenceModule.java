@@ -174,9 +174,9 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
      */
     protected void bindFinderInterceptor(MethodInterceptor finderInterceptor) {
         if (inMultiModulesMode()) {
-            bindInterceptor(any(), InternalPersistenceMatchers.finderWithUnit(annotation), finderInterceptor);
+            bindInterceptor(Defaults.FINDER_CLASS_MATCHER, InternalPersistenceMatchers.finderWithUnit(annotation), finderInterceptor);
         } else {
-            bindInterceptor(any(), annotatedWith(Finder.class), finderInterceptor);
+            bindInterceptor(Defaults.FINDER_CLASS_MATCHER, Defaults.FINDER_METHOD_MATCHER, finderInterceptor);
         }
     }
 
