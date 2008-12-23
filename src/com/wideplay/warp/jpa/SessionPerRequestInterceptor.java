@@ -29,14 +29,14 @@ import javax.servlet.ServletResponse;
 import java.io.IOException;
 
 /**
- * Struts 2 equivalent for {@link com.wideplay.warp.jpa.SessionPerRequestFilter}.
+ * Struts 2 equivalent for {@link com.wideplay.warp.persist.PersistenceFilter}.
  * Needed because Guice's current (1.0.1) Struts 2 plugin creates the Guice Injector
  * internally, which means that that injector instance is not available to other filters
  * before the Struts filter executes. Also see
  * <a href="http://groups.google.com/group/warp-core/browse_thread/thread/738a8ce3c7275602/">here</a>.
  * <p>
  * Do <em>not</em> use this interceptor in combination with the
- * {@link com.wideplay.warp.jpa.SessionPerRequestFilter}.
+ * {@link com.wideplay.warp.persist.PersistenceFilter}.
  * <p>
  * This Interceptor starts the {@link com.wideplay.warp.persist.PersistenceService} at creation time.
  * <p>
@@ -76,7 +76,7 @@ import java.io.IOException;
  * This code originated from the book
  * <a href="http://tinyurl.com/578n9s">Google Guice (Apress, 2008, ISBN 978-1590599976)</a>.
  *
- * @see com.wideplay.warp.jpa.SessionPerRequestFilter
+ * @see com.wideplay.warp.persist.PersistenceFilter
  * @author Robbie Vanbrabant
  */
 @Immutable
