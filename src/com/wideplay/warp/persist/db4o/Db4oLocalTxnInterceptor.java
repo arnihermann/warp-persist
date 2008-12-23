@@ -46,12 +46,12 @@ class Db4oLocalTxnInterceptor implements MethodInterceptor {
     }
 
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-		ObjectContainer oc = internalWorkManager.beginWork();
-
         Transactional transactional = readTransactionMetadata(methodInvocation);
         if (transactional.type() != null && transactional.type() == TransactionType.READ_ONLY) {
-            throw new UnsupportedOperationException("Transaction type READ_ONLY not supported with DB4O");
+            throw new UnsupportedOperationException("Transaction type READ_ONLY is not supported with DB4O");
         }
+
+		ObjectContainer oc = internalWorkManager.beginWork();
 
 		Object result;
 		try {

@@ -46,16 +46,16 @@ class JpaLocalTxnInterceptor implements MethodInterceptor {
     }
 
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
+        Transactional transactional = readTransactionMetadata(methodInvocation);
+        if (transactional.type() != null && transactional.type() == TransactionType.READ_ONLY) {
+            throw new UnsupportedOperationException("Transaction type READ_ONLY is not supported with JPA");
+        }
+
         EntityManager em = this.internalWorkManager.beginWork();
 
         //allow joining of transactions if there is an enclosing @Transactional method
         if (em.getTransaction().isActive())
             return methodInvocation.proceed();
-
-        Transactional transactional = readTransactionMetadata(methodInvocation);
-        if (transactional.type() != null && transactional.type() == TransactionType.READ_ONLY) {
-            throw new UnsupportedOperationException("Transaction type READ_ONLY not supported with JPA");
-        }
 
         //otherwise...
 
