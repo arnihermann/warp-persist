@@ -16,7 +16,7 @@
 
 package com.wideplay.warp.hibernate;
 
-import com.wideplay.warp.persist.SessionFilter;
+import com.wideplay.warp.persist.PersistenceFilter;
 
 /**
  * Apply this filter in web.xml to enable the HTTP Request unit of work.
@@ -25,7 +25,7 @@ import com.wideplay.warp.persist.SessionFilter;
  * @author Robbie Vanbrabant
  * @since 1.0
  * @see com.wideplay.warp.persist.UnitOfWork
- * @deprecated use {@link com.wideplay.warp.persist.SessionFilter}
+ * @deprecated use {@link com.wideplay.warp.persist.PersistenceFilter}
  */
 @Deprecated
-public class SessionPerRequestFilter extends SessionFilter {}
+public class SessionPerRequestFilter extends PersistenceFilter {}

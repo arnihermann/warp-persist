@@ -23,6 +23,6 @@ public class TestCleanup {
 
     // Hack to get around package-private method
     public static void clearWorkManagers() {
-        SessionFilter.clearWorkManagers();
+        PersistenceFilter.clearWorkManagers();
     }
 }

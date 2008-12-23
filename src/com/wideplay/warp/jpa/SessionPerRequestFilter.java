@@ -16,7 +16,7 @@
 
 package com.wideplay.warp.jpa;
 
-import com.wideplay.warp.persist.SessionFilter;
+import com.wideplay.warp.persist.PersistenceFilter;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -27,9 +27,9 @@ import net.jcip.annotations.ThreadSafe;
  * @author Dhanji R. Prasanna (dhanji@gmail.com)
  * @since 1.0
  * @see com.wideplay.warp.persist.UnitOfWork
- * @deprecated use {@link com.wideplay.warp.persist.SessionFilter}
+ * @deprecated use {@link com.wideplay.warp.persist.PersistenceFilter}
  */
 @Deprecated
 @ThreadSafe
-public class SessionPerRequestFilter extends SessionFilter {
+public class SessionPerRequestFilter extends PersistenceFilter {
 }

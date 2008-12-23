@@ -56,10 +56,10 @@ class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, Persisten
         PersistenceModule bindings = flavor.getPersistenceStrategy().getBindings(persistenceConfiguration.build());
         bindings.visit(new PersistenceModuleVisitor() {
             public void publishWorkManager(WorkManager wm) {
-                 SessionFilter.registerWorkManager(wm);
+                 PersistenceFilter.registerWorkManager(wm);
             }
             public void publishPersistenceService(PersistenceService persistenceService) {
-                PersistenceServiceSessionFilter.registerPersistenceService(persistenceService);
+                PersistenceFilter.registerPersistenceService(persistenceService);
             }
         });
         return bindings;

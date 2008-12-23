@@ -42,7 +42,7 @@ public class SessionFilterTest {
     @BeforeClass
     public void pre() {
         // protect against sloppy tests elsewhere
-        SessionFilter.clearWorkManagers();
+        PersistenceFilter.clearWorkManagers();
     }
 
     @AfterClass
@@ -50,20 +50,20 @@ public class SessionFilterTest {
 
     @AfterMethod
     public void cleanSessionFilter() {
-        SessionFilter.clearWorkManagers();
+        PersistenceFilter.clearWorkManagers();
     }
 
     @Test(expectedExceptions = ServletException.class)
     public final void testNoWorkManagersFailure() throws IOException, ServletException {
-        SessionFilter spr = new SessionFilter();
+        PersistenceFilter spr = new PersistenceFilter();
         spr.doFilter(null, null, null);
     }
 
     @Test
     public final void testUseWorkManager() throws IOException, ServletException {
-        SessionFilter spr = new SessionFilter();
+        PersistenceFilter spr = new PersistenceFilter();
         final ValidatableWorkManager workManager = new ValidatableWorkManager();
-        SessionFilter.registerWorkManager(workManager);
+        PersistenceFilter.registerWorkManager(workManager);
         FilterChain chain = new FilterChain() {
             public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse) throws IOException, ServletException {
                 assert workManager.beginCalled;
@@ -77,7 +77,7 @@ public class SessionFilterTest {
 
     @Test
     public final void testWorkManagerBeginThrowsException() throws IOException, ServletException {
-        SessionFilter spr = new SessionFilter();
+        PersistenceFilter spr = new PersistenceFilter();
         final ValidatableWorkManager workManager1 = new ValidatableWorkManager();
         final ValidatableWorkManager workManager2 = new ValidatableWorkManager() {
             public void beginWork() {
@@ -87,9 +87,9 @@ public class SessionFilterTest {
         };
         
         final ValidatableWorkManager workManager3 = new ValidatableWorkManager();
-        SessionFilter.registerWorkManager(workManager1);
-        SessionFilter.registerWorkManager(workManager2);
-        SessionFilter.registerWorkManager(workManager3);
+        PersistenceFilter.registerWorkManager(workManager1);
+        PersistenceFilter.registerWorkManager(workManager2);
+        PersistenceFilter.registerWorkManager(workManager3);
         
         try {
             spr.doFilter(null, null, null);
@@ -108,7 +108,7 @@ public class SessionFilterTest {
 
     @Test
     public final void testWorkManagerEndThrowsException() throws IOException, ServletException {
-        SessionFilter spr = new SessionFilter();
+        PersistenceFilter spr = new PersistenceFilter();
         final ValidatableWorkManager workManager1 = new ValidatableWorkManager();
         final ValidatableWorkManager workManager2 = new ValidatableWorkManager() {
             public void endWork() {
@@ -118,9 +118,9 @@ public class SessionFilterTest {
         };
 
         final ValidatableWorkManager workManager3 = new ValidatableWorkManager();
-        SessionFilter.registerWorkManager(workManager1);
-        SessionFilter.registerWorkManager(workManager2);
-        SessionFilter.registerWorkManager(workManager3);
+        PersistenceFilter.registerWorkManager(workManager1);
+        PersistenceFilter.registerWorkManager(workManager2);
+        PersistenceFilter.registerWorkManager(workManager3);
 
         FilterChain chain = new FilterChain() {
             public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse) throws IOException, ServletException {
@@ -142,7 +142,7 @@ public class SessionFilterTest {
 
     @Test
     public final void testWorkManagerBeginAndEndThrowException() throws IOException, ServletException {
-        SessionFilter spr = new SessionFilter();
+        PersistenceFilter spr = new PersistenceFilter();
         final ValidatableWorkManager workManager1 = new ValidatableWorkManager() {
             public void endWork() {
                 endCalled = true;
@@ -158,9 +158,9 @@ public class SessionFilterTest {
 
         final ValidatableWorkManager workManager3 = new ValidatableWorkManager();
         
-        SessionFilter.registerWorkManager(workManager1);
-        SessionFilter.registerWorkManager(workManager2);
-        SessionFilter.registerWorkManager(workManager3);
+        PersistenceFilter.registerWorkManager(workManager1);
+        PersistenceFilter.registerWorkManager(workManager2);
+        PersistenceFilter.registerWorkManager(workManager3);
 
         try {
             spr.doFilter(null, null, null);
@@ -193,7 +193,7 @@ public class SessionFilterTest {
         //startup persistence
         injector.getInstance(PersistenceService.class).start();
 
-        SessionFilter spr = new SessionFilter();
+        PersistenceFilter spr = new PersistenceFilter();
         FilterChain chain = new FilterChain() {
             public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse) throws IOException, ServletException {
                 assert ManagedSessionContext.hasBind(injector.getInstance(SessionFactory.class));

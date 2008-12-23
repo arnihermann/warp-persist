@@ -18,7 +18,7 @@ package com.wideplay.warp.jpa;
 
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;
-import com.wideplay.warp.persist.PersistenceServiceSessionFilter;
+import com.wideplay.warp.persist.PersistenceFilter;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
@@ -81,14 +81,14 @@ import java.io.IOException;
  */
 @Immutable
 @ThreadSafe
-public class SessionPerRequestInterceptor extends PersistenceServiceSessionFilter implements Interceptor {
+public class SessionPerRequestInterceptor extends PersistenceFilter implements Interceptor {
     /**
      * Makes sure an {@link javax.persistence.EntityManager} instance is available while
      * the current request is being processed.
      * @see com.opensymphony.xwork2.interceptor.Interceptor#intercept(com.opensymphony.xwork2.ActionInvocation)
      */
     public String intercept(final ActionInvocation ai) throws Exception {
-        // Ugly hack to reuse code. We should probably pull some code out of SessionFilter
+        // Ugly hack to reuse code. We should probably pull some code out of PersistenceFilter
         // into a class that we can reuse.
         final String[] result = new String[1];
         final Exception[] exception = new Exception[1];
