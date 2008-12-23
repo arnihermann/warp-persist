@@ -1,9 +1,11 @@
-package com.wideplay.warp.persist;
+package com.wideplay.warp.persist.internal;
+
+import com.wideplay.warp.persist.PersistenceStrategy;
 
 /**
  * Internal interface for passing persistence strategies around.
  * @author Robbie Vanbrabant
  */
-interface HasPersistenceStrategy {
+public interface HasPersistenceStrategy {
     PersistenceStrategy getPersistenceStrategy();
 }

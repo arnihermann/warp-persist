@@ -13,12 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wideplay.warp.persist;
+package com.wideplay.warp.persist.internal;
 
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
 import java.util.*;
+
+import com.wideplay.warp.persist.spi.PersistenceConfiguration;
+import com.wideplay.warp.persist.spi.TransactionMatcher;
+import com.wideplay.warp.persist.UnitOfWork;
+import com.wideplay.warp.persist.TransactionStrategy;
 
 /**
  * Value object that indicates how a persistence service should be configured.
@@ -48,7 +53,7 @@ class PersistenceConfigurationImpl implements PersistenceConfiguration {
     public TransactionStrategy getTransactionStrategy() {
         return this.txStrategy;
     }
-    public Set<Class<?>> getAccessors() {
+    public Set<Class<?>> getDynamicAccessors() {
         return this.accessors;
     }
     public List<TransactionMatcher> getTransactionMatchers() {

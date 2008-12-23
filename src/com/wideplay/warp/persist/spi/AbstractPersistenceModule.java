@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wideplay.warp.persist;
+package com.wideplay.warp.persist.spi;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
@@ -23,6 +23,8 @@ import com.wideplay.warp.persist.dao.Finder;
 import com.wideplay.warp.persist.internal.WarpPersistNamingPolicy;
 import com.wideplay.warp.persist.internal.AopAllianceCglibAdapter;
 import com.wideplay.warp.persist.internal.AopAllianceJdkProxyAdapter;
+import com.wideplay.warp.persist.internal.InternalPersistenceMatchers;
+import com.wideplay.warp.persist.*;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.Proxy;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -46,11 +48,11 @@ import java.util.concurrent.ConcurrentMap;
 public abstract class AbstractPersistenceModule extends AbstractModule implements PersistenceModule {
     private final PersistenceConfiguration config;
     private final Class<? extends Annotation> annotation;
-    private final List<TransactionMatcher> transactionMatchers;
+    private final List<TransactionMatcher> transactionMatchers; 
 
     /**
      * @param configuration the non-{@code null} PersistenceConfiguration obtained from
-     *               {@link com.wideplay.warp.persist.PersistenceStrategy#getBindings(PersistenceConfiguration)}.
+     *               {@link PersistenceStrategy#getBindings(PersistenceConfiguration)}.
      * @param unitAnnotation the unit annotation or {@code null} if there is none
      */
     protected AbstractPersistenceModule(final PersistenceConfiguration configuration, Class<? extends Annotation> unitAnnotation) {
@@ -81,8 +83,8 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
             public List<TransactionMatcher> getTransactionMatchers() {
                 throw new UnsupportedOperationException();
             }
-            public Set<Class<?>> getAccessors() {
-                return configuration.getAccessors();
+            public Set<Class<?>> getDynamicAccessors() {
+                return configuration.getDynamicAccessors();
             }
         };
     }
@@ -123,7 +125,7 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
                 if (!matcherCache.containsKey(methodInvocation.getMethod())) {
                     boolean matches = false;
                     for (TransactionMatcher matcher : transactionMatchers) {
-                        matches |= matcher.getTxMethodMatcher().matches(methodInvocation.getMethod());
+                        matches |= matcher.getMethodMatcher().matches(methodInvocation.getMethod());
                     }
                     matcherCache.putIfAbsent(methodInvocation.getMethod(), matches);
                 }
@@ -161,7 +163,7 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
     protected void bindTransactionInterceptor(MethodInterceptor txInterceptor) {
         // We support forAll, and assume the user knows what he/she is doing.
         for (TransactionMatcher matcher : transactionMatchers) {
-            bindInterceptor(matcher.getTxClassMatcher(), matcher.getTxMethodMatcher(), txInterceptor);
+            bindInterceptor(matcher.getClassMatcher(), matcher.getMethodMatcher(), txInterceptor);
         }
     }
 
@@ -172,7 +174,7 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
      */
     protected void bindFinderInterceptor(MethodInterceptor finderInterceptor) {
         if (inMultiModulesMode()) {
-            bindInterceptor(any(), PersistenceMatchers.finderWithUnit(annotation), finderInterceptor);
+            bindInterceptor(any(), InternalPersistenceMatchers.finderWithUnit(annotation), finderInterceptor);
         } else {
             bindInterceptor(any(), annotatedWith(Finder.class), finderInterceptor);
         }
@@ -210,7 +212,7 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
         Enhancer enhancer = new Enhancer();
         enhancer.setNamingPolicy(new WarpPersistNamingPolicy());
 
-        for (Class accessor : config.getAccessors()) {
+        for (Class accessor : config.getDynamicAccessors()) {
             if (accessor.isInterface()) {
                 bindDynamicAccessorInterface(finderInterceptor, transactionalFinderInterceptor, accessor);
             } else {
@@ -260,7 +262,7 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
                                                               Class<?> accessor) {
         boolean matches = false;
         for (TransactionMatcher matcher : transactionMatchers) {
-            matches |= matcher.getTxClassMatcher().matches(accessor);
+            matches |= matcher.getClassMatcher().matches(accessor);
         }
         return matches ? transactionalFinderInterceptor : finderInterceptor;
     }

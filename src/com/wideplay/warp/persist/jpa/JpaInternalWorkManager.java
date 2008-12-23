@@ -25,10 +25,10 @@ import javax.persistence.EntityManagerFactory;
 /**
  * @author Robbie Vanbrabant
  */
-public class JpaInternalWorkManager implements InternalWorkManager<EntityManager> {
+class JpaInternalWorkManager implements InternalWorkManager<EntityManager> {
     private final Provider<EntityManagerFactory> emfProvider;
 
-    public JpaInternalWorkManager(Provider<EntityManagerFactory> emfProvider) {
+    JpaInternalWorkManager(Provider<EntityManagerFactory> emfProvider) {
         this.emfProvider = emfProvider;
     }
 

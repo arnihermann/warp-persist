@@ -26,7 +26,7 @@ import com.wideplay.warp.persist.WorkManager;
 class Db4oWorkManager implements WorkManager {
     private final InternalWorkManager<ObjectContainer> internalWorkManager;
 
-    public Db4oWorkManager(InternalWorkManager<ObjectContainer> internalWorkManager) {
+    Db4oWorkManager(InternalWorkManager<ObjectContainer> internalWorkManager) {
         this.internalWorkManager = internalWorkManager;
     }
 

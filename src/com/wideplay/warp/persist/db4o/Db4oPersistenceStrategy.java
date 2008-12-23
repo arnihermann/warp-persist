@@ -23,6 +23,7 @@ import com.google.inject.Provider;
 import com.google.inject.Stage;
 import com.google.inject.name.Named;
 import com.wideplay.warp.persist.*;
+import com.wideplay.warp.persist.spi.*;
 import com.wideplay.warp.persist.internal.Text;
 import com.wideplay.warp.persist.internal.InternalWorkManager;
 import static com.wideplay.warp.persist.internal.Text.empty;
@@ -45,7 +46,7 @@ public class Db4oPersistenceStrategy implements PersistenceStrategy {
 
     public PersistenceModule getBindings(final PersistenceConfiguration config) {
         // No Dynamic Finders yet.
-        if (config.getAccessors().size() > 0) {
+        if (config.getDynamicAccessors().size() > 0) {
             throw new UnsupportedOperationException("Dynamic Finders or Accessors are not supported with DB4O. " +
                     "Please remove all configured Accessor interfaces.");
         }

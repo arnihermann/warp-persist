@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wideplay.warp.persist;
+package com.wideplay.warp.persist.internal;
 
 import com.wideplay.warp.persist.db4o.Db4oPersistenceStrategy;
 import com.wideplay.warp.persist.hibernate.HibernatePersistenceStrategy;
 import com.wideplay.warp.persist.jpa.JpaPersistenceStrategy;
+import com.wideplay.warp.persist.PersistenceStrategy;
+import com.wideplay.warp.persist.internal.HasPersistenceStrategy;
 
 /**
  * Enumerates the persistence engines we support out-of-the-box.
  * @author Robbie Vanbrabant
  */
-enum PersistenceFlavor implements HasPersistenceStrategy {
+public enum PersistenceFlavor implements HasPersistenceStrategy {
     HIBERNATE {
         public PersistenceStrategy getPersistenceStrategy() {
             return HibernatePersistenceStrategy.builder().build();

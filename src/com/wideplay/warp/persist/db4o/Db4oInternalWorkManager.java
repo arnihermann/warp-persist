@@ -25,10 +25,10 @@ import com.wideplay.warp.persist.internal.ManagedContext;
  * Internal WorkManager.
  * @author Robbie Vanbrabant
  */
-public class Db4oInternalWorkManager implements InternalWorkManager<ObjectContainer> {
+class Db4oInternalWorkManager implements InternalWorkManager<ObjectContainer> {
     private final ObjectServerProvider objectServerProvider;
 
-    public Db4oInternalWorkManager(ObjectServerProvider objectServerProvider) {
+    Db4oInternalWorkManager(ObjectServerProvider objectServerProvider) {
         this.objectServerProvider = objectServerProvider;
     }
     
