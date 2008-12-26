@@ -21,7 +21,6 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.matcher.Matchers;
 import com.wideplay.warp.persist.PersistenceService;
-import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.UnitOfWork;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeTest;
@@ -44,7 +43,6 @@ public class EntityManagerFactoryDuplicationAwareTest {
     public void pre() {
         injector = Guice.createInjector(PersistenceService.usingJpa()
             .across(UnitOfWork.TRANSACTION)
-            .transactedWith(TransactionStrategy.LOCAL)
             .forAll(Matchers.any())
             .buildModule(),
                 new AbstractModule() {

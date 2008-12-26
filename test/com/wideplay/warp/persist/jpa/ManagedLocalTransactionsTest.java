@@ -60,7 +60,6 @@ public class ManagedLocalTransactionsTest {
                 },
                 PersistenceService.usingJpa()
             .across(UnitOfWork.TRANSACTION)
-            .transactedWith(TransactionStrategy.LOCAL)
             .forAll(Matchers.any())
             .buildModule());
 

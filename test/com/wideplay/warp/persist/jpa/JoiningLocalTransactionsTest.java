@@ -50,7 +50,6 @@ public class JoiningLocalTransactionsTest {
     public void pre() {
         injector = Guice.createInjector(PersistenceService.usingJpa()
             .across(UnitOfWork.TRANSACTION)
-            .transactedWith(TransactionStrategy.LOCAL)
             .forAll(Matchers.any())
             .buildModule(),
                 new AbstractModule() {

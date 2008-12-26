@@ -27,17 +27,6 @@ import java.lang.reflect.Method;
  */
 public interface TransactionStrategyBuilder extends PersistenceModuleBuilder {
     /**
-     *
-     * @param transactionStrategy One of the enum {@code TransactionStrategy}.
-     *  See warp-persist website for details. By default {@code TransactionStrategy.LOCAL} is set.
-     * 
-     * @return Returns the next step in the builder chain
-     * @deprecated see {@link TransactionStrategy}
-     */
-    @Deprecated
-    TransactionStrategyBuilder transactedWith(TransactionStrategy transactionStrategy);
-
-    /**
      * This is a convenience method, and defaults to using the method matcher:
      * {@code Matchers.annotatedWith(Transactional.class)}.
      *

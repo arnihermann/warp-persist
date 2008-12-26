@@ -23,7 +23,6 @@ import com.google.inject.Injector;
 import com.google.inject.matcher.Matchers;
 import com.wideplay.codemonkey.web.startup.Initializer;
 import com.wideplay.warp.persist.PersistenceService;
-import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.Transactional;
 import com.wideplay.warp.persist.UnitOfWork;
 import org.hibernate.Session;
@@ -55,7 +54,6 @@ public class ManualLocalTransactionsTest {
     public void pre() {
         injector = Guice.createInjector(PersistenceService.usingHibernate()
             .across(UnitOfWork.REQUEST)
-            .transactedWith(TransactionStrategy.LOCAL)
             .forAll(Matchers.any())
             .buildModule(),
                 new AbstractModule() {

@@ -77,9 +77,6 @@ public abstract class AbstractPersistenceModule extends AbstractModule implement
             public UnitOfWork getUnitOfWork() {
                 return configuration.getUnitOfWork();
             }
-            public TransactionStrategy getTransactionStrategy() {
-                return configuration.getTransactionStrategy();
-            }
             public List<TransactionMatcher> getTransactionMatchers() {
                 throw new UnsupportedOperationException();
             }

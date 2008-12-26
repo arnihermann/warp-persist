@@ -55,7 +55,7 @@ public class EdslBuilderTest {
 
     @Test public void testHibernateConfig() {
         Injector injector = Guice.createInjector(PersistenceService.usingHibernate().across(UnitOfWork.TRANSACTION)
-                .transactedWith(TransactionStrategy.LOCAL).buildModule(),
+                .buildModule(),
                 new AbstractModule() {
                     protected void configure() {
                         bind(Configuration.class).toInstance(new AnnotationConfiguration().addAnnotatedClass(HibernateTestEntity.class)
@@ -76,7 +76,7 @@ public class EdslBuilderTest {
                                                         .annotatedWith(MyUnit.class).build();
         Module m = PersistenceService.using(jpa)
                                      .across(UnitOfWork.TRANSACTION)
-                                     .transactedWith(TransactionStrategy.LOCAL)
+
                                      .forAll(Matchers.any(), Matchers.annotatedWith(Transactional.class))
                                      .buildModule();
         
@@ -90,7 +90,7 @@ public class EdslBuilderTest {
                                                         .annotatedWith(MyUnit.class).build();
         Module m = PersistenceService.using(h)
                                      .across(UnitOfWork.TRANSACTION)
-                                     .transactedWith(TransactionStrategy.LOCAL)
+
                                      .forAll(Matchers.any(), Matchers.annotatedWith(Transactional.class))
                                      .buildModule();
 
@@ -104,7 +104,7 @@ public class EdslBuilderTest {
                                                         .annotatedWith(MyUnit.class).build();
         Module hibernateModule = PersistenceService.using(h)
                                      .across(UnitOfWork.TRANSACTION)
-                                     .transactedWith(TransactionStrategy.LOCAL)
+
                                      .forAll(Matchers.any(), Matchers.annotatedWith(Transactional.class))
                                      .buildModule();
 
@@ -114,7 +114,7 @@ public class EdslBuilderTest {
                                             .annotatedWith(MySecondUnit.class).build();
         Module jpaModule = PersistenceService.using(jpa)
                                      .across(UnitOfWork.TRANSACTION)
-                                     .transactedWith(TransactionStrategy.LOCAL)
+
                                      .forAll(Matchers.any(), Matchers.annotatedWith(Transactional.class))
                                      .buildModule();
 

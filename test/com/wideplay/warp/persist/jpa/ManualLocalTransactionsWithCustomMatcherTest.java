@@ -22,7 +22,6 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.matcher.Matchers;
 import com.wideplay.warp.persist.PersistenceService;
-import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.UnitOfWork;
 import com.wideplay.warp.persist.WorkManager;
 import org.testng.annotations.AfterClass;
@@ -52,7 +51,6 @@ public class ManualLocalTransactionsWithCustomMatcherTest {
     public void pre() {
         injector = Guice.createInjector(PersistenceService.usingJpa()
             .across(UnitOfWork.REQUEST)
-            .transactedWith(TransactionStrategy.LOCAL)
             .forAll(Matchers.subclassesOf(TransactionalObject.class), Matchers.any())
             .buildModule(),
                 new AbstractModule() {

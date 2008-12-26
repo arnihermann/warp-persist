@@ -63,7 +63,7 @@ public class ManagedLocalTransactionsAcrossRequestTest {
                 },
                 PersistenceService.usingJpa()
             .across(UnitOfWork.REQUEST)
-            .transactedWith(TransactionStrategy.LOCAL)
+
             .forAll(Matchers.any())
             .buildModule());
 

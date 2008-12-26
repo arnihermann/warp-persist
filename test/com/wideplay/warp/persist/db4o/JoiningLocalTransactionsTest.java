@@ -47,7 +47,7 @@ public class JoiningLocalTransactionsTest {
 	public void preClass() {
 		injector = Guice.createInjector(PersistenceService.usingDb4o()
 				.across(UnitOfWork.TRANSACTION)
-				.transactedWith(TransactionStrategy.LOCAL)
+
 				.buildModule(),
 
 				new AbstractModule() {

@@ -22,7 +22,6 @@ import com.wideplay.codemonkey.web.startup.InitializerWeb;
 import com.wideplay.warp.Warp;
 import com.wideplay.warp.WarpModule;
 import com.wideplay.warp.persist.PersistenceService;
-import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.UnitOfWork;
 import com.wideplay.warp.persist.db4o.Db4Objects;
 
@@ -39,7 +38,6 @@ public class Db4oCodeMonkeyModule implements WarpModule {
         warp.install(PersistenceService.usingDb4o()
 
                 .across(UnitOfWork.REQUEST)
-                .transactedWith(TransactionStrategy.LOCAL)
                 .forAll(Matchers.any())
 
                 .buildModule()

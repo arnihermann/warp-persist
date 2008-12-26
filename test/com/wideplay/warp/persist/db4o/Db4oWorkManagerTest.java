@@ -42,7 +42,7 @@ public class Db4oWorkManagerTest {
 	public void preClass() {
 		injector = Guice.createInjector(PersistenceService.usingDb4o()
 				.across(UnitOfWork.REQUEST)
-				.transactedWith(TransactionStrategy.LOCAL)
+
 				.buildModule(),
 
 				new AbstractModule() {

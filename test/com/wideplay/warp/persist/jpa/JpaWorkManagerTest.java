@@ -47,7 +47,6 @@ public class JpaWorkManagerTest {
     public void pre() {
         injector = Guice.createInjector(PersistenceService.usingJpa()
             .across(UnitOfWork.REQUEST)
-            .transactedWith(TransactionStrategy.LOCAL)
             .forAll(Matchers.any())
             .buildModule(),
                 new AbstractModule() {

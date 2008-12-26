@@ -23,7 +23,6 @@ import com.wideplay.codemonkey.web.startup.InitializerWeb;
 import com.wideplay.warp.Warp;
 import com.wideplay.warp.WarpModule;
 import com.wideplay.warp.persist.PersistenceService;
-import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.UnitOfWork;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
@@ -41,7 +40,6 @@ public class HibernateCodeMonkeyModule implements WarpModule {
         warp.install(PersistenceService.usingHibernate()
 
                 .across(UnitOfWork.REQUEST)
-                .transactedWith(TransactionStrategy.LOCAL)
                 .forAll(Matchers.any())
 
                 .buildModule()

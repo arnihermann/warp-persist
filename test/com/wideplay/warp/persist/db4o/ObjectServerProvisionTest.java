@@ -22,7 +22,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.wideplay.warp.persist.PersistenceService;
-import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.UnitOfWork;
 import com.wideplay.warp.persist.WorkManager;
 import org.testng.annotations.AfterClass;
@@ -42,7 +41,6 @@ public class ObjectServerProvisionTest {
 	public void preClass() {
 		injector = Guice.createInjector(PersistenceService.usingDb4o()
 				.across(UnitOfWork.TRANSACTION)
-				.transactedWith(TransactionStrategy.LOCAL)
 				.buildModule(),
 
 				new AbstractModule() {

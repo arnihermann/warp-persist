@@ -35,7 +35,6 @@ public class Defaults {
     private Defaults() {}
 
     public static final UnitOfWork UNIT_OF_WORK = UnitOfWork.TRANSACTION;
-    public static final TransactionStrategy TX_STRATEGY = TransactionStrategy.LOCAL;
     
     public static final Matcher<? super Class<?>> TX_CLASS_MATCHER = any();
     public static final Matcher<? super Method> TX_METHOD_MATCHER =

@@ -68,13 +68,6 @@ public class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, Pe
         return bindings;
     }
 
-    public TransactionStrategyBuilder transactedWith(TransactionStrategy transactionStrategy) {
-        persistenceConfiguration.transactionStrategy(transactionStrategy);
-
-        return this;
-    }
-
-
     public TransactionStrategyBuilder addAccessor(Class<?> daoInterface) {
         persistenceConfiguration.accessor(daoInterface);
 

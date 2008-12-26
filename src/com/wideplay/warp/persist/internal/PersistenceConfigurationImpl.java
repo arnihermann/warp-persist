@@ -23,7 +23,7 @@ import java.util.*;
 import com.wideplay.warp.persist.spi.PersistenceConfiguration;
 import com.wideplay.warp.persist.spi.TransactionMatcher;
 import com.wideplay.warp.persist.UnitOfWork;
-import com.wideplay.warp.persist.TransactionStrategy;
+import com.wideplay.warp.persist.Defaults;
 
 /**
  * Value object that indicates how a persistence service should be configured.
@@ -36,22 +36,17 @@ import com.wideplay.warp.persist.TransactionStrategy;
 @Immutable
 class PersistenceConfigurationImpl implements PersistenceConfiguration {
     private final UnitOfWork unitOfWork;
-    private final TransactionStrategy txStrategy;
     private final Set<Class<?>> accessors;
     private final List<TransactionMatcher> transactionMatchers;
 
     private PersistenceConfigurationImpl(PersistenceConfigurationBuilder builder) {
         this.unitOfWork = builder.unitOfWork;
-        this.txStrategy = builder.txStrategy;
         this.transactionMatchers = Collections.unmodifiableList(builder.transactionMatchers);
         this.accessors = Collections.unmodifiableSet(builder.accessors);
     }
 
     public UnitOfWork getUnitOfWork() {
         return this.unitOfWork;
-    }
-    public TransactionStrategy getTransactionStrategy() {
-        return this.txStrategy;
     }
     public Set<Class<?>> getDynamicAccessors() {
         return this.accessors;
@@ -66,18 +61,13 @@ class PersistenceConfigurationImpl implements PersistenceConfiguration {
 
     static class PersistenceConfigurationBuilder {
         // default values
-        private UnitOfWork unitOfWork = UnitOfWork.TRANSACTION;
-        private TransactionStrategy txStrategy = TransactionStrategy.LOCAL;
+        private UnitOfWork unitOfWork = Defaults.UNIT_OF_WORK;
         private List<TransactionMatcher> transactionMatchers = new ArrayList<TransactionMatcher>();
 
         private final Set<Class<?>> accessors = new LinkedHashSet<Class<?>>();
 
         public PersistenceConfigurationBuilder unitOfWork(UnitOfWork unitOfWork) {
             this.unitOfWork = unitOfWork;
-            return this;
-        }
-        public PersistenceConfigurationBuilder transactionStrategy(TransactionStrategy strategy) {
-            this.txStrategy = strategy;
             return this;
         }
         public PersistenceConfigurationBuilder transactionMatcher(TransactionMatcher txMatcher) {

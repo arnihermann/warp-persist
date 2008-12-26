@@ -179,7 +179,6 @@ public class SessionFilterTest {
     public final void testUseRealWorkManager() throws IOException, ServletException {
         final Injector injector = Guice.createInjector(PersistenceService.usingHibernate()
             .across(UnitOfWork.REQUEST)
-            .transactedWith(TransactionStrategy.LOCAL)
             .forAll(Matchers.any())
             .buildModule(),
                 new AbstractModule() {

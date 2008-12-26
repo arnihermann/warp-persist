@@ -16,7 +16,6 @@
 package com.wideplay.warp.persist.spi;
 
 import com.wideplay.warp.persist.UnitOfWork;
-import com.wideplay.warp.persist.TransactionStrategy;
 
 import java.util.List;
 import java.util.Set;
@@ -27,8 +26,6 @@ import java.util.Set;
  */
 public interface PersistenceConfiguration {
     UnitOfWork getUnitOfWork();
-
-    TransactionStrategy getTransactionStrategy();
 
     List<TransactionMatcher> getTransactionMatchers();
 

@@ -50,7 +50,7 @@ public class HibernateWorkManagerTest {
     public void pre() {
         injector = Guice.createInjector(PersistenceService.usingHibernate()
             .across(UnitOfWork.REQUEST)
-            .transactedWith(TransactionStrategy.LOCAL)
+
             .forAll(Matchers.any())
             .buildModule(),
                 new AbstractModule() {

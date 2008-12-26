@@ -26,7 +26,6 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.name.Names;
 import com.wideplay.warp.persist.PersistenceService;
-import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.Transactional;
 import com.wideplay.warp.persist.UnitOfWork;
 import org.testng.annotations.AfterClass;
@@ -45,7 +44,6 @@ public class ObjectContainerProvisionTest {
 	public void preClass() {
 		injector = Guice.createInjector(PersistenceService.usingDb4o()
 				.across(UnitOfWork.TRANSACTION)
-				.transactedWith(TransactionStrategy.LOCAL)
 				.buildModule(),
 
 				new AbstractModule() {

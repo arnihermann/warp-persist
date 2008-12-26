@@ -22,7 +22,6 @@ import com.google.inject.Injector;
 import com.google.inject.matcher.Matchers;
 import com.wideplay.codemonkey.web.startup.Initializer;
 import com.wideplay.warp.persist.PersistenceService;
-import com.wideplay.warp.persist.TransactionStrategy;
 import com.wideplay.warp.persist.UnitOfWork;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -50,7 +49,6 @@ public class SessionFactoryProvisionTest {
     public void pre() {
         injector = Guice.createInjector(PersistenceService.usingHibernate()
             .across(UnitOfWork.TRANSACTION)
-            .transactedWith(TransactionStrategy.LOCAL)
             .forAll(Matchers.any())
             .buildModule(),
                 new AbstractModule() {
