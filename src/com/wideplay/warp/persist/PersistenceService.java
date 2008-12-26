@@ -18,6 +18,7 @@ package com.wideplay.warp.persist;
 
 import com.wideplay.warp.persist.dao.Finder;
 import com.wideplay.warp.persist.PersistenceStrategy;
+import com.wideplay.warp.persist.spi.PersistenceModuleVisitor;
 import com.wideplay.warp.persist.internal.PersistenceFlavor;
 import com.wideplay.warp.persist.internal.PersistenceServiceBuilderImpl;
 
@@ -38,6 +39,14 @@ import java.lang.reflect.Method;
  * @since 1.0
  */
 public abstract class PersistenceService {
+    private static final PersistenceModuleVisitor persistenceModuleVisitor = new PersistenceModuleVisitor() {
+        public void publishWorkManager(WorkManager wm) {
+             PersistenceFilter.registerWorkManager(wm);
+        }
+        public void publishPersistenceService(PersistenceService persistenceService) {
+            PersistenceFilter.registerPersistenceService(persistenceService);
+        }
+    };
 
     /**
      * Starts the underlying persistence engine and makes warp-persist ready for use.
@@ -61,7 +70,7 @@ public abstract class PersistenceService {
      * @return Returns the next step in the configuration chain.
      */
     public static SessionStrategyBuilder usingHibernate() {
-        return new PersistenceServiceBuilderImpl(PersistenceFlavor.HIBERNATE);
+        return new PersistenceServiceBuilderImpl(PersistenceFlavor.HIBERNATE, persistenceModuleVisitor);
     }
 
 
@@ -73,7 +82,7 @@ public abstract class PersistenceService {
      * @return Returns the next step in the configuration chain.
      */
     public static SessionStrategyBuilder usingJpa() {
-        return new PersistenceServiceBuilderImpl(PersistenceFlavor.JPA);
+        return new PersistenceServiceBuilderImpl(PersistenceFlavor.JPA, persistenceModuleVisitor);
     }
 
     /**
@@ -84,7 +93,7 @@ public abstract class PersistenceService {
      * @return Returns the next step in the configuration chain.
      */
     public static SessionStrategyBuilder usingDb4o() {
-        return new PersistenceServiceBuilderImpl(PersistenceFlavor.DB4O);
+        return new PersistenceServiceBuilderImpl(PersistenceFlavor.DB4O, persistenceModuleVisitor);
     }
 
     /**
@@ -96,7 +105,7 @@ public abstract class PersistenceService {
      * @return the next step in the configuration chain
      */
     public static SessionStrategyBuilder using(PersistenceStrategy ps) {
-        return new PersistenceServiceBuilderImpl(ps);
+        return new PersistenceServiceBuilderImpl(ps, persistenceModuleVisitor);
     }
     
     /**

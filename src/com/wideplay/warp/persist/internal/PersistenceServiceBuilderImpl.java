@@ -40,12 +40,15 @@ import java.lang.reflect.Method;
 public class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, PersistenceModuleBuilder, TransactionStrategyBuilder {
     private final PersistenceConfigurationImpl.PersistenceConfigurationBuilder persistenceConfiguration = PersistenceConfigurationImpl.builder();
     private final HasPersistenceStrategy flavor;
+    private final PersistenceModuleVisitor persistenceModuleVisitor;
 
-    public PersistenceServiceBuilderImpl(PersistenceFlavor flavor) {
+    public PersistenceServiceBuilderImpl(PersistenceFlavor flavor, PersistenceModuleVisitor persistenceModuleVisitor) {
         this.flavor = flavor;
+        this.persistenceModuleVisitor = persistenceModuleVisitor;
     }
 
-    public PersistenceServiceBuilderImpl(final PersistenceStrategy persistenceStrategy) {
+    public PersistenceServiceBuilderImpl(final PersistenceStrategy persistenceStrategy, PersistenceModuleVisitor persistenceModuleVisitor) {
+        this.persistenceModuleVisitor = persistenceModuleVisitor;
         this.flavor = new HasPersistenceStrategy() {
             public PersistenceStrategy getPersistenceStrategy() {
                 return persistenceStrategy;
@@ -61,14 +64,7 @@ public class PersistenceServiceBuilderImpl implements SessionStrategyBuilder, Pe
 
     public Module buildModule() {
         PersistenceModule bindings = flavor.getPersistenceStrategy().getBindings(persistenceConfiguration.build());
-        bindings.visit(new PersistenceModuleVisitor() {
-            public void publishWorkManager(WorkManager wm) {
-                 PersistenceFilter.registerWorkManager(wm);
-            }
-            public void publishPersistenceService(PersistenceService persistenceService) {
-                PersistenceFilter.registerPersistenceService(persistenceService);
-            }
-        });
+        bindings.visit(persistenceModuleVisitor);
         return bindings;
     }
 
