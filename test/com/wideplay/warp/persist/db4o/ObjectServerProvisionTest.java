@@ -45,7 +45,7 @@ public class ObjectServerProvisionTest {
 
 				new AbstractModule() {
 					protected void configure() {	
-						bindConstant().annotatedWith(Db4Objects.class).to("TestDatabase.data");
+						bindConstant().annotatedWith(Db4Objects.class).to("target/TestDatabase.data");
 					}
 				}
 		);

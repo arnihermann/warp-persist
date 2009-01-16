@@ -48,7 +48,7 @@ public class ObjectContainerProvisionTest {
 
 				new AbstractModule() {
 					protected void configure() {
-						bindConstant().annotatedWith(Db4Objects.class).to("TestDatabase.data");
+						bindConstant().annotatedWith(Db4Objects.class).to("target/TestDatabase.data");
 						
 						bindConstant().annotatedWith(Names.named(Db4Objects.HOST)).to("localhost");
 						bindConstant().annotatedWith(Names.named(Db4Objects.PORT)).to(4321);
